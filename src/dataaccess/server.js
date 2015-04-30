@@ -70,18 +70,6 @@ export class ServerDataAccess{
         let file = new File(config.dataPath);
         file.write(JSON.stringify(data));
 
-        let mock = new File(config.mock);
-        try{
-            let size = mock.read();
-            if(size<=0){
-                this.logger.info(Strings.dataaccess.server.mock.fill);
-                mock.write(JSON.stringify(data));
-            }
-        } catch(e){
-            this.logger.info(Strings.dataaccess.server.mock.create);
-            mock.write(JSON.stringify(data));
-        }
-
     }
 
     /**

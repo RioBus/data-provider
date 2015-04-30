@@ -17,8 +17,7 @@ module.exports = {
             intervalTime: 15000,
             timeout: 20000,
             log: '/tmp/riobus/data-server.log',
-            dataPath: '/tmp/riobus/busData.json',
-            mock: '/tmp/riobus/mock.busData.json'
+            dataPath: '/tmp/riobus/busData.json'
         }
     }
 };
