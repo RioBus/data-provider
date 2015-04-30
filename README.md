@@ -1,5 +1,5 @@
-RioBus [![Build Status](https://travis-ci.org/RioBus/server.svg)](https://travis-ci.org/RioBus/server)
-======================================================================================================
+RioBus
+======
 
 O RioBus é um sistema colaborativo de monitoramento de ônibus em tempo real, que utiliza a API aberta de dados de
 mobilidade urbana fornecida pela parceria entre a Prefeitura do Rio de Janeiro e a FETRANSPOR.
@@ -9,8 +9,7 @@ Seu objetivo principal é ajudar o cidadão, seja ele morador ou visitante, do R
 Arquitetura
 -----------
 
-A aplicação do servidor do RioBus foi desenvolvida em ECMAscript 6, através do GULP e Node.js junto ao ExpressJS, que é
-uma solução bastante madura de framework para construir uma RESTful API.
+A aplicação do provedor de dados do RioBus foi desenvolvida em ECMAscript 6, através do GULP e Node.js.
 
 A organização da lógica da aplicação segue a metodologia de desenvolvimento do DDD (Domain-Driven Design), que deixa o
 código desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
@@ -38,19 +37,18 @@ Mac OS X:
 
 Faça o download do projeto em sua máquina:
 
-    $ git clone https://github.com/RioBus/server.git
+    $ git clone https://github.com/RioBus/data-provider.git
 
 Entre na raiz do projeto e instale as dependências do Node.js:
 
     $ npm install
 
-Todos os dados dos itinerários e das localizações dos ônibus são salvas em cache. O diretório até o arquivo deve existir
-para que seja possível criar os arquivos de cache e deve ser indicado em ```config.js```, em 
+Todos os dados dos ônibus são salvas em cache. O diretório até o arquivo deve ser indicado em ```config.js```, em 
 ```server.dataProvider.dataPath``` e em ```server.dataProvider.path.output```.
 
 Execute a aplicação:
 
-    $ npm start
+> $ npm start
 
 
 Comandos do NPM e Gulp
