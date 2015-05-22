@@ -1,9 +1,5 @@
 class Config{
 	
-	public static projectName:string = "Nodelicious";
-	
-	public static main:string = "index";
-	
 	public static log:any = {
 		runtime: "./runtime.log",
 		server: "./server.log"
@@ -20,9 +16,13 @@ class Config{
 		}
 	}
 	
-	public static resources:any = [
-		"resources/main"
-	]
+	public static isProduction(): Boolean{
+		return process.argv.indexOf("--production")>-1;
+	}
+
+	public static resources: Object = {
+		"resources/main": "/"
+	}
 }
 
 export = Config;

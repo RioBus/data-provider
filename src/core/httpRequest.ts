@@ -1,4 +1,4 @@
-/// <reference path="../../defs/node/node.d.ts" />
+/// <reference path="../../defs/tsd.d.ts" />
 /**
  * Creates a new synchronized HttpRequest
  *
@@ -7,7 +7,7 @@
  */
 class HttpRequest{
     
-    private driver:any;
+    private driver: any;
 
     public constructor(){
         "use strict";
@@ -20,9 +20,9 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public get(host, options=null): any{
+    public get(host: String, options?: any): any{
         "use strict";
-        return this.driver('GET',host, options);
+        return this.driver('GET', host, options);
     }
 
     /**
@@ -31,9 +31,9 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public post(host, options=null): any{
+    public post(host: String, options?: any): any{
         "use strict";
-        return this.driver('POST',host, options);
+        return this.driver('POST', host, options);
     }
 
     /**
@@ -42,9 +42,9 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public put(host, options=null): any{
+    public put(host: String, options?: any): any{
         "use strict";
-        return this.driver('PUT',host, options);
+        return this.driver('PUT', host, options);
     }
 
     /**
@@ -53,9 +53,9 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public delete(host, options=null): any{
+    public delete(host: String, options?: any): any{
         "use strict";
-        return this.driver('DELETE',host, options);
+        return this.driver('DELETE', host, options);
     }
 }
 
