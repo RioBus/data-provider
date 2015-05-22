@@ -1,18 +1,20 @@
-import {Utils} from './utils';
-import {File} from '../core/file';
-
+/// <reference path="../../defs/node/node.d.ts" />
+import File = require("../core/file");
 /**
  * Better logging interface
  *
  * @class Logger
  * @constructor
  */
-export class Logger{
+class Logger{
+	
+	private driver:any;
+	private flag:string;
+	private fileStream:File;
 
-    constructor(fileName, flag){
+    public constructor(fileName, flag){
         "use strict";
         this.driver = console;
-        this.filePath = fileName;
         this.flag = (flag)? flag:'RUNTIME';
         this.fileStream = new File(fileName);
     }
@@ -22,19 +24,19 @@ export class Logger{
      * @param message
      * @param level
      */
-    log(message, level){
+    private log(message, level): void{
         "use strict";
-        let time = Utils.getTimestamp();
-        let information = '['+time+']['+level+'] '+message;
+        var time = (new Date()).toLocaleString();
+        var information = '['+time+']['+level+'] '+message;
         this.driver.log(information);
-        this.fileStream.append(information+'\n');
+        this.fileStream.append(information);
     }
 
     /**
      * Information-level message
      * @param message
      */
-    info(message){
+    public info(message): void{
         "use strict";
         this.log(message, this.flag + ' - INFO');
     }
@@ -43,7 +45,7 @@ export class Logger{
      * Alert-level message
      * @param message
      */
-    alert(message){
+    public alert(message): void{
         "use strict";
         this.log(message, this.flag + ' - ALERT');
     }
@@ -52,8 +54,9 @@ export class Logger{
      * Error-level message
      * @param message
      */
-    error(message){
+    public error(message): void{
         "use strict";
         this.log(message, this.flag + ' - ERROR');
     }
 }
+export = Logger;

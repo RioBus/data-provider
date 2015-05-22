@@ -1,12 +1,15 @@
+/// <reference path="../../defs/node/node.d.ts" />
 /**
  * Creates a new synchronized HttpRequest
  *
  * @class HttpRequest
  * @constructor
  */
-export class HttpRequest{
+class HttpRequest{
+    
+    private driver:any;
 
-    constructor(){
+    public constructor(){
         "use strict";
         this.driver = require('sync-request');
     }
@@ -17,7 +20,7 @@ export class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    get(host, options=null){
+    public get(host, options=null): any{
         "use strict";
         return this.driver('GET',host, options);
     }
@@ -28,7 +31,7 @@ export class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    post(host, options=null){
+    public post(host, options=null): any{
         "use strict";
         return this.driver('POST',host, options);
     }
@@ -39,7 +42,7 @@ export class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    put(host, options=null){
+    public put(host, options=null): any{
         "use strict";
         return this.driver('PUT',host, options);
     }
@@ -50,8 +53,10 @@ export class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    delete(host, options=null){
+    public delete(host, options=null): any{
         "use strict";
         return this.driver('DELETE',host, options);
     }
 }
+
+export = HttpRequest;

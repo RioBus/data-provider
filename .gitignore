@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -28,3 +29,13 @@ node_modules
 
 .idea
 dist
+=======
+node_modules
+build
+dist
+.settings
+.idea
+*.log
+defs
+tmp
+>>>>>>> 5340d20d6a557b9e4d6e6d9ae94a795ab9fcad44
