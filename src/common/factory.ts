@@ -23,23 +23,13 @@ class Factory{
     }
 
     /**
-     * Gets a new Logger instance to log runtime messages
-     * @returns {Logger}
-     */
-    public static getRuntimeLogger(): Logger{
-        "use strict";
-        var runtimeLogPath: String = Config.log.runtime;
-        return Factory.getLogger(runtimeLogPath, 'RUNTIME');
-    }
-
-    /**
      * Gets a new Logger instance to log server messages
      * @returns {Logger}
      */
     public static getServerLogger(): Logger{
         "use strict";
         var serverLogPath: String = Config.log.server;
-        return Factory.getLogger(serverLogPath, 'SERVER');
+        return Factory.getLogger(serverLogPath, 'DATA PROVIDER');
     }
 }
 export = Factory;

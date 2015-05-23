@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-require('require-dir')('build/tasks');
-=======
 /* global __dirname */
 var gulp = require("gulp");
 var plugins = require('gulp-load-plugins')();
@@ -25,4 +22,3 @@ gulp.task("release", ["build"], task("release", paths));
 gulp.task("run", task("run", paths));
 gulp.task("run-release", task("run-release", paths));
 gulp.task("default", ["build"]);
->>>>>>> 5340d20d6a557b9e4d6e6d9ae94a795ab9fcad44

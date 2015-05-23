@@ -1,8 +1,9 @@
 /// <reference path="../defs/tsd.d.ts" />
-import Factory = require("./common/factory");
-import Logger = require("./common/logger");
-import Router = require("./core/router");
-import Config = require("./config");
+import Factory        = require("./common/factory");
+import Logger         = require("./common/logger");
+import Config   	  = require("./config");
+import ServiceFactory = require("./service/serviceFactory");
+import IService       = require("./service/iService");
 
 /**
  * Main application process.
@@ -20,17 +21,23 @@ class Application{
     public static main(argv: String[]): void{
         "use strict";
 
-        var logger: Logger = Factory.getRuntimeLogger();
+        var logger: Logger = Factory.getServerLogger();
         logger.info('Starting the server...');
-
-        // Configuring the RESTful router to handle HTTP requests
-        var router: Router = new Router();
-        router.registerResources(Config.resources); // Registering resources to handle the URLs
         
-        var environment: any = Config.isProduction()?
-         Config.environment.production : Config.environment.development;
-         
-        router.start(environment.ip, environment.port); // Starting RESTful application
+        var updateInterval = Config.environment.provider.updateInterval;
+        
+        var service: IService = ServiceFactory.getServerService();
+        service.handle();
+        Application.schedule(()=>{
+            service.handle();
+        }, updateInterval);
+    }
+    
+    public static schedule(callback: ()=>void, updateInterval: number): void{
+        setTimeout( ()=>{
+            callback();
+            Application.schedule(callback, updateInterval);
+        }, updateInterval);
     }
 }
 
