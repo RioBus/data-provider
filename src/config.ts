@@ -4,11 +4,11 @@ class Config{
 	public static log:any = {
 		runtime: "./runtime.log",
 		server: "./server.log"
-	};
+	}
 	
-	public static isProduction(): Boolean{
+	public static isProduction(): boolean{
 		return (process.argv.indexOf("--production")>-1);
-	};
+	}
 	
 	public static environment: any = {
 		provider: {
@@ -23,7 +23,7 @@ class Config{
             log: 			"/tmp/riobus/data-server.log",
             dataPath: 		"/tmp/riobus/busData.json"
 		}
-	};
+	}
 }
 
 export = Config;

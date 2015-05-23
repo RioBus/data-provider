@@ -46,11 +46,11 @@ class BusDataAccess implements IDataAccess {
         var dataList: any = {};
         var indexedList: any = {};
         var busCount: number = 0;
-        for (var d of data) {
+        for (var d in data) {
             // Converting external data do the application's pattern
             var bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
             if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
-            var lineExists = Object.keys(dataList).indexOf(bus.getLine().toString());
+            var lineExists = Object.keys(dataList).indexOf(bus.getLine());
 
             if (lineExists < 0) dataList[bus.getLine().toString()] = [];
 
