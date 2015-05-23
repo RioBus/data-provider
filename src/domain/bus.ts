@@ -14,6 +14,10 @@ class Bus{
 		return this.line;
 	}
 	
+	public setLine(line: String): void{
+		this.line = line;
+	}
+	
 	public getOrder(): String{
 		return this.order;
 	}

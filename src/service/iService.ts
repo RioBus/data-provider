@@ -1,4 +1,4 @@
 interface IService{
-	handle();
+	handle(...args);
 }
 export = IService;

@@ -3,6 +3,7 @@ import Logger         = require("./common/logger");
 import Config   	  = require("./config");
 import ServiceFactory = require("./service/serviceFactory");
 import IService       = require("./service/iService");
+import Strings        = require("./strings");
 
 /**
  * Main application process.
@@ -21,7 +22,7 @@ class Application{
         "use strict";
 
         var logger: Logger = Factory.getServerLogger();
-        logger.info('Starting the server...');
+        logger.info(Strings.provider.rest.start);
         
         var updateInterval = Config.environment.provider.updateInterval;
         

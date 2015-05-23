@@ -1,4 +1,4 @@
 interface IBusiness{
-	handle();
+	handle(...args);
 }
 export = IBusiness;
