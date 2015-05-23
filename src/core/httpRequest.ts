@@ -1,4 +1,4 @@
-/// <reference path="../../defs/tsd.d.ts" />
+/// <reference path="../../defs/node/node.d.ts" />
 /**
  * Creates a new synchronized HttpRequest
  *

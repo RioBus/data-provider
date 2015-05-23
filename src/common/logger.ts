@@ -1,4 +1,3 @@
-/// <reference path="../../defs/tsd.d.ts" />
 import File = require("../core/file");
 /**
  * Better logging interface

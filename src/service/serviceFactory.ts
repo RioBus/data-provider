@@ -3,7 +3,7 @@ import ServerService = require("./serverService");
 
 class ServiceFactory{
 	
-	public getServerService(): IService{
+	public static getServerService(): IService{
 		return new ServerService();
 	}
 }

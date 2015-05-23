@@ -1,4 +1,3 @@
-/// <reference path="../defs/tsd.d.ts" />
 import Factory        = require("./common/factory");
 import Logger         = require("./common/logger");
 import Config   	  = require("./config");

@@ -1,3 +1,4 @@
+/// <reference path="../defs/node/node.d.ts" />
 class Config{
 	
 	public static log:any = {
@@ -6,7 +7,7 @@ class Config{
 	};
 	
 	public static isProduction(): Boolean{
-		return process.argv.indexOf("--production")>-1;
+		return (process.argv.indexOf("--production")>-1);
 	};
 	
 	public static environment: any = {
