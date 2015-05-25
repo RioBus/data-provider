@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 RioBus
 ======
 
@@ -10,16 +9,16 @@ Seu objetivo principal é ajudar o cidadão, seja ele morador ou visitante, do R
 Arquitetura
 -----------
 
-A aplicação do provedor de dados do RioBus foi desenvolvida em ECMAscript 6, através do GULP e Node.js.
+A aplicação do provedor de dados do RioBus foi desenvolvida em TypeScript, através do GULP e Node.js.
 
 A organização da lógica da aplicação segue a metodologia de desenvolvimento do DDD (Domain-Driven Design), que deixa o
 código desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
 
 Além disso, foi preparada uma infra-estrutura graças ao poder do GULP, um dos automatizadores de tarefas mais utilizados
-atualmente por equipes de desenvolvimento de Javascript. Desta forma foi possível escrever um código limpo e sucinto que
+atualmente por equipes de desenvolvimento de JavaScript. Desta forma foi possível escrever um código limpo e sucinto que
 garante flexibilidade e modularidade.
 
-Além disso, o GULP compila o código do ECMAscript 6 em "Javascript comum" seguindo os padrões CommonJS, garantindo a
+Além disso, o GULP compila o código do TypeScript em "Javascript comum" seguindo os padrões CommonJS, garantindo a
 compatibilidade com a plataforma do Node.js.
 
 
@@ -29,27 +28,46 @@ Instalação
 Instale o Node.js
 
 Windows e Linux:
-
-    http://nodebr.com/instalando-node-js-atraves-do-gerenciador-de-pacotes/
+> http://nodebr.com/instalando-node-js-atraves-do-gerenciador-de-pacotes/
 
 Mac OS X:
-
-    https://nodejs.org/download/
+> https://nodejs.org/download/
 
 Faça o download do projeto em sua máquina:
-
-    $ git clone https://github.com/RioBus/data-provider.git
+> $ git clone https://github.com/RioBus/data-provider.git
 
 Entre na raiz do projeto e instale as dependências do Node.js:
-
-    $ npm install
+> $ npm install
 
 Todos os dados dos ônibus são salvas em cache. O diretório até o arquivo deve ser indicado em ```config.js```, em 
 ```server.dataProvider.dataPath``` e em ```server.dataProvider.path.output```.
 
-Execute a aplicação:
+Ainda na raiz do projeto, configure o ambiente
+> $ npm run configure
 
+Execute a aplicação:
 > $ npm start
+
+Comandos NPM
+------------
+
+npm run configure
+> Configura o ambiente para compilação
+
+npm run build
+> Compila o projeto para JavaScript e põe o código em compiled/build/
+
+npm run test
+> Invoca o Mocha e roda as rotinas de testes unitários configurados em test/
+
+npm run start
+> Compila e roda a aplicação
+
+npm run release
+> Compila e gera um código comprimido para distribuição
+
+npm run deploy
+> Compila, gera o código de distribuição e executa a aplicação final
 
 
 Comandos do NPM e Gulp
@@ -80,58 +98,4 @@ Comandos do NPM e Gulp
 Compatibilidade
 ---------------
 
-Esta aplicação é compatível com as seguintes versões do nodejs:
-
-* 0.12.x
-* 0.11.x
-=======
-NodeTS
-=======
-
-It's an little infrastructure to start a new node.js project using typescript. It is focused in API
-development providing an abstraction to ExpressJS.
-
-Installing
-----------
-
-It's necessary to have ```node.js``` installed.
-> https://nodejs.org/download/
-
-Download the code in your machine
-> $ git clone https://github.com/fmsouza/nodets.git
-
-Go to the project root and install dependencies
-> $ npm install
-
-Also in the root, configure the environment
-> $ npm run configure
-
-NPM commands
-------------
-
-npm run configure
-> Configures the environment for compiling
-
-npm run build
-> Compiles the project to Javascript and places the code in build/
-
-npm run test
-> Invokes Mocha and runs the acception test cases configured in test/
-
-npm run start
-> Compile and run the application
-
-npm run release
-> Compile and generates a compressed code for release
-
-npm run deploy
-> Compiles, generates the release code and runs the final application
-
-Compatibility
--------------
-
-Node.js versions
-* 0.12.x
-* 0.11.x
-* 0.10.x
->>>>>>> 5340d20d6a557b9e4d6e6d9ae94a795ab9fcad44
+* 0.10.x ou superior

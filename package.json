@@ -1,5 +1,5 @@
 {
-  "name": "riobus-data-provider",
+  "name": "data-provider",
   "version": "2.1.2",
   "description": "RioBus data-provider application",
   "main": "dist/index.js",
