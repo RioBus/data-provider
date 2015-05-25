@@ -20,7 +20,7 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public get(host: String, options?: any): any{
+    public get(host: string, options?: any): any{
         "use strict";
         return this.driver('GET', host, options);
     }
@@ -31,7 +31,7 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public post(host: String, options?: any): any{
+    public post(host: string, options?: any): any{
         "use strict";
         return this.driver('POST', host, options);
     }
@@ -42,7 +42,7 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public put(host: String, options?: any): any{
+    public put(host: string, options?: any): any{
         "use strict";
         return this.driver('PUT', host, options);
     }
@@ -53,7 +53,7 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public delete(host: String, options?: any): any{
+    public delete(host: string, options?: any): any{
         "use strict";
         return this.driver('DELETE', host, options);
     }

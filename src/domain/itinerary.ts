@@ -6,15 +6,15 @@
 class Itinerary{
 	
 	private sequential: number;
-	private line: String;
-	private description: String;
-	private agency: String;
+	private line: string;
+	private description: string;
+	private agency: string;
 	private shape: number;
 	private latitude: number;
 	private longitude: number;
 
-    public constructor(sequential: number, line: String, description: String, 
-				agency: String, shape: number, latitude: number, longitude: number){
+    public constructor(sequential: number, line: string, description: string, 
+				agency: string, shape: number, latitude: number, longitude: number){
         "use strict";
         this.sequential = sequential;
         this.line = line;
@@ -29,15 +29,15 @@ class Itinerary{
 		return this.sequential;
 	}
 	
-	public getLine(): String{
+	public getLine(): string{
 		return this.line;
 	}
 	
-	public getDescription(): String{
+	public getDescription(): string{
 		return this.description;
 	}
 	
-	public getAgency(): String{
+	public getAgency(): string{
 		return this.agency;
 	}
 	

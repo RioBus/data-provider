@@ -7,13 +7,13 @@
  */
 class File{
     
-    private file: String;
-    private directory: String;
+    private file: string;
+    private directory: string;
     private driver: any;
     private mkdirp: any;
 
-    public constructor(path: String){
-        var splittedPath: String[] = path.split('/');
+    public constructor(path: string){
+        var splittedPath: string[] = path.split('/');
         this.file = splittedPath.pop();
         this.directory = splittedPath.join('/');
         this.driver = require('fs');
@@ -24,7 +24,7 @@ class File{
      * Appends content to end of file
      * @param {String} content
      */
-    public append(content: String): void{
+    public append(content: string): void{
         var self = this;
         this.mkdirp(this.directory, (e1) => {
             if(e1) throw e1;
@@ -38,7 +38,7 @@ class File{
      * Writes the given content to a file. Ovewrites if it already has any content.
      * @param {*} content
      */
-    public write(content: String): void{
+    public write(content: string): void{
         var self = this;
         this.mkdirp(this.directory, (e1) => {
             if(e1) throw e1;
@@ -52,7 +52,7 @@ class File{
      * Reads the file content
      * @return string
      */
-    public read(): String[]{
+    public read(): string[]{
         return this.driver.readFileSync(this.directory + '/' + this.file, 'utf8');
     }
 }

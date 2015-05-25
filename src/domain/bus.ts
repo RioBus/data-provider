@@ -5,20 +5,20 @@
  */
 class Bus{
 
-    public constructor(private line: String, private order: String, private speed: number, 
+    public constructor(private line: string, private order: string, private speed: number, 
 				private direction: number, private latitude: number, 
 				private longitude: number, private timestamp: Date){
     }
 	
-	public getLine(): String{
+	public getLine(): string{
 		return this.line;
 	}
 	
-	public setLine(line: String): void{
+	public setLine(line: string): void{
 		this.line = line;
 	}
 	
-	public getOrder(): String{
+	public getOrder(): string{
 		return this.order;
 	}
 	

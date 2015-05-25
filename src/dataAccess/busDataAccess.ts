@@ -52,11 +52,11 @@ class BusDataAccess implements IDataAccess {
             if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
             var lineExists = Object.keys(dataList).indexOf(bus.getLine());
 
-            if (lineExists < 0) dataList[bus.getLine().toString()] = [];
+            if (lineExists < 0) dataList[bus.getLine()] = [];
 
-            var index = dataList[bus.getLine().toString()].length;
-            indexedList[bus.getOrder().toString()] = { line: bus.getLine().toString(), position: index };
-            dataList[bus.getLine().toString()].push(bus);
+            var index = dataList[bus.getLine()].length;
+            indexedList[bus.getOrder()] = { line: bus.getLine(), position: index };
+            dataList[bus.getLine()].push(bus);
             busCount++;
         }
 
@@ -65,9 +65,9 @@ class BusDataAccess implements IDataAccess {
 
     /**
      * Stores the given data to the local storage
-     * @param {String} data
+     * @param {string} data
      */
-    private storeBusData(data: String): void {
+    private storeBusData(data: string): void {
         "use strict";
         var config: any = Config.environment.provider;
         var obj: any = {
@@ -93,7 +93,7 @@ class BusDataAccess implements IDataAccess {
             },
             json: true
         };
-        var requestPath: String = 'http://' + config.host + config.path.bus;
+        var requestPath: string = 'http://' + config.host + config.path.bus;
         try {
             var response: any = http.get(requestPath, options);
             return this.respondRequest(response);

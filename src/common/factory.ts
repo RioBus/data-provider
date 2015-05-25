@@ -14,7 +14,7 @@ class Factory{
      * @param flag Log flag (default: RUNTIME)
      * @returns {Logger}
      */
-    public static getLogger(filePath?: String, flag?: String): Logger{
+    public static getLogger(filePath?: string, flag?: string): Logger{
         "use strict";
         if(!filePath) filePath = Config.log.runtime;
         if(!flag) flag = "";
@@ -27,7 +27,7 @@ class Factory{
      */
     public static getServerLogger(): Logger{
         "use strict";
-        var serverLogPath: String = Config.log.server;
+        var serverLogPath: string = Config.log.server;
         return Factory.getLogger(serverLogPath, 'DATA PROVIDER');
     }
 }
