@@ -15,7 +15,7 @@ class Itinerary{
 
     public constructor(sequential: number, line: string, description: string, 
 				agency: string, shape: number, latitude: number, longitude: number){
-        "use strict";
+					
         this.sequential = sequential;
         this.line = line;
         this.description = description;
