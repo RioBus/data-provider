@@ -35,13 +35,6 @@ class Application{
         }, updateInterval);
         
         Application.handleFatalError();
-        
-        var fs = require('fs');
-
-fs.readFile('somefile.txt', function (err, data) {
-  if (err) throw err;
-  console.log(data);
-});
     }
     
     public static schedule(callback: ()=>void, updateInterval: number): void{
