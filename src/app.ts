@@ -6,6 +6,7 @@ import IService       = require("./service/iService");
 import Strings        = require("./strings");
 import MailServer     = require("./core/mail/mailServer");
 import MailObject     = require("./core/mail/mailObject");
+import Utils          = require("./common/tools/utils");
 
 /**
  * Main application process.
@@ -52,7 +53,7 @@ class Application{
             mail.setFromAddress(msgConfig.from);
             mail.setToAddress(msgConfig.to);
             mail.setSubject(msgConfig.subject);
-            mail.setMessage(msgConfig.text + error);
+            mail.setMessage(Utils.replacePattern(/\$\$/, error, msgConfig.text));
             
             var mailServer: MailServer = new MailServer();
             mailServer.sendMail(mail, (error, message) =>{
@@ -60,7 +61,6 @@ class Application{
                 if(message) console.log(message);
                 process.exit(-1);
             });
-            
         });
     }
 }

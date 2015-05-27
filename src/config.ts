@@ -14,7 +14,7 @@ class Config{
 		from: "RioBus <error-report@riob.us>",
 		to: "",
 		subject: "[ERROR] Server down!",
-		text: ""
+		text: "An error ocurred in the data-provider service\n\n$$\n\nand it shut the server down."
 	}
 	
 	public static environment: any = {
