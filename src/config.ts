@@ -10,6 +10,13 @@ class Config{
 		return (process.argv.indexOf("--production")>-1);
 	}
 	
+	public static errorMailMessage: any = {
+		from: "RioBus <error-report@riob.us>",
+		to: "",
+		subject: "[ERROR] Server down!",
+		text: ""
+	}
+	
 	public static environment: any = {
 		provider: {
 			host: 			"dadosabertos.rio.rj.gov.br",
@@ -22,6 +29,12 @@ class Config{
             timeout: 		20000,
             log: 			"/tmp/riobus/data-server.log",
             dataPath: 		"/tmp/riobus/busData.json"
+		},
+		mailServer: {
+			user: "",
+			password: "",
+			host: "smtp.gmail.com",
+			ssl: true
 		}
 	}
 }

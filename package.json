@@ -32,10 +32,11 @@
   },
   "homepage": "http://github.com/RioBus/data-provider",
   "dependencies": {
-    "express": "^4.12.0",
     "compression": "^1.4.1",
-    "sync-request": "^2.0.1",
-    "mkdirp": "^0.5.0"
+    "emailjs": "^0.3.16",
+    "express": "^4.12.0",
+    "mkdirp": "^0.5.0",
+    "sync-request": "^2.0.1"
   },
   "devDependencies": {
     "gulp": "^3.8.11",
