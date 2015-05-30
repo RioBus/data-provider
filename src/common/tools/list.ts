@@ -1,4 +1,5 @@
 class List<T> {
+    
     private items: Array<T>;
 
     public constructor() {
@@ -17,7 +18,7 @@ class List<T> {
         return this.items[index];
     }
     
-    public getAsArray(): Array<T>{
+    public getIterable(): Array<T>{
         return this.items;
     }
 }

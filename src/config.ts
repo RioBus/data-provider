@@ -1,13 +1,9 @@
 /// <reference path="../defs/node/node.d.ts" />
-class Config{
-	
-	public static log:any = {
+class Config {
+
+	public static log: any = {
 		runtime: "./runtime.log",
 		server: "./server.log"
-	}
-	
-	public static isProduction(): boolean{
-		return (process.argv.indexOf("--production")>-1);
 	}
 	
 	public static errorMailMessage: any = {
@@ -15,6 +11,10 @@ class Config{
 		to: "",
 		subject: "[ERROR] Server down!",
 		text: "An error ocurred in the data-provider service\n\n$$\n\nand it shut the server down."
+	}
+
+	public static isProduction(): Boolean {
+		return process.argv.indexOf("--production") > -1;
 	}
 	
 	public static environment: any = {
@@ -35,6 +35,14 @@ class Config{
 			password: "",
 			host: "smtp.gmail.com",
 			ssl: true
+		},
+		development: {
+			ip: "127.0.0.1",
+			port: "8080"
+		},
+		production: {
+			ip: "0.0.0.0",
+			port: "80"
 		}
 	}
 }

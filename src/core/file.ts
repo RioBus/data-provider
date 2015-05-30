@@ -7,28 +7,40 @@
  */
 class File{
     
-    private file: string;
     private directory: string;
-    private driver: any;
-    private mkdirp: any;
+    private file: string;
+    private fs: any;
+    private fullPath: string;
 
     public constructor(path: string){
+        this.fullPath = path;
         var splittedPath: string[] = path.split('/');
         this.file = splittedPath.pop();
         this.directory = splittedPath.join('/');
-        this.driver = require('fs');
-        this.mkdirp = require('mkdirp');
+        this.fs = require("fs-extra");
+    }
+    
+    public getFilePath(): string{
+        return this.fullPath;
+    }
+    
+    public getDirPath(): string{
+        return this.directory;
+    }
+    
+    public getFileName(): string{
+        return this.file;
     }
 
     /**
      * Appends content to end of file
-     * @param {String} content
+     * @param {string} content
      */
     public append(content: string): void{
         var self = this;
-        this.mkdirp(this.directory, (e1) => {
+        this.fs.ensureFile(this.fullPath, (e1) => {
             if(e1) throw e1;
-            else self.driver.appendFile(self.directory + '/' + self.file, content+'\n', (e2) => {
+            else self.fs.appendFile(self.fullPath, content+'\n', (e2) => {
                 if(e2) throw e2;
             });
         });
@@ -39,12 +51,8 @@ class File{
      * @param {*} content
      */
     public write(content: string): void{
-        var self = this;
-        this.mkdirp(this.directory, (e1) => {
-            if(e1) throw e1;
-            else self.driver.writeFile(self.directory + '/' + self.file, content, (e2) => {
-                if(e2) throw e2;
-            });
+        this.fs.outputFile(this.fullPath, content, (e2) => {
+            if(e2) throw e2;
         });
     }
 
@@ -53,7 +61,7 @@ class File{
      * @return string
      */
     public read(): string[]{
-        return this.driver.readFileSync(this.directory + '/' + this.file, 'utf8');
+        return this.fs.readFileSync(this.fullPath, 'utf8');
     }
 }
 export = File;
