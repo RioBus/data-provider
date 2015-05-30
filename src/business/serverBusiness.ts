@@ -1,6 +1,8 @@
 import IBusiness = require("./iBusiness");
 import IDataAccess = require("../dataAccess/iDataAccess");
 import DataAccessFactory = require("../dataAccess/dataAccessFactory");
+import List = require("../common/tools/list");
+import Bus = require("../domain/bus");
 
 class ServerBusines implements IBusiness{
 	
@@ -11,10 +13,9 @@ class ServerBusines implements IBusiness{
 	}
 	
 	public handle(): void{
-		var data: any = this.dataAccess.handle();
-		if(!data.type){
+		var data: List<Bus> = this.dataAccess.handle();
+		if(data.size()>0)
 			this.dataAccess.handle(data);
-		}
 	}
 }
 export = ServerBusines;

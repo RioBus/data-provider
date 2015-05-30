@@ -7,7 +7,7 @@ class Bus{
 
     public constructor(private line: string, private order: string, private speed: number, 
 				private direction: number, private latitude: number, 
-				private longitude: number, private timestamp: Date){
+				private longitude: number, private timestamp: Date, private sense?: string){
     }
 	
 	public getLine(): string{
@@ -24,6 +24,14 @@ class Bus{
 	
 	public getSpeed(): number{
 		return this.speed;
+	}
+	
+	public getSense(): string{
+		return this.sense;
+	}
+	
+	public setSense(sense: string): void{
+		this.sense = sense;
 	}
 	
 	public getDirection(): number{

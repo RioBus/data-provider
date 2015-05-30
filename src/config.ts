@@ -37,12 +37,14 @@ class Config {
 			ssl: true
 		},
 		development: {
-			ip: "127.0.0.1",
-			port: "8080"
+			database: {
+				databaseName: "riobus"
+			}
 		},
 		production: {
-			ip: "0.0.0.0",
-			port: "80"
+			database: {
+				databaseName: "riobus"
+			}
 		}
 	}
 }

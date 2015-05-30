@@ -20,9 +20,10 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public get(host: string, options?: any): any{
+    public get(host: string, sync: boolean, callback?: (error: Error, response: any, body: string)=>void): any{
         "use strict";
-        return this.driver.get(host, options);
+        var prototype: any = this.driver.get;
+        return (sync)? prototype.sync(this, host) : prototype(host, callback);
     }
 
     /**
@@ -31,9 +32,10 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public post(host: string, data: any, callback?: (error: Error, response: any, body: string)=>void): any{
+    public post(host: string, data: any, sync: boolean, callback?: (error: Error, response: any, body: string)=>void): any{
         "use strict";
-        return this.driver.post({url: host, formData: data}, callback);
+        var prototype: any = this.driver.post;
+        return (sync)? prototype.sync(this, host, {url: host, formData: data}) : prototype({url: host, formData: data}, callback);
     }
 }
 

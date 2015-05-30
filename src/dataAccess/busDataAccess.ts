@@ -7,7 +7,8 @@ import File = require("../core/file");
 import Bus = require("../domain/bus");
 import BusList = require("../domain/busList");
 import Strings = require("../strings");
-
+import List = require("../common/tools/list");
+import DbContext = require("../core/database/dbContext");
 
 /**
  * DataAccess responsible for managing data access to the data stored in the
@@ -19,12 +20,15 @@ import Strings = require("../strings");
 class BusDataAccess implements IDataAccess {
 
     private logger: Logger;
+    private db: DbContext;
+    private collectionName: string = "bus";
 
     public constructor() {
         this.logger = Factory.getServerLogger();
+        this.db = new DbContext;
     }
 
-    public handle(data?: any): void {
+    public handle(data?: any): List<Bus> | void {
         if (!data) return this.getBusData();
         this.storeBusData(data);
     }
@@ -34,48 +38,44 @@ class BusDataAccess implements IDataAccess {
      * @returns {BusList}
      */
     private getBusData(): any {
+        var busList: List<Bus> = new List<Bus>();
+        
         var body: any = this.requestFromServer();
         if (body.type || !body.DATA) {
             this.logger.error(Strings.dataaccess.server.jsonError);
-            return body;
+            return busList;
         }
         var data = body.DATA;
         //let columns = body.COLUMNS;
         // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-
-        var dataList: any = {};
-        var indexedList: any = {};
-        var busCount: number = 0;
-        for (var d in data) {
+        
+        
+        data.forEach( (d) => {
             // Converting external data do the application's pattern
             var bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
             if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
-            var lineExists = Object.keys(dataList).indexOf(bus.getLine());
+            busList.add(bus);
+        });
 
-            if (lineExists < 0) dataList[bus.getLine()] = [];
-
-            var index = dataList[bus.getLine()].length;
-            indexedList[bus.getOrder()] = { line: bus.getLine(), position: index };
-            dataList[bus.getLine()].push(bus);
-            busCount++;
-        }
-
-        return new BusList(dataList, indexedList, busCount);
+        return busList;
     }
 
     /**
      * Stores the given data to the local storage
      * @param {string} data
      */
-    private storeBusData(data: string): void {
+    private storeBusData(data: List<Bus>): void {
         "use strict";
-        var config: any = Config.environment.provider;
-        var obj: any = {
-            data: data,
-            timestamp: (new Date).toLocaleString()
-        };
-        var file: File = new File(config.dataPath);
-        file.write(JSON.stringify(obj));
+        var colBus = this.db.collection(this.collectionName);
+        data.getIterable().forEach( (bus)=>{
+            var doc = colBus.document(this.collectionName+"/"+bus.getOrder());
+            if(!doc){
+                this.logger.info("Creating document: "+this.collectionName+"/"+bus.getOrder());
+                doc = colBus.save({ _key: bus.getOrder(), line: bus.getLine() });
+            } else if(bus.getLine()!==Strings.dataaccess.bus.blankLine && doc.line!==bus.getLine()){
+                colBus.update(doc, { line: bus.getLine() });
+            }
+        }, this);
     }
 
     /**
@@ -86,17 +86,18 @@ class BusDataAccess implements IDataAccess {
         "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
+        
         var options: any = {
+            url: 'http://' + config.host + config.path.bus,
             headers: {
                 'Accept': '*/*',
                 'Cache-Control': 'no-cache'
             },
             json: true
         };
-        var requestPath: string = 'http://' + config.host + config.path.bus;
         try {
-            var response: any = http.get(requestPath, options);
-            return this.respondRequest(response);
+            var response: any = http.get(options, true);
+            return this.respondRequest(response[0]);
         } catch (e) {
             this.logger.error(e);
             e.type = Strings.keyword.error;
@@ -114,7 +115,7 @@ class BusDataAccess implements IDataAccess {
         switch (response.statusCode) {
             case 200:
                 this.logger.info(Strings.dataaccess.all.request.ok);
-                return JSON.parse(response.getBody());
+                return response.body;
             case 302:
                 this.logger.alert(Strings.dataaccess.all.request.e302);
                 return { type: Strings.keyword.error, code: response.statusCode };

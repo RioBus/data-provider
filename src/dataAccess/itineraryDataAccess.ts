@@ -58,7 +58,7 @@ class ItineraryDataAccess implements IDataAccess{
     public storeData(filePath: string, data: List<Itinerary>): void{
         try{
             var file = new File(filePath);
-            file.write(JSON.stringify(data.getAsArray()));
+            file.write(JSON.stringify(data.getIterable()));
             this.logger.info(Strings.dataaccess.itinerary.stored);
         } catch(e){
             this.logger.error(e);
@@ -75,16 +75,10 @@ class ItineraryDataAccess implements IDataAccess{
         "use strict";
         var config = Config.environment.provider;
         var http = new HttpRequest();
-        var options = {
-            headers: {
-                'Accept': '*/*',
-                'Cache-Control': 'no-cache'
-            },
-            json: false
-        };
         var requestPath = 'http://' + config.host + config.path.itinerary.replace("$$", line);
         this.logger.info(Strings.dataaccess.itinerary.searching+requestPath);
-        var response = http.get(requestPath, options);
+        var response = http.get(requestPath, true);
+        console.log(response);
         return this.respondRequest(response);
     }
 
