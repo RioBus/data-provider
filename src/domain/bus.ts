@@ -1,9 +1,10 @@
+import IGeolocated = require("./iGeolocated");
 /**
  * Describes a bus instance
  * @class Bus
  * @constructor
  */
-class Bus{
+class Bus implements IGeolocated{
 
     public constructor(private line: string, private order: string, private speed: number, 
 				private direction: number, private latitude: number, 

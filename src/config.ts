@@ -38,11 +38,13 @@ class Config {
 		},
 		development: {
 			database: {
+				url: "http://localhost:8529",
 				databaseName: "riobus"
 			}
 		},
 		production: {
 			database: {
+				url: "http://localhost:8529",
 				databaseName: "riobus"
 			}
 		}

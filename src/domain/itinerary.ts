@@ -1,9 +1,10 @@
+import IGeolocated = require("./iGeolocated");
 /**
  * Describes one spot of the Itinerary of a given line
  * @class Itinerary
  * @constructor
  */
-class Itinerary{
+class Itinerary implements IGeolocated{
 	
 	private sequential: number;
 	private line: string;

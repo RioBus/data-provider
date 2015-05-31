@@ -6,6 +6,7 @@ import Factory              = require("../common/factory");
 import File                 = require("../core/file");
 import HttpRequest          = require("../core/httpRequest");
 import IDataAccess          = require("./iDataAccess");
+import Itinerary            = require("../domain/itinerary");
 import ItineraryDataAccess  = require("./itineraryDataAccess");
 import List                 = require("../common/tools/list");
 import Logger               = require("../common/logger");
@@ -24,10 +25,12 @@ class BusDataAccess implements IDataAccess {
     private db: DbContext;
     private collectionName: string = "bus";
     private subCollectionName: string = "bus_history";
+    private ida: IDataAccess;
 
     public constructor() {
         this.logger = Factory.getServerLogger();
         this.db = new DbContext;
+        this.ida = new ItineraryDataAccess();
     }
 
     public handle(data?: any): List<Bus> | void {
@@ -54,7 +57,10 @@ class BusDataAccess implements IDataAccess {
             
             data.forEach((d) => {
                 // Converting external data do the application's pattern
-                var bus: Bus = this.completeFields(new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]));
+                var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
+                if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
+                var itinerary: Itinerary = this.ida.handle(bus, 1);
+                bus.setSense(itinerary.getDescription());
                 busList.add(bus);
             });
         } catch (e) {
@@ -62,12 +68,6 @@ class BusDataAccess implements IDataAccess {
         }
 
         return busList;
-    }
-    
-    private completeFields(bus: Bus): Bus{
-        if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
-        
-        return bus;
     }
 
     /**

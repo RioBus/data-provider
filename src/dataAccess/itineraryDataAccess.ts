@@ -1,6 +1,7 @@
 import Config      = require("../config");
 import Factory     = require("../common/factory");
 import File        = require("../core/file");
+import IGeolocated = require("../domain/iGeolocated");
 import HttpRequest = require("../core/httpRequest");
 import IDataAccess = require("./iDataAccess");
 import Itinerary   = require("../domain/itinerary");
@@ -27,8 +28,11 @@ class ItineraryDataAccess implements IDataAccess{
         this.db = new DbContext;
     }
     
-    public handle(line: string): List<Itinerary>{
-        return this.getItinerary(line);
+    public handle(data: any, limit?: number): List<Itinerary> | Itinerary{
+        if(limit!==undefined){
+            return this.getNearest(data, limit);
+        }
+        return this.getItinerary(data);
     }
 
     /**
@@ -46,6 +50,18 @@ class ItineraryDataAccess implements IDataAccess{
             var itineraries: List<Itinerary> = this.requestFromServer(line);
             this.storeData(itineraries);
             return itineraries;
+        }
+    }
+    
+    public getNearest(obj: IGeolocated, options: any): Itinerary{
+        var itineraryCollection: any = this.db.collection(this.collectionName);
+        var itinerary: Itinerary = null;
+        try{
+            var item: any = itineraryCollection.near(obj.getLatitude(), obj.getLongitude(), options);
+            itinerary = new Itinerary(item.sequential, item._key, item.description, 
+                                item.agency, item.shape, item.latitude, item.longitude);
+        } finally {
+            return itinerary;
         }
     }
     
@@ -77,6 +93,7 @@ class ItineraryDataAccess implements IDataAccess{
                 sequential: itinerary.getSequential()
             });
         }, this);
+        itineraryCollection.createGeoIndex(["latitude", "longitude"]);
         this.logger.info(Strings.dataaccess.itinerary.stored);
     }
 
