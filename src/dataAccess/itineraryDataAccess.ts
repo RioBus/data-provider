@@ -7,6 +7,7 @@ import Itinerary   = require("../domain/itinerary");
 import List        = require("../common/tools/list");
 import Logger      = require("../common/logger");
 import Strings     = require("../strings");
+import DbContext   = require("../core/database/dbContext");
 
 /**
  * DataAccess referred to Itinerary stored data
@@ -18,16 +19,16 @@ import Strings     = require("../strings");
 class ItineraryDataAccess implements IDataAccess{
     
     private logger: Logger;
+    private db: DbContext;
+    private collectionName: string = "itinerary";
 
     public constructor(){
         this.logger = Factory.getLogger();
+        this.db = new DbContext;
     }
     
-    public handle(data: any): any{
-        if(!(data instanceof List)){
-            return this.getItinerary(data);
-        }
-        this.storeData.apply(data);
+    public handle(line: string): List<Itinerary>{
+        return this.getItinerary(line);
     }
 
     /**
@@ -36,17 +37,25 @@ class ItineraryDataAccess implements IDataAccess{
      * @return List<Itinerary>
      */
     public getItinerary(line: string): List<Itinerary>{
-        var filePath = Config.environment.provider.path.output + '/'+ line;
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
-
+        var itineraryCollection: any = this.db.collection(this.collectionName);
         try{
-            var file = new File(filePath);
-            return JSON.parse(file.read().toString());
+            var list: Array<any> = itineraryCollection.byExample({ _key: line });
+            return this.prepareList(list);
         } catch(e){
-            var data = this.requestFromServer(line);
-            this.storeData(filePath, data);
-            return data;
+            var itineraries: List<Itinerary> = this.requestFromServer(line);
+            this.storeData(itineraries);
+            return itineraries;
         }
+    }
+    
+    private prepareList(list: Array<any>): List<Itinerary>{
+        var itineraries: List<Itinerary> = new List<Itinerary>();
+        list.forEach((item)=>{
+            itineraries.add(new Itinerary(item.sequential, item._key, item.description, 
+                    item.agency, item.shape, item.latitude, item.longitude));
+        }, this);
+        return itineraries;
     }
 
     /**
@@ -55,15 +64,20 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {Array} data Itinerary list to be saved
      * @return List<Itinerary>
      * */
-    public storeData(filePath: string, data: List<Itinerary>): void{
-        try{
-            var file = new File(filePath);
-            file.write(JSON.stringify(data.getIterable()));
-            this.logger.info(Strings.dataaccess.itinerary.stored);
-        } catch(e){
-            this.logger.error(e);
-            throw e;
-        }
+    public storeData(itineraries: List<Itinerary>): void{
+        var itineraryCollection: any = this.db.collection(this.collectionName);
+        itineraries.getIterable().forEach((itinerary)=>{
+            itineraryCollection.save({
+                _key: itinerary.getLine(),
+                latitude: itinerary.getLatitude(),
+                tongitude: itinerary.getLongitude(),
+                description: itinerary.getDescription(),
+                agency: itinerary.getAgency(),
+                shape: itinerary.getShape(),
+                sequential: itinerary.getSequential()
+            });
+        }, this);
+        this.logger.info(Strings.dataaccess.itinerary.stored);
     }
 
     /**
@@ -71,15 +85,27 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {String} line
      * @return List<Itinerary>
      */
-    private requestFromServer(line: string): List<Itinerary>{
+    private requestFromServer(line: string): List<Itinerary> {
         "use strict";
-        var config = Config.environment.provider;
-        var http = new HttpRequest();
-        var requestPath = 'http://' + config.host + config.path.itinerary.replace("$$", line);
-        this.logger.info(Strings.dataaccess.itinerary.searching+requestPath);
-        var response = http.get(requestPath, true);
-        console.log(response);
-        return this.respondRequest(response);
+        var config: any = Config.environment.provider;
+        var http: HttpRequest = new HttpRequest();
+
+        var options: any = {
+            url: 'http://' + config.host + config.path.itinerary.replace("$$", line),
+            headers: {
+                'Accept': '*/*',
+                'Cache-Control': 'no-cache'
+            },
+            json: true
+        };
+        try {
+            var response: any = http.get(options, true);
+            return this.respondRequest(response[0]);
+        } catch (e) {
+            this.logger.error(e);
+            e.type = Strings.keyword.error;
+            return e;
+        }
     }
 
     /**
@@ -87,12 +113,12 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {*} response
      * @return List<Itinerary>
      * */
-    private respondRequest(response): List<Itinerary>{
+    private respondRequest(response: any): List<Itinerary>{
         "use strict";
         var result = new List<Itinerary>();
         switch(response.statusCode){ // Verifying response statusCode
             case 200:
-                var body = response.getBody().toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
+                var body = response.body.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
                 body.shift(); // Removes the CSV header line with column names
                 var returning;
                 for(var it in body){

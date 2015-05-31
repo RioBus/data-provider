@@ -1,14 +1,15 @@
-import IDataAccess = require("./iDataAccess");
-import Factory = require("../common/factory");
-import Logger = require("../common/logger");
-import Config = require("../config");
-import HttpRequest = require("../core/httpRequest");
-import File = require("../core/file");
-import Bus = require("../domain/bus");
-import BusList = require("../domain/busList");
-import Strings = require("../strings");
-import List = require("../common/tools/list");
-import DbContext = require("../core/database/dbContext");
+import Bus                  = require("../domain/bus");
+import BusList              = require("../domain/busList");
+import Config               = require("../config");
+import DbContext            = require("../core/database/dbContext");
+import Factory              = require("../common/factory");
+import File                 = require("../core/file");
+import HttpRequest          = require("../core/httpRequest");
+import IDataAccess          = require("./iDataAccess");
+import ItineraryDataAccess  = require("./itineraryDataAccess");
+import List                 = require("../common/tools/list");
+import Logger               = require("../common/logger");
+import Strings              = require("../strings");
 
 /**
  * DataAccess responsible for managing data access to the data stored in the
@@ -22,6 +23,7 @@ class BusDataAccess implements IDataAccess {
     private logger: Logger;
     private db: DbContext;
     private collectionName: string = "bus";
+    private subCollectionName: string = "bus_history";
 
     public constructor() {
         this.logger = Factory.getServerLogger();
@@ -39,25 +41,33 @@ class BusDataAccess implements IDataAccess {
      */
     private getBusData(): any {
         var busList: List<Bus> = new List<Bus>();
-        
-        var body: any = this.requestFromServer();
-        if (body.type || !body.DATA) {
-            this.logger.error(Strings.dataaccess.server.jsonError);
-            return busList;
+
+        try {
+            var body: any = this.requestFromServer();
+            if (!body.DATA) {
+                this.logger.error(Strings.dataaccess.server.jsonError);
+                return busList;
+            }
+            var data = body.DATA;
+            //let columns = body.COLUMNS;
+            // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
+            
+            data.forEach((d) => {
+                // Converting external data do the application's pattern
+                var bus: Bus = this.completeFields(new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]));
+                busList.add(bus);
+            });
+        } catch (e) {
+            this.logger.error(e);
         }
-        var data = body.DATA;
-        //let columns = body.COLUMNS;
-        // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-        
-        
-        data.forEach( (d) => {
-            // Converting external data do the application's pattern
-            var bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
-            if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
-            busList.add(bus);
-        });
 
         return busList;
+    }
+    
+    private completeFields(bus: Bus): Bus{
+        if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
+        
+        return bus;
     }
 
     /**
@@ -67,13 +77,29 @@ class BusDataAccess implements IDataAccess {
     private storeBusData(data: List<Bus>): void {
         "use strict";
         var colBus = this.db.collection(this.collectionName);
-        data.getIterable().forEach( (bus)=>{
-            var doc = colBus.document(this.collectionName+"/"+bus.getOrder());
-            if(!doc){
-                this.logger.info("Creating document: "+this.collectionName+"/"+bus.getOrder());
-                doc = colBus.save({ _key: bus.getOrder(), line: bus.getLine() });
-            } else if(bus.getLine()!==Strings.dataaccess.bus.blankLine && doc.line!==bus.getLine()){
-                colBus.update(doc, { line: bus.getLine() });
+        var colHistory = this.db.collection(this.subCollectionName);
+        data.getIterable().forEach( (bus) => {
+            try {
+                var doc = colBus.document.sync(colBus, bus.getOrder());
+                if (bus.getLine() !== Strings.dataaccess.bus.blankLine && doc.line !== bus.getLine()) {
+                    this.logger.info(Strings.dataaccess.bus.updating + this.collectionName + "/" + bus.getOrder());
+                    colBus.update(doc, { line: bus.getLine() });
+                }
+            } catch (e) {
+                if (e.code === Strings.error.notFound) {
+                    this.logger.info(Strings.dataaccess.bus.creating + this.collectionName + "/" + bus.getOrder());
+                    colBus.save({ _key: bus.getOrder(), line: bus.getLine() });
+                } else this.logger.error(e.stack);
+            } finally {
+                colHistory.save({
+                    order: bus.getOrder(),
+                    updateTime: bus.getUpdateTime(),
+                    speed: bus.getSpeed(),
+                    direction: bus.getDirection(),
+                    latitude: bus.getLatitude(),
+                    longitude: bus.getLongitude(),
+                    sense: bus.getSense()
+                });
             }
         }, this);
     }
@@ -86,7 +112,7 @@ class BusDataAccess implements IDataAccess {
         "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
-        
+
         var options: any = {
             url: 'http://' + config.host + config.path.bus,
             headers: {

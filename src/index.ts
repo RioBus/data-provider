@@ -5,6 +5,6 @@ require("sync")(()=>{
 	try{
 		Application.main(process.argv);
 	} catch(e){
-		console.log(e);
+		console.log("Fatal: "+e);
 	}
 });

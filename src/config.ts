@@ -25,7 +25,7 @@ class Config {
                 itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv",
                 output: 	"/tmp/riobus/itinerary"
             },
-			updateInterval:	15000,
+			updateInterval:	5000,
             timeout: 		20000,
             log: 			"/tmp/riobus/data-server.log",
             dataPath: 		"/tmp/riobus/busData.json"
