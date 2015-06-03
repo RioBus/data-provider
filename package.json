@@ -32,6 +32,7 @@
   },
   "homepage": "http://github.com/RioBus/data-provider",
   "dependencies": {
+    "arangojs": "^3.8.1",
     "compression": "^1.4.1",
     "emailjs": "^0.3.16",
     "express": "^4.12.0",

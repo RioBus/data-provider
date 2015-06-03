@@ -34,40 +34,8 @@ class BusDataAccess implements IDataAccess {
     }
 
     public handle(data?: any): List<Bus> | void {
-        if (!data) return this.getBusData();
+        if (data === undefined) return this.requestFromServer();
         this.storeBusData(data);
-    }
-
-    /**
-     * Retrieves all data from the external storage
-     * @returns {BusList}
-     */
-    private getBusData(): any {
-        var busList: List<Bus> = new List<Bus>();
-
-        try {
-            var body: any = this.requestFromServer();
-            if (!body.DATA) {
-                this.logger.error(Strings.dataaccess.server.jsonError);
-                return busList;
-            }
-            var data = body.DATA;
-            //let columns = body.COLUMNS;
-            // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-            
-            data.forEach((d) => {
-                // Converting external data do the application's pattern
-                var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
-                if (bus.getLine() === "") bus.setLine(Strings.dataaccess.bus.blankLine);
-                var itinerary: Itinerary = this.ida.handle(bus, 1);
-                bus.setSense(itinerary.getDescription());
-                busList.add(bus);
-            });
-        } catch (e) {
-            this.logger.error(e);
-        }
-
-        return busList;
     }
 
     /**
@@ -82,7 +50,7 @@ class BusDataAccess implements IDataAccess {
             try {
                 var doc = colBus.document.sync(colBus, bus.getOrder());
                 if (bus.getLine() !== Strings.dataaccess.bus.blankLine && doc.line !== bus.getLine()) {
-                    this.logger.info(Strings.dataaccess.bus.updating + this.collectionName + "/" + bus.getOrder());
+                    this.logger.info(Strings.dataaccess.bus.updating + this.collectionName + "/" + bus.getOrder() + " " + doc.line + "->" + bus.getLine());
                     colBus.update(doc, { line: bus.getLine() });
                 }
             } catch (e) {
@@ -108,7 +76,7 @@ class BusDataAccess implements IDataAccess {
      * Does the request to the external server and retrieves the data
      * @returns {any}
      */
-    private requestFromServer(): Object {
+    private requestFromServer(): List<Bus> {
         "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
@@ -125,7 +93,7 @@ class BusDataAccess implements IDataAccess {
             var response: any = http.get(options, true);
             return this.respondRequest(response[0]);
         } catch (e) {
-            this.logger.error(e);
+            this.logger.error(e.stack);
             e.type = Strings.keyword.error;
             return e;
         }
@@ -136,24 +104,50 @@ class BusDataAccess implements IDataAccess {
      * @param {any} response
      * @returns {any}
      */
-    private respondRequest(response: any): Object {
+    private respondRequest(response: any): List<Bus> {
         "use strict";
+        var busList: List<Bus> = new List<Bus>();
         switch (response.statusCode) {
             case 200:
                 this.logger.info(Strings.dataaccess.all.request.ok);
-                return response.body;
+                try {
+                    var body: any = response.body;
+                    if (!body.DATA) {
+                        this.logger.error(Strings.dataaccess.server.jsonError);
+                        return busList;
+                    }
+                    var data = body.DATA;
+                    //let columns = body.COLUMNS;
+                    // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
+                    
+                    data.forEach( (d) => {
+                        var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
+                        if (bus.getLine() === ""){
+                            bus.setLine(Strings.dataaccess.bus.blankLine);
+                            bus.setSense(Strings.dataaccess.bus.blankSense);
+                        } else {
+                            var itinerary: Itinerary = this.ida.handle(bus);
+                            bus.setSense(itinerary.getDescription());
+                        }
+                        busList.add(bus);
+                        this.logger.info(bus.getOrder()+" added.");
+                    }, this);
+                } catch (e) {
+                    this.logger.error(e.stack);
+                }
+                return busList;
             case 302:
                 this.logger.alert(Strings.dataaccess.all.request.e302);
-                return { type: Strings.keyword.error, code: response.statusCode };
+                return busList;
             case 404:
                 this.logger.alert(Strings.dataaccess.all.request.e404);
-                return { type: Strings.keyword.error, code: response.statusCode };
+                return busList;
             case 503:
                 this.logger.alert(Strings.dataaccess.all.request.e503);
-                return { type: Strings.keyword.error, code: response.statusCode };
+                return busList;
             default:
                 this.logger.error('(' + response.statusCode + ') ' + Strings.dataaccess.all.request.default);
-                return { type: Strings.keyword.error, code: response.statusCode };
+                return busList;
         }
     }
 }

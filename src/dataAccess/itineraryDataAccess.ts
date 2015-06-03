@@ -28,11 +28,11 @@ class ItineraryDataAccess implements IDataAccess{
         this.db = new DbContext;
     }
     
-    public handle(data: any, limit?: number): List<Itinerary> | Itinerary{
-        if(limit!==undefined){
-            return this.getNearest(data, limit);
+    public handle(data: any): List<Itinerary> | Itinerary{
+        if(data.constructor === String){
+            return this.getItinerary(data);
         }
-        return this.getItinerary(data);
+        return this.getNearest(data);
     }
 
     /**
@@ -43,32 +43,40 @@ class ItineraryDataAccess implements IDataAccess{
     public getItinerary(line: string): List<Itinerary>{
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
         var itineraryCollection: any = this.db.collection(this.collectionName);
-        try{
-            var list: Array<any> = itineraryCollection.byExample({ _key: line });
+        itineraryCollection.createFulltextIndex.sync(itineraryCollection, "line");
+        var cursor: any = itineraryCollection.fulltext.sync(itineraryCollection, "line", line);
+        var list: Array<any> = cursor.all.sync(cursor);
+        if(list.length>0){
             return this.prepareList(list);
-        } catch(e){
+        } else {
             var itineraries: List<Itinerary> = this.requestFromServer(line);
             this.storeData(itineraries);
             return itineraries;
         }
     }
     
-    public getNearest(obj: IGeolocated, options: any): Itinerary{
-        var itineraryCollection: any = this.db.collection(this.collectionName);
-        var itinerary: Itinerary = null;
-        try{
-            var item: any = itineraryCollection.near(obj.getLatitude(), obj.getLongitude(), options);
-            itinerary = new Itinerary(item.sequential, item._key, item.description, 
-                                item.agency, item.shape, item.latitude, item.longitude);
-        } finally {
-            return itinerary;
-        }
+    public getNearest(obj: IGeolocated): Itinerary{
+        var itineraries: List<Itinerary> = this.getItinerary(obj.getLine());
+        var nearest: Itinerary = new Itinerary(0, obj.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
+        var factor: number = Math.pow(10,5);
+        var nearestNormal: number = 99 * factor;
+        
+        itineraries.getIterable().forEach( (current)=>{
+            var currentLongitude: number = current.getLongitude() * factor;
+            var currentLatitude: number = current.getLatitude() * factor;
+            var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
+            if(nearestNormal > currentNormal){
+                nearestNormal = currentNormal;
+                nearest = current;
+            }
+        }, this);
+        return nearest;
     }
     
     private prepareList(list: Array<any>): List<Itinerary>{
         var itineraries: List<Itinerary> = new List<Itinerary>();
         list.forEach((item)=>{
-            itineraries.add(new Itinerary(item.sequential, item._key, item.description, 
+            itineraries.add(new Itinerary(item.sequential, item.line, item.description, 
                     item.agency, item.shape, item.latitude, item.longitude));
         }, this);
         return itineraries;
@@ -82,11 +90,14 @@ class ItineraryDataAccess implements IDataAccess{
      * */
     public storeData(itineraries: List<Itinerary>): void{
         var itineraryCollection: any = this.db.collection(this.collectionName);
-        itineraries.getIterable().forEach((itinerary)=>{
+        var line: string = "";
+        if(itineraries.size()==0) return;
+        itineraries.getIterable().forEach( (itinerary)=>{
+            if(line==="") line = itinerary.getLine();
             itineraryCollection.save({
-                _key: itinerary.getLine(),
+                line: itinerary.getLine(),
                 latitude: itinerary.getLatitude(),
-                tongitude: itinerary.getLongitude(),
+                longitude: itinerary.getLongitude(),
                 description: itinerary.getDescription(),
                 agency: itinerary.getAgency(),
                 shape: itinerary.getShape(),
@@ -94,7 +105,7 @@ class ItineraryDataAccess implements IDataAccess{
             });
         }, this);
         itineraryCollection.createGeoIndex(["latitude", "longitude"]);
-        this.logger.info(Strings.dataaccess.itinerary.stored);
+        this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
     }
 
     /**
@@ -116,12 +127,12 @@ class ItineraryDataAccess implements IDataAccess{
             json: true
         };
         try {
+            this.logger.info("["+line+"] "+Strings.dataaccess.itinerary.downloading);
             var response: any = http.get(options, true);
             return this.respondRequest(response[0]);
         } catch (e) {
-            this.logger.error(e);
-            e.type = Strings.keyword.error;
-            return e;
+            this.logger.error(e.stack);
+            return new List<Itinerary>();
         }
     }
 
@@ -137,19 +148,29 @@ class ItineraryDataAccess implements IDataAccess{
             case 200:
                 var body = response.body.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
                 body.shift(); // Removes the CSV header line with column names
-                var returning;
-                for(var it in body){
-                    if(it.length<=0) continue;
+                var returning = 0;
+                // columns: ["linha", "descricao", "agencia", "sequencia", "shape_id", "latitude", "longitude"]
+                body.forEach( (it)=>{
+                    if(it.length<=0) return;
                     it = it.split(",");
                     
                     if(it[3]==0 && returning==0) returning = 1;
                     else if(it[3]==0 && returning==1) returning = -1;
                     // Transforming the external data into an application's known
-                    var description = it[1].split('-');
+                    var description = it[1].split("-");
                     description.shift();
-                    var itinerary = new Itinerary(it[3]*returning,it[0],description.join('-'),it[2],it[4],it[5],it[6]);
+                    description = description.join("-");
+                    var sequential: number = parseInt(it[3])*returning;
+                    if(sequential<0){
+                        description = description.split(" X ");
+                        var tmp: string = description[0];
+                        description[0] = description[1];
+                        description[1] = tmp;
+                        description = description.join(" X ");
+                    }
+                    var itinerary = new Itinerary(sequential,it[0],description,it[2],it[4],it[5],it[6]);
                     result.add(itinerary);
-                }
+                }, this);
                 return result;
             case 302:
                 this.logger.alert(Strings.dataaccess.all.request.e302);

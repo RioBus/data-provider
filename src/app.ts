@@ -52,7 +52,7 @@ class Application{
             mail.setFromAddress(msgConfig.from);
             mail.setToAddress(msgConfig.to);
             mail.setSubject(msgConfig.subject);
-            mail.setMessage(Utils.replacePattern(/\$\$/, error, msgConfig.text));
+            mail.setMessage(Utils.replacePattern(/\$\$/, error.stack, msgConfig.text));
             
             var mailServer: MailServer = new MailServer();
             mailServer.sendMail(mail, (error, message) =>{

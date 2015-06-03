@@ -55,12 +55,13 @@ class Strings{
             blankLine: "indefinido",
             blankSense: "desconhecido",
             creating: "Creating document: ",
-            updating: "Updating document: "
+            updating: "Updating document: ",
         },
         itinerary: {
             searching: "Searching for local data for line itinerary: ",
             requesting: "Requesting from: ",
-            stored: "Data stored successfully."
+            stored: "Itinerary stored successfully.",
+            downloading: "Downloading..."
         },
         log: {
             reading: "Reading log: ",
