@@ -98,6 +98,23 @@ class BusDataAccess implements IDataAccess {
             return e;
         }
     }
+    
+    private getNearest(bus: Bus, itineraries: List<Itinerary>): Itinerary{
+        var nearest: Itinerary = new Itinerary(0, bus.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
+        var factor: number = Math.pow(10,5);
+        var nearestNormal: number = 99 * factor;
+        
+        itineraries.getIterable().forEach( (current)=>{
+            var currentLongitude: number = current.getLongitude() * factor;
+            var currentLatitude: number = current.getLatitude() * factor;
+            var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
+            if(nearestNormal > currentNormal){
+                nearestNormal = currentNormal;
+                nearest = current;
+            }
+        }, this);
+        return nearest;
+    }
 
     /**
      * Verifies the request response status and returns the correct output
@@ -119,6 +136,7 @@ class BusDataAccess implements IDataAccess {
                     var data = body.DATA;
                     //let columns = body.COLUMNS;
                     // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
+                    var itineraries: any = {};
                     
                     data.forEach( (d) => {
                         var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
@@ -126,8 +144,11 @@ class BusDataAccess implements IDataAccess {
                             bus.setLine(Strings.dataaccess.bus.blankLine);
                             bus.setSense(Strings.dataaccess.bus.blankSense);
                         } else {
-                            var itinerary: Itinerary = this.ida.handle(bus);
-                            bus.setSense(itinerary.getDescription());
+                            if(!itineraries[bus.getLine().toString()]){
+                                itineraries[bus.getLine().toString()] = this.ida.handle(bus.getLine().toString());
+                            }
+                            var nearest: Itinerary = this.getNearest(bus, itineraries[bus.getLine().toString()]);
+                            bus.setSense(nearest.getDescription());
                         }
                         busList.add(bus);
                         this.logger.info(bus.getOrder()+" added.");

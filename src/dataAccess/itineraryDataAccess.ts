@@ -28,11 +28,8 @@ class ItineraryDataAccess implements IDataAccess{
         this.db = new DbContext;
     }
     
-    public handle(data: any): List<Itinerary> | Itinerary{
-        if(data.constructor === String){
-            return this.getItinerary(data);
-        }
-        return this.getNearest(data);
+    public handle(data: string): List<Itinerary>{
+        return this.getItinerary(data);
     }
 
     /**
@@ -53,24 +50,6 @@ class ItineraryDataAccess implements IDataAccess{
             this.storeData(itineraries);
             return itineraries;
         }
-    }
-    
-    public getNearest(obj: IGeolocated): Itinerary{
-        var itineraries: List<Itinerary> = this.getItinerary(obj.getLine());
-        var nearest: Itinerary = new Itinerary(0, obj.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
-        var factor: number = Math.pow(10,5);
-        var nearestNormal: number = 99 * factor;
-        
-        itineraries.getIterable().forEach( (current)=>{
-            var currentLongitude: number = current.getLongitude() * factor;
-            var currentLatitude: number = current.getLatitude() * factor;
-            var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
-            if(nearestNormal > currentNormal){
-                nearestNormal = currentNormal;
-                nearest = current;
-            }
-        }, this);
-        return nearest;
     }
     
     private prepareList(list: Array<any>): List<Itinerary>{
