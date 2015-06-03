@@ -28,8 +28,8 @@ class ItineraryDataAccess implements IDataAccess{
         this.db = new DbContext;
     }
     
-    public handle(data: string): List<Itinerary>{
-        return this.getItinerary(data);
+    public handle(data?: string): List<Itinerary>{
+        return (data!==undefined)? this.getItinerary(data) : this.getItineraries();
     }
 
     /**
@@ -40,16 +40,28 @@ class ItineraryDataAccess implements IDataAccess{
     public getItinerary(line: string): List<Itinerary>{
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
         var itineraryCollection: any = this.db.collection(this.collectionName);
-        itineraryCollection.createFulltextIndex.sync(itineraryCollection, "line");
-        var cursor: any = itineraryCollection.fulltext.sync(itineraryCollection, "line", line);
-        var list: Array<any> = cursor.all.sync(cursor);
-        if(list.length>0){
-            return this.prepareList(list);
-        } else {
+        try{
+            var obj: any = itineraryCollection.document.sync(itineraryCollection, this.collectionName+"/"+line);
+            return this.prepareList(obj.itineraries);
+        } catch (e) {
             var itineraries: List<Itinerary> = this.requestFromServer(line);
-            this.storeData(itineraries);
+            this.logger.info(itineraries.size().toString());
+            this.storeData(line, itineraries);
             return itineraries;
         }
+    }
+    
+    public getItineraries(): any{
+        var itineraryCollection: any = this.db.collection(this.collectionName);
+        var cursor: any = itineraryCollection.all.sync(itineraryCollection);
+        var itineraries: any = {};
+        if(cursor.length>0){
+            cursor.forEach( (id) => {
+                var obj: any = itineraryCollection.document.sync(itineraryCollection, id);
+                itineraries[obj.line] = this.prepareList(obj.itineraries);
+            }, this);
+        }
+        return itineraries;
     }
     
     private prepareList(list: Array<any>): List<Itinerary>{
@@ -67,23 +79,10 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {Array} data Itinerary list to be saved
      * @return List<Itinerary>
      * */
-    public storeData(itineraries: List<Itinerary>): void{
+    public storeData(line: string, itineraries: List<Itinerary>): void{
         var itineraryCollection: any = this.db.collection(this.collectionName);
-        var line: string = "";
-        if(itineraries.size()==0) return;
-        itineraries.getIterable().forEach( (itinerary)=>{
-            if(line==="") line = itinerary.getLine();
-            itineraryCollection.save({
-                line: itinerary.getLine(),
-                latitude: itinerary.getLatitude(),
-                longitude: itinerary.getLongitude(),
-                description: itinerary.getDescription(),
-                agency: itinerary.getAgency(),
-                shape: itinerary.getShape(),
-                sequential: itinerary.getSequential()
-            });
-        }, this);
-        itineraryCollection.createGeoIndex(["latitude", "longitude"]);
+        var structure: any = { _key: line, itineraries: itineraries.getIterable() };
+        itineraryCollection.save(structure);
         this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
     }
 

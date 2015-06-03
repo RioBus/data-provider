@@ -136,7 +136,7 @@ class BusDataAccess implements IDataAccess {
                     var data = body.DATA;
                     //let columns = body.COLUMNS;
                     // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-                    var itineraries: any = {};
+                    var itineraries: any = this.ida.handle();
                     
                     data.forEach( (d) => {
                         var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
