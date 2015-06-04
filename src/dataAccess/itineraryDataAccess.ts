@@ -41,24 +41,22 @@ class ItineraryDataAccess implements IDataAccess{
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
         var itineraryCollection: any = this.db.collection(this.collectionName);
         try{
-            var obj: any = itineraryCollection.document.sync(itineraryCollection, this.collectionName+"/"+line);
+            var obj: any = itineraryCollection.document.sync(itineraryCollection, line);
             return this.prepareList(obj.itineraries);
         } catch (e) {
             var itineraries: List<Itinerary> = this.requestFromServer(line);
-            this.logger.info(itineraries.size().toString());
             this.storeData(line, itineraries);
             return itineraries;
         }
     }
     
     public getItineraries(): any{
-        var itineraryCollection: any = this.db.collection(this.collectionName);
-        var cursor: any = itineraryCollection.all.sync(itineraryCollection);
+        var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i._key, \"itineraries\": i.itineraries}");
+        var documents = cursor.all.sync(cursor);
         var itineraries: any = {};
-        if(cursor.length>0){
-            cursor.forEach( (id) => {
-                var obj: any = itineraryCollection.document.sync(itineraryCollection, id);
-                itineraries[obj.line] = this.prepareList(obj.itineraries);
+        if(documents.length>0){
+            documents.forEach( (doc) => {
+                itineraries[doc.line] = this.prepareList(doc.itineraries);
             }, this);
         }
         return itineraries;
@@ -80,9 +78,8 @@ class ItineraryDataAccess implements IDataAccess{
      * @return List<Itinerary>
      * */
     public storeData(line: string, itineraries: List<Itinerary>): void{
-        var itineraryCollection: any = this.db.collection(this.collectionName);
         var structure: any = { _key: line, itineraries: itineraries.getIterable() };
-        itineraryCollection.save(structure);
+        this.db.collection(this.collectionName).save(structure);
         this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
     }
 

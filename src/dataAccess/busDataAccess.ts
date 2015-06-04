@@ -137,17 +137,20 @@ class BusDataAccess implements IDataAccess {
                     //let columns = body.COLUMNS;
                     // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
                     var itineraries: any = this.ida.handle();
+                    console.log(Object.keys(itineraries));
+                    process.exit();
                     
                     data.forEach( (d) => {
                         var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
-                        if (bus.getLine() === ""){
+                        var line: string = bus.getLine().toString();
+                        if (line === ""){
                             bus.setLine(Strings.dataaccess.bus.blankLine);
                             bus.setSense(Strings.dataaccess.bus.blankSense);
                         } else {
-                            if(!itineraries[bus.getLine().toString()]){
-                                itineraries[bus.getLine().toString()] = this.ida.handle(bus.getLine().toString());
+                            if(!itineraries[line]){
+                                itineraries[line] = this.ida.handle(line);
                             }
-                            var nearest: Itinerary = this.getNearest(bus, itineraries[bus.getLine().toString()]);
+                            var nearest: Itinerary = this.getNearest(bus, itineraries[line]);
                             bus.setSense(nearest.getDescription());
                         }
                         busList.add(bus);
