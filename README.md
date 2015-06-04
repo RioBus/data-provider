@@ -39,14 +39,15 @@ Faça o download do projeto em sua máquina:
 Entre na raiz do projeto e instale as dependências do Node.js:
 > $ npm install
 
-Todos os dados dos ônibus são salvas em cache. O diretório até o arquivo deve ser indicado em ```config.js```, em 
-```server.dataProvider.dataPath``` e em ```server.dataProvider.path.output```.
-
 Ainda na raiz do projeto, configure o ambiente
 > $ npm run configure
 
 Execute a aplicação:
 > $ npm start
+
+Os dados dos ônibus são salvos no banco de dados NoSQL [ArangoDB](https://www.arangodb.com). Certifique-se de que ele 
+esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas na classe ```Config```, 
+em ```Config.environment.<ambiente>.database```.
 
 Comandos NPM
 ------------
@@ -69,33 +70,9 @@ npm run release
 npm run deploy
 > Compila, gera o código de distribuição e executa a aplicação final
 
-
-Comandos do NPM e Gulp
-----------------------
-
-> gulp build ou npm run build
-
-    Compila o projeto e gera o código em dist/
-
-> gulp clean
-
-    Limpa o diretório dist/ que é onde fica o código compilado
-
-> gulp run
-
-    gulp clean && Executa o código compilado
-
-> npm test
-
-    Invoca o Mocha para executar as rotinas de teste definidas em test/
-
-> npm start
-
-    gulp build && gulp run
-
 ```OBS.: Para a aplicação funcionar, ela precisa estar em um projeto cujos módulos Node.js estejam instalados.```
 
 Compatibilidade
 ---------------
 
-* 0.10.x ou superior
+* nodejs >= 0.10

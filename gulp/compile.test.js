@@ -1,9 +1,9 @@
 module.exports = function(gulp, plugins, paths){
-    gulp.src([paths.src+"/**/*.ts"])
+    gulp.src([paths.test+"/**/*.ts"])
         .pipe(plugins.typescript({
             target: "es5",
             module: "commonjs",
-            removeComments: false
+            removeComments: true
         }))
-        .pipe(gulp.dest(paths.build));
+        .pipe(gulp.dest(paths.buildTest));
 };
