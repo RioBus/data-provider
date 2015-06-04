@@ -21,11 +21,13 @@ class ItineraryDataAccess implements IDataAccess{
     
     private logger: Logger;
     private db: DbContext;
+    private collection: any;
     private collectionName: string = "itinerary";
 
     public constructor(){
         this.logger = Factory.getLogger();
         this.db = new DbContext;
+        this.collection = this.db.collection("itinerary");
     }
     
     public handle(data?: string): List<Itinerary>{
@@ -39,9 +41,8 @@ class ItineraryDataAccess implements IDataAccess{
      */
     public getItinerary(line: string): List<Itinerary>{
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
-        var itineraryCollection: any = this.db.collection(this.collectionName);
         try{
-            var obj: any = itineraryCollection.document.sync(itineraryCollection, line);
+            var obj: any = this.collection.document.sync(this.collection, { line: line });
             return this.prepareList(obj.itineraries);
         } catch (e) {
             var itineraries: List<Itinerary> = this.requestFromServer(line);
@@ -51,7 +52,7 @@ class ItineraryDataAccess implements IDataAccess{
     }
     
     public getItineraries(): any{
-        var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i._key, \"itineraries\": i.itineraries}");
+        var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i.line, \"itineraries\": i.itineraries}");
         var documents = cursor.all.sync(cursor);
         var itineraries: any = {};
         if(documents.length>0){
@@ -78,8 +79,8 @@ class ItineraryDataAccess implements IDataAccess{
      * @return List<Itinerary>
      * */
     public storeData(line: string, itineraries: List<Itinerary>): void{
-        var structure: any = { _key: line, itineraries: itineraries.getIterable() };
-        this.db.collection(this.collectionName).save(structure);
+        var structure: any = { line: line, itineraries: itineraries.getIterable() };
+        this.collection.save(structure);
         this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
     }
 

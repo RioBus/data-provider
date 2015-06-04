@@ -1,6 +1,5 @@
 /// <reference path="../../../defs/node/node.d.ts" />
 import Config = require("../../config");
-
 var Database = require("arangojs");
 
 class DbContext{
@@ -12,7 +11,7 @@ class DbContext{
 			dbConfig = (Config.isProduction())?
 				Config.environment.production.database : Config.environment.development.database;
 		}
-		var db = new Database;
+		var db = new Database();
 		try{
 			this.context = db.database.sync(db, dbConfig.databaseName);
 		} catch(e){
@@ -20,7 +19,7 @@ class DbContext{
 		}
 	}
 	
-	public collection(name: Object): any{
+	public collection(name: string): any{
 		try{
 			return this.context.collection.sync(this.context, name);
 		} catch(e){
@@ -28,7 +27,7 @@ class DbContext{
 		}
 	}
 	
-	public edgeCollection(name: Object): any{
+	public edgeCollection(name: string): any{
 		try{
 			return this.context.edgeCollection.sync(this.context, name);
 		} catch(e){

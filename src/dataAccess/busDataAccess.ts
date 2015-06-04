@@ -70,6 +70,7 @@ class BusDataAccess implements IDataAccess {
                 });
             }
         }, this);
+        this.logger.info(data.size()+" records saved successfully.");
     }
 
     /**
@@ -137,8 +138,6 @@ class BusDataAccess implements IDataAccess {
                     //let columns = body.COLUMNS;
                     // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
                     var itineraries: any = this.ida.handle();
-                    console.log(Object.keys(itineraries));
-                    process.exit();
                     
                     data.forEach( (d) => {
                         var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
@@ -154,7 +153,7 @@ class BusDataAccess implements IDataAccess {
                             bus.setSense(nearest.getDescription());
                         }
                         busList.add(bus);
-                        this.logger.info(bus.getOrder()+" added.");
+                        //this.logger.info(bus.getOrder()+" added.");
                     }, this);
                 } catch (e) {
                     this.logger.error(e.stack);
