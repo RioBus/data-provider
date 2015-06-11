@@ -3,12 +3,12 @@ var gulp = require("gulp");
 var plugins = require('gulp-load-plugins')();
 
 var root = __dirname;
-var compiled = root+"/compiled";
+var compiled = root+"/.compiled";
 var paths = {
     root: root,
     build: compiled+"/src",
     buildTest: compiled+"/test",
-    dist: compiled+"/dist",
+    dist: root+"/dist",
     src: root+"/src",
     test: root+"/test"
 };

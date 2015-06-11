@@ -1,0 +1,1 @@
+docker run -it --rm -v $(pwd):/riobus/data-provider --name riobus riobus-data-provider
