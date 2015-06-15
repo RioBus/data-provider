@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "configure": "tsd reinstall",
-    "test": "gulp buildTest && mocha compiled/test/",
+    "test": "gulp buildTest && mocha .compiled/test/**/*",
     "build": "gulp build",
     "release": "gulp release",
     "start": "gulp build && gulp run",
@@ -34,6 +34,7 @@
   "dependencies": {
     "arangojs": "^3.8.1",
     "compression": "^1.4.4",
+    "deasync": "^0.1.0",
     "emailjs": "^0.3.16",
     "express": "^4.12.4",
     "fs-extra": "^0.18.4",
