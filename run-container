@@ -1,1 +1,4 @@
-docker run -it --rm -v $(pwd):/riobus/data-provider --name riobus riobus-data-provider
+#!/bin/bash
+mkdir -p /tmp/nosqldb/db
+docker run -it --name arangodb-container -p 8529:8529 -v /tmp/nosqldb/db:/data/db -d arangodb/arangodb
+docker run -it --rm --link arangodb-container:arango -v $(pwd):/riobus/data-provider --name riobus riobus /bin/bash

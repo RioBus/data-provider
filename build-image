@@ -1,1 +1,1 @@
-docker build -t riobus-data-provider .
+docker build -t riobus .

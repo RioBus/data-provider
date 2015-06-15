@@ -1,7 +1,8 @@
 node_modules
-compiled
+.compiled
 .settings
 .idea
 *.log
 defs
+dist
 tmp
