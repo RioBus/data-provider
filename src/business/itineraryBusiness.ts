@@ -1,7 +1,8 @@
-import IBusiness 		 = require("./iBusiness");
-import DataAccessFactory = require("../dataAccess/dataAccessFactory");
-import List 			 = require("../common/tools/list");
-import Itinerary 		 = require("../domain/itinerary");
+import IBusiness   = require("./iBusiness");
+import IDataAccess = require("../dataAccess/iDataAccess");
+import List 	   = require("../common/tools/list");
+import Itinerary   = require("../domain/itinerary");
+import $inject     = require("../core/inject");
 
 /**
  * Itinerary Business logics
@@ -9,24 +10,23 @@ import Itinerary 		 = require("../domain/itinerary");
  * @class ItineraryBusiness
  */
 class ItineraryBusiness implements IBusiness{
-	
-    /**
-     * Handles the request
-     * @param {String} line
-     * @returns List<Itinerary>
-     */
-	public handle(line: string): List<Itinerary>{
-		return this.getItinerary(line);
-	}
+    
+    public constructor(private dataAccess: IDataAccess = $inject("dataAccess/itineraryDataAccess")){}
+    
+	create(...args: any[]): any {}
 	
     /**
      * Returns the Itinerary, given a line
      * @param {String} line
      * @returns List<Itinerary>
      */
-    getItinerary(line: string): List<Itinerary>{
-        var dataAccess = DataAccessFactory.getItineraryDataAccess();
-        return dataAccess.handle(line);
+	retrieve(line: string): List<Itinerary> {
+        return this.dataAccess.retrieve(line);
     }
+    
+	update(...args: any[]): any {}
+    
+	delete(...args: any[]): any {}
+    
 }
 export = ItineraryBusiness;

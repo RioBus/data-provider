@@ -1,16 +1,15 @@
-import Bus                  = require("../domain/bus");
-import BusList              = require("../domain/busList");
-import Config               = require("../config");
-import DbContext            = require("../core/database/dbContext");
-import Factory              = require("../common/factory");
-import File                 = require("../core/file");
-import HttpRequest          = require("../core/httpRequest");
-import IDataAccess          = require("./iDataAccess");
-import Itinerary            = require("../domain/itinerary");
-import ItineraryDataAccess  = require("./itineraryDataAccess");
-import List                 = require("../common/tools/list");
-import Logger               = require("../common/logger");
-import Strings              = require("../strings");
+import Bus         = require("../domain/bus");
+import Config      = require("../config");
+import DbContext   = require("../core/database/dbContext");
+import Factory     = require("../common/factory");
+import File        = require("../core/file");
+import HttpRequest = require("../core/httpRequest");
+import IDataAccess = require("./iDataAccess");
+import Itinerary   = require("../domain/itinerary");
+import List        = require("../common/tools/list");
+import Logger      = require("../common/logger");
+import Strings     = require("../strings");
+import $inject     = require("../core/inject");
 
 /**
  * DataAccess responsible for managing data access to the data stored in the
@@ -25,24 +24,13 @@ class BusDataAccess implements IDataAccess {
     private db: DbContext;
     private collectionName: string = "bus";
     private subCollectionName: string = "bus_history";
-    private ida: IDataAccess;
 
-    public constructor() {
+    public constructor(private dataAccess: IDataAccess = $inject("dataAccess/itineraryDataAccess")) {
         this.logger = Factory.getServerLogger();
-        this.db = new DbContext;
-        this.ida = new ItineraryDataAccess();
+        this.db = new DbContext();
     }
-
-    public handle(data?: any): List<Bus> | void {
-        if (data === undefined) return this.requestFromServer();
-        this.storeBusData(data);
-    }
-
-    /**
-     * Stores the given data to the local storage
-     * @param {string} data
-     */
-    private storeBusData(data: List<Bus>): void {
+    
+    public create(data: List<Bus>): void {
         "use strict";
         var colBus = this.db.collection(this.collectionName);
         var colHistory = this.db.collection(this.subCollectionName);
@@ -72,6 +60,14 @@ class BusDataAccess implements IDataAccess {
         }, this);
         this.logger.info(data.size()+" records saved successfully.");
     }
+    
+	public retrieve(): List<Bus> {
+        return this.requestFromServer();
+    }
+    
+	public update(...args: any[]): any {}
+    
+	public delete(...args: any[]): any {}
     
     private getNearest(bus: Bus, itineraries: List<Itinerary>): Itinerary{
         var nearest: Itinerary = new Itinerary(0, bus.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
@@ -137,7 +133,7 @@ class BusDataAccess implements IDataAccess {
                     var data = body.DATA;
                     //let columns = body.COLUMNS;
                     // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-                    var itineraries: any = this.ida.handle();
+                    var itineraries: any = this.dataAccess.retrieve();
                     
                     data.forEach( (d) => {
                         var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
@@ -147,7 +143,7 @@ class BusDataAccess implements IDataAccess {
                             bus.setSense(Strings.dataaccess.bus.blankSense);
                         } else {
                             if(!itineraries[line]){
-                                itineraries[line] = this.ida.handle(line);
+                                itineraries[line] = this.dataAccess.retrieve(line);
                             }
                             var nearest: Itinerary = this.getNearest(bus, itineraries[line]);
                             bus.setSense(nearest.getDescription());

@@ -1,12 +1,12 @@
 import Factory        = require("./common/factory");
 import Logger         = require("./common/logger");
 import Config   	  = require("./config");
-import ServiceFactory = require("./service/serviceFactory");
 import IService       = require("./service/iService");
 import Strings        = require("./strings");
 import MailServer     = require("./core/mail/mailServer");
 import MailObject     = require("./core/mail/mailObject");
 import Utils          = require("./common/tools/utils");
+import $inject        = require("./core/inject");
 var Sync    	      = require("sync");
 
 /**
@@ -22,29 +22,28 @@ class Application{
      * @param {String[]} argv Process arg list
      * @return {void}
      */
-    public static main(argv: string[]): void{
+    public static main(argv: string[]): void {
         "use strict";
         Application.handleFatalError();
 
         var logger: Logger = Factory.getServerLogger();
         logger.info(Strings.provider.rest.start);
         
-        var service: IService = ServiceFactory.getServerService();
-        service.handle();
+        var service: IService = $inject("service/serverService");
+        service.retrieve();
         
         Application.schedule( ()=>{
-            service.handle();
-        }, Config.environment.provider.updateInterval);
-        
+            service.retrieve();
+        }, Config.environment.provider.updateInterval);   
     }
     
-    public static schedule(callback: ()=>void, updateInterval: number): void{
+    public static schedule(callback: ()=>void, updateInterval: number): void {
         Sync.sleep(updateInterval);
         callback();
         Application.schedule(callback, updateInterval);
     }
     
-    public static handleFatalError(): void{
+    public static handleFatalError(): void {
         process.on('uncaughtException', (error: any) => {
             
             var msgConfig: any = Config.errorMailMessage;

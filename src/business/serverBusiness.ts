@@ -1,21 +1,24 @@
-import IBusiness = require("./iBusiness");
+import Bus 		   = require("../domain/bus");
+import IBusiness   = require("./iBusiness");
 import IDataAccess = require("../dataAccess/iDataAccess");
-import DataAccessFactory = require("../dataAccess/dataAccessFactory");
-import List = require("../common/tools/list");
-import Bus = require("../domain/bus");
+import List 	   = require("../common/tools/list");
+import $inject 	   = require("../core/inject");
 
 class ServerBusines implements IBusiness{
-	
-	private dataAccess: IDataAccess;
-	
-	public constructor(){
-		this.dataAccess = DataAccessFactory.getBusDataAccess();
+    
+    public constructor(private dataAccess: IDataAccess = $inject("dataAccess/busDataAccess")){}
+    
+	create(data: List<Bus>): void {
+		this.dataAccess.create(data);
 	}
 	
-	public handle(): void{
-		var data: List<Bus> = this.dataAccess.handle();
-		if(data.size()>0)
-			this.dataAccess.handle(data);
-	}
+	retrieve(): void {
+        var data: List<Bus> = this.dataAccess.retrieve();
+		if(data.size()>0) this.create(data);
+    }
+    
+	update(...args: any[]): any {}
+    
+	delete(...args: any[]): any {}
 }
 export = ServerBusines;

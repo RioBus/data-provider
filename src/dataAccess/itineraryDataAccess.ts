@@ -26,13 +26,23 @@ class ItineraryDataAccess implements IDataAccess{
 
     public constructor(){
         this.logger = Factory.getLogger();
-        this.db = new DbContext;
+        this.db = new DbContext();
         this.collection = this.db.collection("itinerary");
     }
     
-    public handle(data?: string): List<Itinerary>{
+    public create(line: string, itineraries: List<Itinerary>): void{
+        var structure: any = { line: line, itineraries: itineraries.getIterable() };
+        this.collection.save(structure);
+        this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
+    }
+    
+	public retrieve(data?: string): any {
         return (data!==undefined)? this.getItinerary(data) : this.getItineraries();
     }
+    
+	public update(...args: any[]): any {}
+    
+	public delete(...args: any[]): any {}
 
     /**
      * Retrieves the Itinerary spots given a line
@@ -46,7 +56,7 @@ class ItineraryDataAccess implements IDataAccess{
             return this.prepareList(obj.itineraries);
         } catch (e) {
             var itineraries: List<Itinerary> = this.requestFromServer(line);
-            this.storeData(line, itineraries);
+            this.create(line, itineraries);
             return itineraries;
         }
     }
@@ -70,18 +80,6 @@ class ItineraryDataAccess implements IDataAccess{
                     item.agency, item.shape, item.latitude, item.longitude));
         }, this);
         return itineraries;
-    }
-
-    /**
-     * Cached locally the itinerary
-     * @param {String} filePath Place to create the file and save the data
-     * @param {Array} data Itinerary list to be saved
-     * @return List<Itinerary>
-     * */
-    public storeData(line: string, itineraries: List<Itinerary>): void{
-        var structure: any = { line: line, itineraries: itineraries.getIterable() };
-        this.collection.save(structure);
-        this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
     }
 
     /**
