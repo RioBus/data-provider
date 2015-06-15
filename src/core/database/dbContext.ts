@@ -11,7 +11,7 @@ class DbContext{
 			dbConfig = (Config.isProduction())?
 				Config.environment.production.database : Config.environment.development.database;
 		}
-		var db = new Database();
+		var db = new Database(dbConfig);
 		try{
 			this.context = db.database.sync(db, dbConfig.databaseName);
 		} catch(e){
