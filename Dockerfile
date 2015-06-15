@@ -7,7 +7,7 @@ RUN pacman -Sy --noconfirm git nodejs npm
 
 # installing nodejs dependencies
 RUN npm install -g n
-RUN n 0.10
+RUN n 0.11
 RUN npm install -g gulp mocha pm2 tsd
 
 RUN mkdir -p /riobus/data-provider
