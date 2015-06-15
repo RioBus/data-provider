@@ -3,7 +3,8 @@ FROM l3iggs/archlinux
 MAINTAINER Frederico Souza <fredericoamsouza@gmail.com>
 
 # installing and configuring environment
-RUN pacman -Sy --noconfirm git nodejs npm
+RUN pacman -Sy --noconfirm gcc git make nodejs npm python2
+RUN npm config set python python2.7
 
 # installing nodejs dependencies
 RUN npm install -g n
