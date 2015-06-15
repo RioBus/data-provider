@@ -109,7 +109,7 @@ class BusDataAccess implements IDataAccess {
         };
         try {
             var response: any = http.get(options);
-            return this.respondRequest(response[0]);
+            return this.respondRequest(response);
         } catch (e) {
             this.logger.error(e.stack);
             e.type = Strings.keyword.error;
