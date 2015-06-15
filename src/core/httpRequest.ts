@@ -1,4 +1,5 @@
 /// <reference path="../../defs/node/node.d.ts" />
+var DeAsync = require("deasync");
 /**
  * Creates a new synchronized HttpRequest
  *
@@ -20,10 +21,15 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public get(host: string, sync: boolean, callback?: (error: Error, response: any, body: string)=>void): any{
+    public get(host: string, callback?: (error: Error, response: any, body: string)=>void): void|any{
         "use strict";
-        var prototype: any = this.driver.get;
-        return (sync)? prototype.sync(this, host) : prototype(host, callback);
+        if(callback) this.driver.get(host, callback);
+        else{
+            var get: any = DeAsync(this.driver.get);
+            var output: any = get(host);
+            if(output.stack!==undefined) throw output;
+            else return output;
+        }
     }
 
     /**
@@ -32,10 +38,15 @@ class HttpRequest{
      * @param {Object} options
      * @returns {*}
      */
-    public post(host: string, data: any, sync: boolean, callback?: (error: Error, response: any, body: string)=>void): any{
+    public post(host: string, data: any, callback?: (error: Error, response: any, body: string)=>void): any{
         "use strict";
-        var prototype: any = this.driver.post;
-        return (sync)? prototype.sync(this, host, {url: host, formData: data}) : prototype({url: host, formData: data}, callback);
+        if(callback) this.driver.post({url: host, formData: data}, callback);
+        else{
+            var post: any = DeAsync(this.driver.post);
+            var output: any = post({url: host, formData: data});
+            if(output.stack!==undefined) throw output;
+            else return output;
+        }
     }
 }
 

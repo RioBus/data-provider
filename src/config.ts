@@ -1,5 +1,7 @@
 /// <reference path="../defs/node/node.d.ts" />
 class Config {
+	
+	public static rootPath: string = __dirname;
 
 	public static log: any = {
 		runtime: "./runtime.log",
@@ -27,8 +29,7 @@ class Config {
             },
 			updateInterval:	5000,
             timeout: 		20000,
-            log: 			"/tmp/riobus/data-server.log",
-            dataPath: 		"/tmp/riobus/busData.json"
+            log: 			"/tmp/riobus/data-server.log"
 		},
 		mailServer: {
 			user: "",
@@ -38,13 +39,13 @@ class Config {
 		},
 		development: {
 			database: {
-				url: "http://localhost:8529",
+				url: "http://riobus:riobus@arango:8529",
 				databaseName: "riobus"
 			}
 		},
 		production: {
 			database: {
-				url: "http://localhost:8529",
+				url: "http://riobus:riobus@arango:8529",
 				databaseName: "riobus"
 			}
 		}

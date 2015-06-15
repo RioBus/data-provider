@@ -72,6 +72,23 @@ class BusDataAccess implements IDataAccess {
         }, this);
         this.logger.info(data.size()+" records saved successfully.");
     }
+    
+    private getNearest(bus: Bus, itineraries: List<Itinerary>): Itinerary{
+        var nearest: Itinerary = new Itinerary(0, bus.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
+        var factor: number = Math.pow(10,5);
+        var nearestNormal: number = 99 * factor;
+        
+        itineraries.getIterable().forEach( (current)=>{
+            var currentLongitude: number = current.getLongitude() * factor;
+            var currentLatitude: number = current.getLatitude() * factor;
+            var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
+            if(nearestNormal > currentNormal){
+                nearestNormal = currentNormal;
+                nearest = current;
+            }
+        }, this);
+        return nearest;
+    }
 
     /**
      * Does the request to the external server and retrieves the data
@@ -91,30 +108,13 @@ class BusDataAccess implements IDataAccess {
             json: true
         };
         try {
-            var response: any = http.get(options, true);
+            var response: any = http.get(options);
             return this.respondRequest(response[0]);
         } catch (e) {
             this.logger.error(e.stack);
             e.type = Strings.keyword.error;
             return e;
         }
-    }
-    
-    private getNearest(bus: Bus, itineraries: List<Itinerary>): Itinerary{
-        var nearest: Itinerary = new Itinerary(0, bus.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
-        var factor: number = Math.pow(10,5);
-        var nearestNormal: number = 99 * factor;
-        
-        itineraries.getIterable().forEach( (current)=>{
-            var currentLongitude: number = current.getLongitude() * factor;
-            var currentLatitude: number = current.getLatitude() * factor;
-            var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
-            if(nearestNormal > currentNormal){
-                nearestNormal = currentNormal;
-                nearest = current;
-            }
-        }, this);
-        return nearest;
     }
 
     /**

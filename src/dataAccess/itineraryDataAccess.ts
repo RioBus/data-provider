@@ -104,7 +104,7 @@ class ItineraryDataAccess implements IDataAccess{
         };
         try {
             this.logger.info("["+line+"] "+Strings.dataaccess.itinerary.downloading);
-            var response: any = http.get(options, true);
+            var response: any = http.get(options);
             return this.respondRequest(response[0]);
         } catch (e) {
             this.logger.error(e.stack);
