@@ -18,11 +18,9 @@ describe("HttpRequest class test", () => {
 	
 	it("should return something asynchronously from GET request", (done) => {
 		http.get("http://google.com/", (error: Error, response: any)=>{
-			if(error || response){
-				console.log(response.statusCode);
-				Assert(true);
-				done();
-			}
+			if(error) Assert(error instanceof Error);
+			if(response) Assert(response.statusCode > 0);
+			done();
 		});
 	});
 	
@@ -30,15 +28,21 @@ describe("HttpRequest class test", () => {
 		try{
 			var response = http.get("http://google.com/");
 			Assert(response.statusCode > 0);
-		} catch(e){
+		} catch(e) {
 			Assert(e instanceof Error);
+		} finally {
+			done();
 		}
-		done();
 	});
 	
 	it("should return something synchronously from GET request using options object", (done) => {
-		var response = http.get(options);
-		Assert(response.statusCode > 0);
-		done();
+		try{
+			var response = http.get(options);
+			Assert(response.statusCode > 0);
+		} catch(e) {
+			Assert(e instanceof Error);
+		} finally {
+			done();
+		}
 	});
 });
