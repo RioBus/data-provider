@@ -13,7 +13,7 @@ class ServerBusines implements IBusiness{
 	}
 	
 	retrieve(): void {
-        var data: List<Bus> = this.dataAccess.retrieve();
+        var data: List<Bus> = <List<Bus>> this.dataAccess.retrieve();
 		if(data.size()>0) this.create(data);
     }
     

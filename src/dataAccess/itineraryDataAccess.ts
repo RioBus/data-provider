@@ -9,6 +9,7 @@ import List        = require("../common/tools/list");
 import Logger      = require("../common/logger");
 import Strings     = require("../strings");
 import DbContext   = require("../core/database/dbContext");
+import Sync        = require("../core/sync");
 
 /**
  * DataAccess referred to Itinerary stored data
@@ -52,7 +53,7 @@ class ItineraryDataAccess implements IDataAccess{
     public getItinerary(line: string): List<Itinerary>{
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
         try{
-            var obj: any = this.collection.document.sync(this.collection, { line: line });
+            var obj: any = Sync.promise(this.collection, this.collection.document, { line: line });
             return this.prepareList(obj.itineraries);
         } catch (e) {
             var itineraries: List<Itinerary> = this.requestFromServer(line);
@@ -63,7 +64,7 @@ class ItineraryDataAccess implements IDataAccess{
     
     public getItineraries(): any{
         var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i.line, \"itineraries\": i.itineraries}");
-        var documents = cursor.all.sync(cursor);
+        var documents = Sync.promise(cursor, cursor.all);
         var itineraries: any = {};
         if(documents.length>0){
             documents.forEach( (doc) => {

@@ -38,8 +38,7 @@
     "emailjs": "^0.3.16",
     "express": "^4.12.4",
     "fs-extra": "^0.18.4",
-    "request": "^2.57.0",
-    "sync": "^0.2.5"
+    "request": "^2.57.0"
   },
   "devDependencies": {
     "gulp": "^3.9.0",
