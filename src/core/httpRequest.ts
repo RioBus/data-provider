@@ -1,5 +1,4 @@
-/// <reference path="../../defs/node/node.d.ts" />
-var DeAsync = require("deasync");
+import Sync = require("./sync");
 /**
  * Creates a new synchronized HttpRequest
  *
@@ -25,9 +24,8 @@ class HttpRequest{
         "use strict";
         if(callback) this.driver.get(host, callback);
         else{
-            var get: any = DeAsync(this.driver.get);
-            var output: any = get(host);
-            if(output.stack!==undefined) throw output;
+            var output: any = Sync.run(this.driver.get, host);
+            if(output instanceof Error) throw output;
             else return output;
         }
     }
@@ -42,9 +40,8 @@ class HttpRequest{
         "use strict";
         if(callback) this.driver.post({url: host, formData: data}, callback);
         else{
-            var post: any = DeAsync(this.driver.post);
-            var output: any = post({url: host, formData: data});
-            if(output.stack!==undefined) throw output;
+            var output: any = Sync.run(this.driver.post, {url: host, formData: data});
+            if(output instanceof Error) throw output;
             else return output;
         }
     }

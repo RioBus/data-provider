@@ -1,9 +1,9 @@
-/// <reference path="../../defs/node/node.d.ts" />
-/// <reference path="../../defs/mocha/mocha.d.ts" />
-import HttpRequest = require("../../src/core/httpRequest");
+/// <reference path="../../../defs/node/node.d.ts" />
+/// <reference path="../../../defs/mocha/mocha.d.ts" />
+import HttpRequest = require("../../../src/core/httpRequest");
 var Assert = require("assert");
 
-describe("HttpRequest class test", () => {
+describe("[UNIT] HttpRequest", () => {
 	
 	var http = new HttpRequest();
 
