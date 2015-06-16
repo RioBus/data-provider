@@ -1,5 +1,6 @@
 /// <reference path="../../../defs/node/node.d.ts" />
 import Config = require("../../config");
+import Sync = require("../sync");
 var Driver = require("arangojs");
 
 class Database{
@@ -13,30 +14,30 @@ class Database{
 		}
 		var db = new Driver(dbConfig);
 		try{
-			this.context = db.database.sync(db, dbConfig.databaseName);
+			this.context = Sync.promise(db, db.database, dbConfig.databaseName);
 		} catch(e){
-			this.context = db.createDatabase.sync(db, dbConfig.databaseName);
+			this.context = Sync.promise(db.createDatabase, dbConfig.databaseName);
 		}
 	}
 	
 	public collection(name: string): any{
 		try{
-			return this.context.collection.sync(this.context, name);
+			return Sync.promise(this.context, this.context.collection, name);
 		} catch(e){
-			return this.context.createCollection.sync(this.context, name);
+			return Sync.promise(this.context, this.context.createCollection, name);
 		}
 	}
 	
 	public edgeCollection(name: string): any{
 		try{
-			return this.context.edgeCollection.sync(this.context, name);
+			return Sync.promise(this.context, this.context.edgeCollection, name);
 		} catch(e){
-			return this.context.createEdgeCollection.sync(this.context, name);
+			return Sync.promise(this.context, this.context.createEdgeCollection, name);
 		}
 	}
 	
 	public query(queryString: string): any{
-		return this.context.query.sync(this.context, queryString);
+		return Sync.promise(this.context, this.context.query, queryString);
 	}
 }
 export = Database;
