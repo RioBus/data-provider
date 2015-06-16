@@ -1,4 +1,4 @@
 #!/bin/bash
 mkdir -p /tmp/nosqldb/db
 docker run -it --name arangodb -p 8529:8529 -v /tmp/nosqldb/db:/data/db -d arangodb/arangodb
-docker run -it --rm --link arangodb-container:arango -v $(pwd):/riobus/data-provider --name riobus riobus /bin/bash
+docker run -it --rm --link arangodb:arango -v $(pwd):/riobus/data-provider --name riobus riobus /bin/bash
