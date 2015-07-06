@@ -1,25 +1,36 @@
 /// <reference path="../../../defs/node/node.d.ts" />
-import Config = require("../../config");
-import Database = require("./database");
+import Config 		= require("../../config");
+import ICollection  = require("./iCollection");
+import IDatabase 	= require("./iDatabase");
+import List 		= require("../../common/tools/list");
+import $inject 		= require("../inject");
+
+var config: any = (Config.isProduction())?
+	Config.environment.production.database : Config.environment.development.database;
 
 class DbContext{
 	
-	private context: Database;
+	private context: IDatabase;
 	
 	public constructor(dbConfig?: any){
-		this.context = new Database(dbConfig);
+		this.context = this.getContext(dbConfig);
 	}
 	
-	public collection(name: string): any{
+	public collection<T>(name: string): ICollection<T>{
 		return this.context.collection(name);
 	}
 	
-	public edgeCollection(name: string): any{
-		return this.context.edgeCollection(name);
-	}
-	
-	public query(queryString: string): any{
-		return this.context.query(queryString);
+	private getContext(dbConfig: any): IDatabase {
+		var connector = dbConfig.driver.toLowerCase();
+		var driverPath = "core/database/driver";
+		switch(connector) {
+			case "mongodb":
+			case "mongo":
+				connector = driverPath+"/mongodb/MongoDb";
+				break;
+			default: break;
+		}
+		return $inject(connector, dbConfig.config);
 	}
 }
 export = DbContext;

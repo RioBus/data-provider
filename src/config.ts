@@ -24,8 +24,7 @@ class Config {
 			host: 			"dadosabertos.rio.rj.gov.br",
 			path: {
                 bus: 		"/apiTransporte/apresentacao/rest/index.cfm/onibus",
-                itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv",
-                output: 	"/tmp/riobus/itinerary"
+                itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv"
             },
 			updateInterval:	5000,
             timeout: 		20000,
@@ -39,14 +38,23 @@ class Config {
 		},
 		development: {
 			database: {
-				url: "http://riobus:riobus@arango:8529",
-				databaseName: "riobus"
+				driver: "mongodb",
+				config: [
+					{
+						dbName: "riobus",
+						host: "mongo",
+						user: "riobus",
+						pass: "riobus",
+						port: "8529"
+					}
+				]
 			}
 		},
 		production: {
 			database: {
-				url: "http://riobus:riobus@arango:8529",
-				databaseName: "riobus"
+				databaseName: "riobus",
+				driver: "core/database/driver/mongodb",
+				url: "http://riobus:riobus@arango:8529"
 			}
 		}
 	}

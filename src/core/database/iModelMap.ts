@@ -1,0 +1,4 @@
+interface IModelMap {
+	
+}
+export = IModelMap;
