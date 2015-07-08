@@ -28,7 +28,7 @@ class ItineraryDataAccess implements IDataAccess{
     public constructor(){
         this.logger = Factory.getLogger();
         this.db = new DbContext();
-        this.collection = this.db.collection("itinerary");
+        this.collection = this.db.collection("itinerary", null);
     }
     
     public create(line: string, itineraries: List<Itinerary>): void{
@@ -63,7 +63,7 @@ class ItineraryDataAccess implements IDataAccess{
     }
     
     public getItineraries(): any{
-        var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i.line, \"itineraries\": i.itineraries}");
+        /*var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i.line, \"itineraries\": i.itineraries}");
         var documents = Sync.promise(cursor, cursor.all);
         var itineraries: any = {};
         if(documents.length>0){
@@ -71,7 +71,7 @@ class ItineraryDataAccess implements IDataAccess{
                 itineraries[doc.line] = this.prepareList(doc.itineraries);
             }, this);
         }
-        return itineraries;
+        return itineraries;*/
     }
     
     private prepareList(list: Array<any>): List<Itinerary>{

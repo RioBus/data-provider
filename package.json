@@ -4,7 +4,7 @@
   "description": "RioBus data-provider application",
   "main": "dist/index.js",
   "scripts": {
-    "configure": "tsd reinstall",
+    "configure": "tsd reinstall && tsd rebundle && npm install",
     "test": "gulp buildTest && mocha .compiled/test/**/**/*",
     "build": "gulp build",
     "release": "gulp release",
@@ -32,12 +32,12 @@
   },
   "homepage": "http://github.com/RioBus/data-provider",
   "dependencies": {
-    "arangojs": "^3.8.1",
     "compression": "^1.4.4",
     "deasync": "^0.1.0",
     "emailjs": "^0.3.16",
     "express": "^4.12.4",
     "fs-extra": "^0.18.4",
+    "mongodb": "^2.0.36",
     "request": "^2.57.0"
   },
   "devDependencies": {

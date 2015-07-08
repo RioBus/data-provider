@@ -7,7 +7,6 @@ import MailServer     = require("./core/mail/mailServer");
 import MailObject     = require("./core/mail/mailObject");
 import Utils          = require("./common/tools/utils");
 import $inject        = require("./core/inject");
-var Sync    	      = require("sync");
 
 /**
  * Main application process.
@@ -25,7 +24,7 @@ class Application{
     public static main(argv: string[]): void {
         "use strict";
         Application.handleFatalError();
-
+        
         var logger: Logger = Factory.getServerLogger();
         logger.info(Strings.provider.rest.start);
         
@@ -38,9 +37,10 @@ class Application{
     }
     
     public static schedule(callback: ()=>void, updateInterval: number): void {
-        Sync.sleep(updateInterval);
-        callback();
-        Application.schedule(callback, updateInterval);
+        setTimeout(()=>{
+            callback();
+            Application.schedule(callback, updateInterval);
+        }, updateInterval);
     }
     
     public static handleFatalError(): void {

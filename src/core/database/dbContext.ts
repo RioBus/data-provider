@@ -2,6 +2,7 @@
 import Config 		= require("../../config");
 import ICollection  = require("./iCollection");
 import IDatabase 	= require("./iDatabase");
+import IModelMap	= require("./iModelMap");
 import List 		= require("../../common/tools/list");
 import $inject 		= require("../inject");
 
@@ -13,11 +14,12 @@ class DbContext{
 	private context: IDatabase;
 	
 	public constructor(dbConfig?: any){
+		if(dbConfig===undefined) dbConfig = config;
 		this.context = this.getContext(dbConfig);
 	}
 	
-	public collection<T>(name: string): ICollection<T>{
-		return this.context.collection(name);
+	public collection<T>(name: string, map: IModelMap<T>): ICollection<T>{
+		return this.context.collection<T>(name, map);
 	}
 	
 	private getContext(dbConfig: any): IDatabase {
@@ -31,6 +33,10 @@ class DbContext{
 			default: break;
 		}
 		return $inject(connector, dbConfig.config);
+	}
+	
+	public closeConnection(): void{
+		this.context.close();
 	}
 }
 export = DbContext;

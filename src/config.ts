@@ -39,21 +39,19 @@ class Config {
 		development: {
 			database: {
 				driver: "mongodb",
-				config: [
-					{
-						dbName: "riobus",
-						host: "mongo",
-						user: "riobus",
-						pass: "riobus",
-						port: "8529"
-					}
-				]
+				config: {
+					dbName: "riobus",
+					host: "mongo",
+					user: "riobus",
+					pass: "riobus",
+					port: "27017"
+				}
 			}
 		},
 		production: {
 			database: {
 				databaseName: "riobus",
-				driver: "core/database/driver/mongodb",
+				driver: "mongodb",
 				url: "http://riobus:riobus@arango:8529"
 			}
 		}

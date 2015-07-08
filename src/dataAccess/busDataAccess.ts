@@ -32,11 +32,11 @@ class BusDataAccess implements IDataAccess {
     
     public create(data: List<Bus>): void {
         "use strict";
-        var colBus = this.db.collection(this.collectionName);
-        var colHistory = this.db.collection(this.subCollectionName);
+        var colBus = this.db.collection(this.collectionName, null);
+        var colHistory = this.db.collection(this.subCollectionName, null);
         data.getIterable().forEach( (bus) => {
             try {
-                var doc = colBus.document.sync(colBus, bus.getOrder());
+                var doc = colBus.update(colBus, bus.getOrder());
                 if (bus.getLine() !== Strings.dataaccess.bus.blankLine && doc.line !== bus.getLine()) {
                     this.logger.info(Strings.dataaccess.bus.updating + this.collectionName + "/" + bus.getOrder() + " " + doc.line + "->" + bus.getLine());
                     colBus.update(doc, { line: bus.getLine() });
