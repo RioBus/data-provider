@@ -1,7 +1,7 @@
 import IBusiness   = require("./iBusiness");
 import IDataAccess = require("../dataAccess/iDataAccess");
 import List 	   = require("../common/tools/list");
-import Itinerary   = require("../domain/itinerary");
+import Itinerary   = require("../domain/entity/itinerary");
 import $inject     = require("../core/inject");
 
 /**

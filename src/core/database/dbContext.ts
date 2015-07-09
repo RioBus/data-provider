@@ -18,7 +18,7 @@ class DbContext{
 		this.context = this.getContext(dbConfig);
 	}
 	
-	public collection<T>(name: string, map: IModelMap<T>): ICollection<T>{
+	public collection<T>(name: string, map: IModelMap): ICollection<T>{
 		return this.context.collection<T>(name, map);
 	}
 	

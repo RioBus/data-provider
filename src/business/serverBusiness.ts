@@ -1,4 +1,4 @@
-import Bus 		   = require("../domain/bus");
+import Bus 		   = require("../domain/entity/bus");
 import IBusiness   = require("./iBusiness");
 import IDataAccess = require("../dataAccess/iDataAccess");
 import List 	   = require("../common/tools/list");

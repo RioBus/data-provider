@@ -1,6 +1,6 @@
 import IBusiness = require("../business/iBusiness");
 import IService  = require("./iService");
-import Itinerary = require("../domain/itinerary");
+import Itinerary = require("../domain/entity/itinerary");
 import List      = require("../common/tools/list");
 import $inject   = require("../core/inject");
 

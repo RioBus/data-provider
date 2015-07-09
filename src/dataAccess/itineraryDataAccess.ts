@@ -1,15 +1,17 @@
-import Config      = require("../config");
-import Factory     = require("../common/factory");
-import File        = require("../core/file");
-import IGeolocated = require("../domain/iGeolocated");
-import HttpRequest = require("../core/httpRequest");
-import IDataAccess = require("./iDataAccess");
-import Itinerary   = require("../domain/itinerary");
-import List        = require("../common/tools/list");
-import Logger      = require("../common/logger");
-import Strings     = require("../strings");
-import DbContext   = require("../core/database/dbContext");
-import Sync        = require("../core/sync");
+import Config            = require("../config");
+import Factory           = require("../common/factory");
+import File              = require("../core/file");
+import ICollection       = require("../core/database/iCollection");
+import HttpRequest       = require("../core/httpRequest");
+import IDataAccess       = require("./iDataAccess");
+import Itinerary         = require("../domain/entity/itinerary");
+import ItinerarySpot     = require("../domain/entity/itinerarySpot");
+import ItineraryModelMap = require("../domain/modelMap/itineraryModelMap");
+import List              = require("../common/tools/list");
+import Logger            = require("../common/logger");
+import Strings           = require("../strings");
+import DbContext         = require("../core/database/dbContext");
+import Sync              = require("../core/sync");
 
 /**
  * DataAccess referred to Itinerary stored data
@@ -22,65 +24,54 @@ class ItineraryDataAccess implements IDataAccess{
     
     private logger: Logger;
     private db: DbContext;
-    private collection: any;
+    private collection: ICollection<Itinerary>;
     private collectionName: string = "itinerary";
 
     public constructor(){
         this.logger = Factory.getLogger();
         this.db = new DbContext();
-        this.collection = this.db.collection("itinerary", null);
-    }
-    
-    public create(line: string, itineraries: List<Itinerary>): void{
-        var structure: any = { line: line, itineraries: itineraries.getIterable() };
-        this.collection.save(structure);
-        this.logger.info("[" + line + "] " + Strings.dataaccess.itinerary.stored);
-    }
-    
-	public retrieve(data?: string): any {
-        return (data!==undefined)? this.getItinerary(data) : this.getItineraries();
+        this.collection = this.db.collection<Itinerary>(this.collectionName, new ItineraryModelMap);
     }
     
 	public update(...args: any[]): any {}
     
 	public delete(...args: any[]): any {}
+    
+    public create(itinerary: Itinerary): Itinerary {
+        var saved: Itinerary = this.collection.save(itinerary);
+        this.logger.info("["+saved.getLine()+"] "+Strings.dataaccess.itinerary.stored);
+        this.db.closeConnection();
+        return saved;
+    }
+    
+	public retrieve(data?: string): any {
+        return (data!==undefined)? this.getItinerary(data) : this.getItineraries();
+        this.db.closeConnection();
+    }
 
     /**
      * Retrieves the Itinerary spots given a line
      * @param {String} line
      * @return List<Itinerary>
      */
-    public getItinerary(line: string): List<Itinerary>{
+    public getItinerary(line: string): Itinerary{
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
         try{
-            var obj: any = Sync.promise(this.collection, this.collection.document, { line: line });
-            return this.prepareList(obj.itineraries);
+            var list: Array<Itinerary> = this.collection.find({line: line});
+            return (list.length>0)? list[0] : null;
         } catch (e) {
-            var itineraries: List<Itinerary> = this.requestFromServer(line);
-            this.create(line, itineraries);
-            return itineraries;
+            var itinerary: Itinerary = this.requestFromServer(line);
+            return this.create(itinerary);
         }
     }
     
-    public getItineraries(): any{
-        /*var cursor = this.db.query("FOR i IN itinerary RETURN {\"line\": i.line, \"itineraries\": i.itineraries}");
-        var documents = Sync.promise(cursor, cursor.all);
-        var itineraries: any = {};
-        if(documents.length>0){
-            documents.forEach( (doc) => {
-                itineraries[doc.line] = this.prepareList(doc.itineraries);
-            }, this);
+    public getItineraries(): Array<Itinerary>{
+        this.logger.info(Strings.dataaccess.itinerary.searching+"all");
+        try{
+            return this.collection.find();
+        } catch (e) {
+            return new Array<Itinerary>();
         }
-        return itineraries;*/
-    }
-    
-    private prepareList(list: Array<any>): List<Itinerary>{
-        var itineraries: List<Itinerary> = new List<Itinerary>();
-        list.forEach((item)=>{
-            itineraries.add(new Itinerary(item.sequential, item.line, item.description, 
-                    item.agency, item.shape, item.latitude, item.longitude));
-        }, this);
-        return itineraries;
     }
 
     /**
@@ -88,26 +79,25 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {String} line
      * @return List<Itinerary>
      */
-    private requestFromServer(line: string): List<Itinerary> {
+    private requestFromServer(line: string): Itinerary {
         "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
+        var empty: Itinerary = new Itinerary(line, Strings.dataaccess.bus.blankSense, "", []);
 
         var options: any = {
             url: 'http://' + config.host + config.path.itinerary.replace("$$", line),
-            headers: {
-                'Accept': '*/*',
-                'Cache-Control': 'no-cache'
-            },
+            headers: {'Accept': '*/*','Cache-Control': 'no-cache'},
             json: true
         };
         try {
             this.logger.info("["+line+"] "+Strings.dataaccess.itinerary.downloading);
             var response: any = http.get(options);
-            return this.respondRequest(response);
+            var itinerary: Itinerary = this.respondRequest(response); 
+            return (itinerary!==null)? itinerary : empty;
         } catch (e) {
             this.logger.error(e.stack);
-            return new List<Itinerary>();
+            return empty;
         }
     }
 
@@ -116,50 +106,53 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {*} response
      * @return List<Itinerary>
      * */
-    private respondRequest(response: any): List<Itinerary>{
+    private respondRequest(response: any): Itinerary {
         "use strict";
-        var result = new List<Itinerary>();
         switch(response.statusCode){ // Verifying response statusCode
             case 200:
-                var body = response.body.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
-                body.shift(); // Removes the CSV header line with column names
-                var returning = 0;
-                // columns: ["linha", "descricao", "agencia", "sequencia", "shape_id", "latitude", "longitude"]
-                body.forEach( (it)=>{
-                    if(it.length<=0) return;
-                    it = it.split(",");
-                    
-                    if(it[3]==0 && returning==0) returning = 1;
-                    else if(it[3]==0 && returning==1) returning = -1;
-                    // Transforming the external data into an application's known
-                    var description = it[1].split("-");
-                    description.shift();
-                    description = description.join("-");
-                    var sequential: number = parseInt(it[3])*returning;
-                    if(sequential<0){
-                        description = description.split(" X ");
-                        var tmp: string = description[0];
-                        description[0] = description[1];
-                        description[1] = tmp;
-                        description = description.join(" X ");
-                    }
-                    var itinerary = new Itinerary(sequential,it[0],description,it[2],it[4],it[5],it[6]);
-                    result.add(itinerary);
-                }, this);
-                return result;
+                return this.parseBody(response.body);
             case 302:
                 this.logger.alert(Strings.dataaccess.all.request.e302);
-                return result;
+                break;
             case 404:
                 this.logger.alert(Strings.dataaccess.all.request.e404);
-                return result;
+                break;
             case 503:
                 this.logger.alert(Strings.dataaccess.all.request.e503);
-                return result;
+                break;
             default:
                 this.logger.alert('('+response.statusCode+') '+Strings.dataaccess.all.request.default);
-                return result;
+                break;
+            return null;
         }
+    }
+    
+    private parseBody(data: string): Itinerary {
+        var returning: number = 0, description: string, line: string, agency: string;
+        var spots: Array<ItinerarySpot> = new Array<ItinerarySpot>();
+         
+        var body = data.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
+        body.shift(); // Removes the CSV header line with column names
+        // columns: ["linha", "descricao", "agencia", "sequencia", "shape_id", "latitude", "longitude"]
+        
+        body.forEach( (iti)=>{
+            if(iti.length<=0) return;
+            var it: string[] = iti.split(",");
+            
+            if(agency===undefined)      agency = it[2];
+            if(description===undefined) description = it[1];
+            if(line===undefined)        line = it[0];
+            if(parseInt(it[3])==0 && returning==0) returning = 1;
+            else if(parseInt(it[3])==0 && returning==1) returning = -1;
+            
+            // Transforming the external data into an application's known
+            var finalDescription: string[] = it[1].split("-");
+            finalDescription.shift();
+            description = finalDescription.join("-");
+            var sequential: number = parseInt(it[3])*returning;
+            spots.push(new ItinerarySpot(parseFloat(it[5]), parseFloat(it[6]), (sequential<0)? true: false));
+        });
+        return new Itinerary(line, description, agency, spots);
     }
 }
 export = ItineraryDataAccess;

@@ -18,7 +18,7 @@ class MongoDb implements IDatabase {
 		this.context = context;
 	}
 	
-	public collection<T>(name: string, map: IModelMap<T>): ICollection<T> {
+	public collection<T>(name: string, map: IModelMap): ICollection<T> {
 		var collection: any = Sync.promise(this.context, this.context.collection, name);
 		if(collection instanceof Error) throw collection;
 		return new MongoCollection<T>(collection, map);

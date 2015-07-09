@@ -1,11 +1,13 @@
-import Bus         = require("../domain/bus");
+import Bus         = require("../domain/entity/bus");
+import BusModelMap = require("../domain/modelMap/busModelMap");
 import Config      = require("../config");
 import DbContext   = require("../core/database/dbContext");
 import Factory     = require("../common/factory");
 import File        = require("../core/file");
 import HttpRequest = require("../core/httpRequest");
 import IDataAccess = require("./iDataAccess");
-import Itinerary   = require("../domain/itinerary");
+import Itinerary   = require("../domain/entity/itinerary");
+import ItinerarySpot = require("../domain/entity/itinerarySpot");
 import List        = require("../common/tools/list");
 import Logger      = require("../common/logger");
 import Strings     = require("../strings");
@@ -30,11 +32,11 @@ class BusDataAccess implements IDataAccess {
         this.db = new DbContext();
     }
     
-    public create(data: List<Bus>): void {
+    public create(data: Array<Bus>): void {
         "use strict";
-        var colBus = this.db.collection(this.collectionName, null);
+        var colBus = this.db.collection(this.collectionName, new BusModelMap);
         var colHistory = this.db.collection(this.subCollectionName, null);
-        data.getIterable().forEach( (bus) => {
+        data.forEach( (bus) => {
             try {
                 var doc = colBus.update(colBus, bus.getOrder());
                 if (bus.getLine() !== Strings.dataaccess.bus.blankLine && doc.line !== bus.getLine()) {
@@ -58,10 +60,10 @@ class BusDataAccess implements IDataAccess {
                 });
             }
         }, this);
-        this.logger.info(data.size()+" records saved successfully.");
+        this.logger.info(data.length+" records saved successfully.");
     }
     
-	public retrieve(): List<Bus> {
+	public retrieve(): Array<Bus> {
         return this.requestFromServer();
     }
     
@@ -69,20 +71,23 @@ class BusDataAccess implements IDataAccess {
     
 	public delete(...args: any[]): any {}
     
-    private getNearest(bus: Bus, itineraries: List<Itinerary>): Itinerary{
-        var nearest: Itinerary = new Itinerary(0, bus.getLine(), Strings.dataaccess.bus.blankSense, "", 0, 999, 999);
+    private getNearest(bus: Bus, itinerary: Itinerary): ItinerarySpot {
+        var nearest: ItinerarySpot = null;
         var factor: number = Math.pow(10,5);
         var nearestNormal: number = 99 * factor;
         
-        itineraries.getIterable().forEach( (current)=>{
-            var currentLongitude: number = current.getLongitude() * factor;
-            var currentLatitude: number = current.getLatitude() * factor;
-            var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
-            if(nearestNormal > currentNormal){
-                nearestNormal = currentNormal;
-                nearest = current;
+        itinerary.getSpots().forEach( (current)=>{
+            if(nearest===null) nearest = current;
+            else {
+                var currentLongitude: number = current.getLongitude() * factor;
+                var currentLatitude: number = current.getLatitude() * factor;
+                var currentNormal: number = Math.sqrt( currentLatitude^2 + currentLongitude^2 );
+                if(nearestNormal > currentNormal){
+                    nearestNormal = currentNormal;
+                    nearest = current;
+                }
             }
-        }, this);
+        });
         return nearest;
     }
 
@@ -90,17 +95,14 @@ class BusDataAccess implements IDataAccess {
      * Does the request to the external server and retrieves the data
      * @returns {any}
      */
-    private requestFromServer(): List<Bus> {
+    private requestFromServer(): Array<Bus> {
         "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
 
         var options: any = {
             url: 'http://' + config.host + config.path.bus,
-            headers: {
-                'Accept': '*/*',
-                'Cache-Control': 'no-cache'
-            },
+            headers: { 'Accept': '*/*', 'Cache-Control': 'no-cache'},
             json: true
         };
         try {
@@ -109,7 +111,7 @@ class BusDataAccess implements IDataAccess {
         } catch (e) {
             this.logger.error(e.stack);
             e.type = Strings.keyword.error;
-            return e;
+            return new Array<Bus>();
         }
     }
 
@@ -118,56 +120,68 @@ class BusDataAccess implements IDataAccess {
      * @param {any} response
      * @returns {any}
      */
-    private respondRequest(response: any): List<Bus> {
+    private respondRequest(response: any): Array<Bus> {
         "use strict";
-        var busList: List<Bus> = new List<Bus>();
+        var busList: Array<Bus> = new Array<Bus>();
         switch (response.statusCode) {
             case 200:
                 this.logger.info(Strings.dataaccess.all.request.ok);
-                try {
-                    var body: any = response.body;
-                    if (!body.DATA) {
-                        this.logger.error(Strings.dataaccess.server.jsonError);
-                        return busList;
-                    }
-                    var data = body.DATA;
-                    //let columns = body.COLUMNS;
-                    // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-                    var itineraries: any = this.dataAccess.retrieve();
-                    
-                    data.forEach( (d) => {
-                        var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
-                        var line: string = bus.getLine().toString();
-                        if (line === ""){
-                            bus.setLine(Strings.dataaccess.bus.blankLine);
-                            bus.setSense(Strings.dataaccess.bus.blankSense);
-                        } else {
-                            if(!itineraries[line]){
-                                itineraries[line] = this.dataAccess.retrieve(line);
-                            }
-                            var nearest: Itinerary = this.getNearest(bus, itineraries[line]);
-                            bus.setSense(nearest.getDescription());
-                        }
-                        busList.add(bus);
-                        //this.logger.info(bus.getOrder()+" added.");
-                    }, this);
-                } catch (e) {
-                    this.logger.error(e.stack);
-                }
-                return busList;
+                return this.parseBody(response.body);
             case 302:
                 this.logger.alert(Strings.dataaccess.all.request.e302);
-                return busList;
+                break;
             case 404:
                 this.logger.alert(Strings.dataaccess.all.request.e404);
-                return busList;
+                break;
             case 503:
                 this.logger.alert(Strings.dataaccess.all.request.e503);
-                return busList;
+                break;
             default:
                 this.logger.error('(' + response.statusCode + ') ' + Strings.dataaccess.all.request.default);
-                return busList;
+                break;
         }
+        return busList;
+    }
+    
+    private parseBody(body: any): Array<Bus> {
+        var busList: Array<Bus> = new Array<Bus>();
+        try {
+            if (!body.DATA) {
+                this.logger.error(Strings.dataaccess.server.jsonError);
+                return busList;
+            }
+            var data = body.DATA;
+            //let columns = body.COLUMNS;
+            // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
+            var itineraries: any = this.dataAccess.retrieve();
+            
+            data.forEach( (d) => {
+                var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
+                var line: string = bus.getLine().toString();
+                if (line === ""){
+                    bus.setLine(Strings.dataaccess.bus.blankLine);
+                    bus.setSense(Strings.dataaccess.bus.blankSense);
+                } else {
+                    if(!itineraries[line]){
+                        itineraries[line] = this.dataAccess.retrieve(line);
+                    }
+                    var itinerary: Itinerary = itineraries[line];
+                    var nearest: ItinerarySpot = this.getNearest(bus, itinerary);
+                    if(nearest.isReturning()){
+                        var description: string[] = itinerary.getDescription().split(" X ");
+                        var tmp: string = description[0];
+                        description[0] = description[1];
+                        description[1] = tmp;
+                        bus.setSense(description.join(" X "));
+                    }
+                    else bus.setSense(itinerary.getDescription());
+                }
+                busList.push(bus);
+            }, this);
+        } catch (e) {
+            this.logger.error(e.stack);
+        }
+        return busList;
     }
 }
 export = BusDataAccess;

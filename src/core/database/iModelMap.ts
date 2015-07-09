@@ -1,4 +1,4 @@
-interface IModelMap<T> {
-	getInstance(data: any): T;
+interface IModelMap {
+	getInstance<T>(data: any): T;
 }
 export = IModelMap;
