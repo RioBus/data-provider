@@ -23,11 +23,11 @@ describe("[SERVICE] Database", () => {
 		done();
 	});
 	
-	var itinerary: Itinerary = new Itinerary(2, "teste", "teste", "agecia", 0, 99, 99);
+	var itinerary: Itinerary = new Itinerary("linha", "descricao", "agencia", []);
 	
 	it("should save the itinerary object to the database", (done) => {
 		var result = collection.save(itinerary);
-		Assert(result !== undefined);
+		Assert(result instanceof Itinerary);
 		done();
 	});
 	
