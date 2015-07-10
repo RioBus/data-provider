@@ -12,6 +12,7 @@ import List        = require("../common/tools/list");
 import Logger      = require("../common/logger");
 import Strings     = require("../strings");
 import $inject     = require("../core/inject");
+import ICollection = require("../core/database/iCollection");
 
 /**
  * DataAccess responsible for managing data access to the data stored in the
@@ -25,46 +26,29 @@ class BusDataAccess implements IDataAccess {
     private logger: Logger;
     private db: DbContext;
     private collectionName: string = "bus";
-    private subCollectionName: string = "bus_history";
+    private historyCollectionName: string = "bus_history";
+    private bus: ICollection<Bus>;
+    private history: ICollection<Bus>;
 
     public constructor(private dataAccess: IDataAccess = $inject("dataAccess/itineraryDataAccess")) {
         this.logger = Factory.getServerLogger();
         this.db = new DbContext();
+        this.bus = this.db.collection<Bus>(this.collectionName, new BusModelMap());
+        this.history = this.db.collection<Bus>(this.historyCollectionName, new BusModelMap());
     }
     
-    public create(data: Array<Bus>): void {
+	public retrieve(itineraries: any): Bus[] {
+        return this.requestFromServer(itineraries);
+    }
+    
+    public create(buses: Bus[]): void {
         "use strict";
-        var colBus = this.db.collection(this.collectionName, new BusModelMap);
-        var colHistory = this.db.collection(this.subCollectionName, null);
-        data.forEach( (bus) => {
-            try {
-                var doc = colBus.update(colBus, bus.getOrder());
-                if (bus.getLine() !== Strings.dataaccess.bus.blankLine && doc.line !== bus.getLine()) {
-                    this.logger.info(Strings.dataaccess.bus.updating + this.collectionName + "/" + bus.getOrder() + " " + doc.line + "->" + bus.getLine());
-                    colBus.update(doc, { line: bus.getLine() });
-                }
-            } catch (e) {
-                if (e.code === Strings.error.notFound) {
-                    this.logger.info(Strings.dataaccess.bus.creating + this.collectionName + "/" + bus.getOrder());
-                    colBus.save({ _key: bus.getOrder(), line: bus.getLine() });
-                } else this.logger.error(e.stack);
-            } finally {
-                colHistory.save({
-                    order: bus.getOrder(),
-                    updateTime: bus.getUpdateTime(),
-                    speed: bus.getSpeed(),
-                    direction: bus.getDirection(),
-                    latitude: bus.getLatitude(),
-                    longitude: bus.getLongitude(),
-                    sense: bus.getSense()
-                });
-            }
+        buses.forEach( (bus) => {
+            var params: any = {};
+            this.history.findOrCreate(bus);
+            this.bus.save(bus);
         }, this);
-        this.logger.info(data.length+" records saved successfully.");
-    }
-    
-	public retrieve(): Array<Bus> {
-        return this.requestFromServer();
+        this.logger.info(buses.length+" records saved successfully.");
     }
     
 	public update(...args: any[]): any {}
@@ -95,7 +79,7 @@ class BusDataAccess implements IDataAccess {
      * Does the request to the external server and retrieves the data
      * @returns {any}
      */
-    private requestFromServer(): Array<Bus> {
+    private requestFromServer(itineraries: any): Bus[] {
         "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
@@ -107,11 +91,11 @@ class BusDataAccess implements IDataAccess {
         };
         try {
             var response: any = http.get(options);
-            return this.respondRequest(response);
+            return this.respondRequest(response, itineraries);
         } catch (e) {
             this.logger.error(e.stack);
             e.type = Strings.keyword.error;
-            return new Array<Bus>();
+            return [];
         }
     }
 
@@ -120,13 +104,11 @@ class BusDataAccess implements IDataAccess {
      * @param {any} response
      * @returns {any}
      */
-    private respondRequest(response: any): Array<Bus> {
-        "use strict";
-        var busList: Array<Bus> = new Array<Bus>();
+    private respondRequest(response: any, itineraries: any): Bus[] {
         switch (response.statusCode) {
             case 200:
                 this.logger.info(Strings.dataaccess.all.request.ok);
-                return this.parseBody(response.body);
+                return this.parseBody(response.body, itineraries);
             case 302:
                 this.logger.alert(Strings.dataaccess.all.request.e302);
                 break;
@@ -137,14 +119,14 @@ class BusDataAccess implements IDataAccess {
                 this.logger.alert(Strings.dataaccess.all.request.e503);
                 break;
             default:
-                this.logger.error('(' + response.statusCode + ') ' + Strings.dataaccess.all.request.default);
+                this.logger.error('(' + response.statusCode + ') ' + Strings.dataaccess.all.request.error);
                 break;
         }
-        return busList;
+        return [];
     }
     
-    private parseBody(body: any): Array<Bus> {
-        var busList: Array<Bus> = new Array<Bus>();
+    private parseBody(body: any, itineraries: any): any {
+        var busList: Bus[] = new Array<Bus>();
         try {
             if (!body.DATA) {
                 this.logger.error(Strings.dataaccess.server.jsonError);
@@ -153,7 +135,6 @@ class BusDataAccess implements IDataAccess {
             var data = body.DATA;
             //let columns = body.COLUMNS;
             // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-            var itineraries: any = this.dataAccess.retrieve();
             
             data.forEach( (d) => {
                 var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
@@ -167,7 +148,7 @@ class BusDataAccess implements IDataAccess {
                     }
                     var itinerary: Itinerary = itineraries[line];
                     var nearest: ItinerarySpot = this.getNearest(bus, itinerary);
-                    if(nearest.isReturning()){
+                    if(nearest!==null && nearest.isReturning()){
                         var description: string[] = itinerary.getDescription().split(" X ");
                         var tmp: string = description[0];
                         description[0] = description[1];
@@ -181,7 +162,7 @@ class BusDataAccess implements IDataAccess {
         } catch (e) {
             this.logger.error(e.stack);
         }
-        return busList;
+        return { buses: busList, itineraries: itineraries };
     }
 }
 export = BusDataAccess;

@@ -1,7 +1,10 @@
+import Bus            = require("./domain/entity/bus");
 import Factory        = require("./common/factory");
 import Logger         = require("./common/logger");
 import Config   	  = require("./config");
-import IService       = require("./service/iService");
+import IBusiness      = require("./business/iBusiness");
+import IDataAccess    = require("./dataAccess/iDataAccess");
+import Itinerary      = require("./domain/entity/itinerary");
 import Strings        = require("./strings");
 import MailServer     = require("./core/mail/mailServer");
 import MailObject     = require("./core/mail/mailObject");
@@ -28,12 +31,29 @@ class Application{
         var logger: Logger = Factory.getServerLogger();
         logger.info(Strings.provider.rest.start);
         
-        var service: IService = $inject("service/serverService");
-        service.retrieve();
+        var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
+        var itineraries: any = Application.mapItineraries(ida.retrieve());
+        
+        var business: IBusiness = $inject("business/serverBusiness");
+        var output: any = business.retrieve(itineraries);
+        var buses: Bus[] = output.buses;
+        itineraries = output.itineraries;
+        if(buses.length>0) business.create(buses);
         
         Application.schedule( ()=>{
-            service.retrieve();
+            output = business.retrieve(itineraries);
+            buses = output.buses;
+            itineraries = output.itineraries;
+            if(buses.length>0) business.create(buses);
         }, Config.environment.provider.updateInterval);   
+    }
+    
+    public static mapItineraries(data: Itinerary[]): any {
+        var obj: any = {};
+        data.forEach((itinerary)=>{
+            obj[itinerary.getLine()] = itinerary;
+        });
+        return obj;
     }
     
     public static schedule(callback: ()=>void, updateInterval: number): void {

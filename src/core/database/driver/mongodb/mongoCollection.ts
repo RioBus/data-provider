@@ -4,10 +4,20 @@ import Sync   	   = require("../../../sync");
 
 class MongoCollection<T> implements ICollection<T>{
 	
-	public constructor(private context: any, private map: IModelMap) {}
+	public constructor(private context: any, private map: IModelMap) {
+		map.preConfig(this);
+	}
 	
-	public find(params?: any): Array<T>{
-		if(params===undefined) params = {};
+	count(query: any={}): number {
+		if(query===undefined) query = {};
+		return Sync.promise(this.context, this.context.count, query);
+	}
+	
+	createIndex(fieldOrSpec: any, options: any = {}): void {
+		return Sync.promise(this.context, this.context.ensureIndex, fieldOrSpec, options);
+	}
+	
+	public find(params: any = {}): Array<T> {
 		var find: any = Sync.promise(this.context, this.context.find, params);
 		var data: Array<any> = Sync.promise(find, find.toArray);
 		var list = new Array<T>();
@@ -17,15 +27,28 @@ class MongoCollection<T> implements ICollection<T>{
 		return list;
 	}
 	
-	public findById(id: number): T{
+	public findById(id: number): T {
 		var find: any = Sync.promise(this.context, this.context.find, {id: id});
-		var data: Array<any> = Sync.promise(find, find.toArray);
-		return (data.length>0)? this.map.getInstance<T>(data[0]) : null;
+		var data: any[] = Sync.promise(find, find.toArray);
+		if(data.length>0) return this.map.getInstance<T>(data[0]);
+		else throw new Error("Document not found");
+	}
+	
+	public findOrCreate(data: any): T {
+		var update: any = { $setOnInsert: data }; 
+		var options = {
+			new: true,
+			upsert: true
+		};
+		var findAndModify: any = Sync.promise(this.context, this.context.findAndModify, data, [], update, options);
+		if(findAndModify instanceof Error) throw findAndModify;
+		return this.map.getInstance<T>(findAndModify);
 	}
 	
 	public save(obj: T): T {
-		var data: any = Sync.promise(this.context, this.context.insert, obj);
-		return this.map.getInstance<T>(data);
+		var saveOperation: any = Sync.promise(this.context, this.context.insert, obj);
+		return this.map.getInstance<T>(saveOperation.ops[0]);
+		// Workaround. depois e necessario corrigir!!!
 	}
 	
 	public update(params: any, data: any): any {

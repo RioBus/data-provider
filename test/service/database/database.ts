@@ -31,7 +31,13 @@ describe("[SERVICE] Database", () => {
 		done();
 	});
 	
-	var list: Array<Itinerary> = collection.find();
+	it("should find or create the itinerary object in the database", (done) => {
+		var result = collection.findOrCreate(itinerary);
+		Assert(result instanceof Itinerary);
+		done();
+	});
+	
+	var list: Itinerary[] = collection.find();
 	
 	it("should return object from the database", (done) => {
 		Assert(list.length > 0);

@@ -80,7 +80,7 @@ class Strings{
                 e302: "(302) Server moved temporarily.",
                 e404: "(404) Not found.",
                 e503: "(503) Server unavailable.",
-                default: "An error ocurred."
+                error: "An error ocurred."
             }
         }
     };

@@ -30,7 +30,7 @@ class ItineraryDataAccess implements IDataAccess{
     public constructor(){
         this.logger = Factory.getLogger();
         this.db = new DbContext();
-        this.collection = this.db.collection<Itinerary>(this.collectionName, new ItineraryModelMap);
+        this.collection = this.db.collection<Itinerary>(this.collectionName, new ItineraryModelMap());
     }
     
 	public update(...args: any[]): any {}
@@ -40,13 +40,11 @@ class ItineraryDataAccess implements IDataAccess{
     public create(itinerary: Itinerary): Itinerary {
         var saved: Itinerary = this.collection.save(itinerary);
         this.logger.info("["+saved.getLine()+"] "+Strings.dataaccess.itinerary.stored);
-        this.db.closeConnection();
         return saved;
     }
     
 	public retrieve(data?: string): any {
         return (data!==undefined)? this.getItinerary(data) : this.getItineraries();
-        this.db.closeConnection();
     }
 
     /**
@@ -54,24 +52,20 @@ class ItineraryDataAccess implements IDataAccess{
      * @param {String} line
      * @return List<Itinerary>
      */
-    public getItinerary(line: string): Itinerary{
+    public getItinerary(line: string): Itinerary {
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
-        try{
-            var list: Array<Itinerary> = this.collection.find({line: line});
-            return (list.length>0)? list[0] : null;
-        } catch (e) {
+        var list: Array<Itinerary> = this.collection.find({line: ""+line});
+        if(list.length>0){
+            return list[0];
+        } else {
             var itinerary: Itinerary = this.requestFromServer(line);
             return this.create(itinerary);
         }
     }
     
-    public getItineraries(): Array<Itinerary>{
+    public getItineraries(): Itinerary[] {
         this.logger.info(Strings.dataaccess.itinerary.searching+"all");
-        try{
-            return this.collection.find();
-        } catch (e) {
-            return new Array<Itinerary>();
-        }
+        return this.collection.find();
     }
 
     /**
@@ -93,8 +87,9 @@ class ItineraryDataAccess implements IDataAccess{
         try {
             this.logger.info("["+line+"] "+Strings.dataaccess.itinerary.downloading);
             var response: any = http.get(options);
-            var itinerary: Itinerary = this.respondRequest(response); 
-            return (itinerary!==null)? itinerary : empty;
+            var itinerary: Itinerary = this.respondRequest(response);
+            if(itinerary===null) return empty; 
+            return itinerary;
         } catch (e) {
             this.logger.error(e.stack);
             return empty;
@@ -123,13 +118,13 @@ class ItineraryDataAccess implements IDataAccess{
             default:
                 this.logger.alert('('+response.statusCode+') '+Strings.dataaccess.all.request.default);
                 break;
-            return null;
         }
+        return null;
     }
     
     private parseBody(data: string): Itinerary {
         var returning: number = 0, description: string, line: string, agency: string;
-        var spots: Array<ItinerarySpot> = new Array<ItinerarySpot>();
+        var spots: ItinerarySpot[] = new Array<ItinerarySpot>();
          
         var body = data.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
         body.shift(); // Removes the CSV header line with column names
