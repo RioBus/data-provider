@@ -46,18 +46,8 @@ class BusDataAccess implements IDataAccess {
         var options: any = { upsert: true };
         buses.forEach( (bus: Bus) => {
             var history: Bus = this.history.findOrCreate(bus);
-            var update = {
-                latitude: history.getLatitude(),
-                longitude: history.getLongitude(),
-                timestamp: history.getUpdateTime(),
-                sense: history.getSense(),
-                speed: history.getSpeed(),
-                direction: history.getDirection(),
-                _id: history.getId()
-            };
-            var modified: Bus = this.bus.findAndModify({order: bus.getOrder()}, [], { $set: update, $setOnInsert: history }, options);
-            var message: string = (modified!==undefined)? "Bus updated: " : "Bus created: ";
-            this.logger.info(message+bus.getOrder());
+            this.bus.save(history);
+            this.logger.info("Bus saved: "+bus.getOrder());
         }, this);
         this.logger.info(buses.length+" records saved successfully.");
     }
