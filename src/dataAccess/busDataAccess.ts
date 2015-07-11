@@ -42,11 +42,22 @@ class BusDataAccess implements IDataAccess {
     }
     
     public create(buses: Bus[]): void {
-        "use strict";
-        buses.forEach( (bus) => {
-            var params: any = {};
-            this.history.findOrCreate(bus);
-            this.bus.save(bus);
+        this.bus.remove();
+        var options: any = { upsert: true };
+        buses.forEach( (bus: Bus) => {
+            var history: Bus = this.history.findOrCreate(bus);
+            var update = {
+                latitude: history.getLatitude(),
+                longitude: history.getLongitude(),
+                timestamp: history.getUpdateTime(),
+                sense: history.getSense(),
+                speed: history.getSpeed(),
+                direction: history.getDirection(),
+                _id: history.getId()
+            };
+            var modified: Bus = this.bus.findAndModify({order: bus.getOrder()}, [], { $set: update, $setOnInsert: history }, options);
+            var message: string = (modified!==undefined)? "Bus updated: " : "Bus created: ";
+            this.logger.info(message+bus.getOrder());
         }, this);
         this.logger.info(buses.length+" records saved successfully.");
     }
@@ -80,7 +91,6 @@ class BusDataAccess implements IDataAccess {
      * @returns {any}
      */
     private requestFromServer(itineraries: any): Bus[] {
-        "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
 

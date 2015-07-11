@@ -64,7 +64,7 @@ class ItineraryDataAccess implements IDataAccess{
     }
     
     public getItineraries(): Itinerary[] {
-        this.logger.info(Strings.dataaccess.itinerary.searching+"all");
+        this.logger.info("Getting all itineraries...");
         return this.collection.find();
     }
 

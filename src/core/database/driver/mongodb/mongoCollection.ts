@@ -34,15 +34,19 @@ class MongoCollection<T> implements ICollection<T>{
 		else throw new Error("Document not found");
 	}
 	
+	findAndModify(criteria: any, sort: any, update: any, options?: any): T {
+		var findAndModify: any = Sync.promise(this.context, this.context.findAndModify, criteria, sort, update, options);
+		if(findAndModify instanceof Error) throw findAndModify;
+		return this.map.getInstance<T>(findAndModify);
+	}
+	
 	public findOrCreate(data: any): T {
 		var update: any = { $setOnInsert: data }; 
 		var options = {
 			new: true,
 			upsert: true
 		};
-		var findAndModify: any = Sync.promise(this.context, this.context.findAndModify, data, [], update, options);
-		if(findAndModify instanceof Error) throw findAndModify;
-		return this.map.getInstance<T>(findAndModify);
+		return this.map.getInstance<T>(this.findAndModify(data, [], update, options) );
 	}
 	
 	public save(obj: T): T {
@@ -56,7 +60,7 @@ class MongoCollection<T> implements ICollection<T>{
 		return this.map.getInstance(data);
 	}
 	
-	public remove(params: any): boolean {
+	public remove(params: any = {}): boolean {
 		return Sync.promise(this.context, this.context.remove, params);
 	}
 }

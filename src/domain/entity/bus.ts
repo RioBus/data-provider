@@ -7,8 +7,12 @@ class Bus{
 
     public constructor(private line: string, private order: string, private speed: number, 
 				private direction: number, private latitude: number, 
-				private longitude: number, private timestamp: Date, private sense?: string){
+				private longitude: number, private timestamp: Date, private sense?: string, private id?: number){
     }
+	
+	public getId(): number {
+		return this.id;
+	}
 	
 	public getLine(): string{
 		return this.line;

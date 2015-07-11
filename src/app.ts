@@ -2,7 +2,6 @@ import Bus            = require("./domain/entity/bus");
 import Factory        = require("./common/factory");
 import Logger         = require("./common/logger");
 import Config   	  = require("./config");
-import IBusiness      = require("./business/iBusiness");
 import IDataAccess    = require("./dataAccess/iDataAccess");
 import Itinerary      = require("./domain/entity/itinerary");
 import Strings        = require("./strings");
@@ -27,24 +26,25 @@ class Application{
     public static main(argv: string[]): void {
         "use strict";
         Application.handleFatalError();
+        var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
+        var bda: IDataAccess = $inject("dataAccess/busDataAccess");
         
         var logger: Logger = Factory.getServerLogger();
         logger.info(Strings.provider.rest.start);
         
-        var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
         var itineraries: any = Application.mapItineraries(ida.retrieve());
+        logger.info("Getting buses...");
+        var output: any = bda.retrieve(itineraries);
         
-        var business: IBusiness = $inject("business/serverBusiness");
-        var output: any = business.retrieve(itineraries);
         var buses: Bus[] = output.buses;
         itineraries = output.itineraries;
-        if(buses.length>0) business.create(buses);
+        if(buses.length>0) bda.create(buses);
         
         Application.schedule( ()=>{
-            output = business.retrieve(itineraries);
+            output = bda.retrieve(itineraries);
             buses = output.buses;
             itineraries = output.itineraries;
-            if(buses.length>0) business.create(buses);
+            if(buses.length>0) bda.create(buses);
         }, Config.environment.provider.updateInterval);   
     }
     

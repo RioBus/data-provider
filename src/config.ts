@@ -41,10 +41,10 @@ class Config {
 				driver: "mongodb",
 				config: {
 					dbName: "riobus",
-					host: "ds047742.mongolab.com",
-					user: "riobus",
-					pass: "riobus",
-					port: "47742"
+					host: "mongo",	 	//	host: "ds047742.mongolab.com",
+					user: "riobus",	 	//	user: "riobus",
+					pass: "riobus",		//	pass: "riobus",
+					port: "27017"		//	port: "47742"
 				}
 			}
 		},

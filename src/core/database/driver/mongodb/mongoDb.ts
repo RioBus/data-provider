@@ -13,7 +13,7 @@ class MongoDb implements IDatabase {
 	
 	public constructor(dbConfig: any){
 		var url: string;
-		if(dbConfig.user!==undefined && dbConfig.pass!==undefined)
+		if(dbConfig.user!=="" && dbConfig.pass!=="")
 			url = "mongodb://"+dbConfig.user+":"+dbConfig.pass+"@"+dbConfig.host+":"+dbConfig.port+"/"+dbConfig.dbName;
 		else
 			url = "mongodb://"+dbConfig.host+":"+dbConfig.port+"/"+dbConfig.dbName;
