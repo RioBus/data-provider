@@ -1,4 +1,2 @@
 #!/bin/bash
-mkdir -p $(pwd)/.compiled/mongo
-docker run -v $(pwd)/.compiled/mongo:/data --name mongo -d mongo mongod --smallfiles
 docker run -it --rm --link mongo:mongo -v $(pwd):/app -w /app --name riobus riobus /bin/bash

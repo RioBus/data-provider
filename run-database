@@ -1,0 +1,3 @@
+#!/bin/bash
+mkdir -p $(pwd)/.compiled/mongo
+docker run -it -d -v $(pwd)/.compiled/mongo:/data --name mongo -p 27017:27017 mongo mongod --smallfiles
