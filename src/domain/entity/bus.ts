@@ -4,14 +4,17 @@
  * @constructor
  */
 class Bus{
+	
+	private timestamp: string;
 
     public constructor(private line: string, private order: string, private speed: number, 
 				private direction: number, private latitude: number, 
-				private longitude: number, private timestamp: Date, private sense?: string, private id?: number){
+				private longitude: number, timestamp: string, private sense?: string, private _id?: number){
+		this.timestamp = (new Date(timestamp)).toISOString();
     }
 	
 	public getId(): number {
-		return this.id;
+		return this._id;
 	}
 	
 	public getLine(): string{
@@ -51,7 +54,7 @@ class Bus{
 	}
 	
 	public getUpdateTime(): Date{
-		return this.timestamp;
+		return (new Date(this.timestamp));
 	}
 }
 export = Bus;
