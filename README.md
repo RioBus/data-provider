@@ -11,10 +11,10 @@ Arquitetura
 
 A aplicação do provedor de dados do RioBus foi desenvolvida em TypeScript, através do GULP e Node.js.
 
-A organização da lógica da aplicação segue a metodologia de desenvolvimento do DDD (Domain-Driven Design), que deixa o
-código desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
+A organização da lógica da aplicação é dividida em camadas e separa o acesso ao repositório de dados da lógica da aplicação,
+de forma que o código fique desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
 
-Além disso, foi preparada uma infra-estrutura graças ao poder do GULP, um dos automatizadores de tarefas mais utilizados
+Além disso, foi preparada uma infra-estrutura utilizando o poder do GULP, um dos automatizadores de tarefas mais utilizados
 atualmente por equipes de desenvolvimento de JavaScript. Desta forma foi possível escrever um código limpo e sucinto que
 garante flexibilidade e modularidade.
 
@@ -45,7 +45,7 @@ Ainda na raiz do projeto, configure o ambiente
 Execute a aplicação:
 > $ npm start
 
-Os dados dos ônibus são salvos no banco de dados NoSQL [ArangoDB](https://www.arangodb.com). Certifique-se de que ele 
+Os dados dos ônibus são salvos no banco de dados NoSQL [MongoDB](https://www.mongodb.org/). Certifique-se de que ele 
 esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas na classe ```Config```, 
 em ```Config.environment.<ambiente>.database```.
 
@@ -75,4 +75,4 @@ npm run deploy
 Compatibilidade
 ---------------
 
-* nodejs >= 0.10
+* nodejs >= 0.11
