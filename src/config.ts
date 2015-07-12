@@ -27,7 +27,6 @@ class Config {
                 itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv"
             },
 			updateInterval:	5000,
-            timeout: 		20000,
             log: 			"/tmp/riobus/data-server.log"
 		},
 		mailServer: {
@@ -50,9 +49,14 @@ class Config {
 		},
 		production: {
 			database: {
-				databaseName: "riobus",
 				driver: "mongodb",
-				url: "http://riobus:riobus@arango:8529"
+				config: {
+					dbName: "riobus",
+					host: "mongo",
+					user: "riobus",
+					pass: "riobus",
+					port: "27017"
+				}
 			}
 		}
 	}
