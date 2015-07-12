@@ -43,13 +43,20 @@ class BusDataAccess implements IDataAccess {
     
     public create(buses: Bus[]): void {
         this.bus.remove();
-        var options: any = { upsert: true };
-        buses.forEach( (bus: Bus) => {
+        buses.forEach( (bus: any) => {
+            delete bus._id; // Is being firstly created, will never have an id here.
+            if(bus.line===Strings.dataaccess.bus.blankLine){
+                var latest: Bus = this.history.findOne({order: bus.order}, {sort: [["timestamp", "DESC"]]});
+                if(latest!==null && latest.getLine()!==Strings.dataaccess.bus.blankLine){
+                    bus.line = latest.getLine();
+                    bus.sense = latest.getSense();
+                }
+            }
             var history: Bus = this.history.findOrCreate(bus);
+            this.logger.info("Bus processed: "+bus.getOrder());
             this.bus.save(history);
-            this.logger.info("Bus saved: "+bus.getOrder());
         }, this);
-        this.logger.info(buses.length+" records saved successfully.");
+        this.logger.info(buses.length+" records processed successfully.");
     }
     
 	public update(...args: any[]): any {}
