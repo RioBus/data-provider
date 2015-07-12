@@ -9,7 +9,6 @@ class MongoCollection<T> implements ICollection<T>{
 	}
 	
 	count(query: any={}): number {
-		if(query===undefined) query = {};
 		return Sync.promise(this.context, this.context.count, query);
 	}
 	
@@ -28,40 +27,38 @@ class MongoCollection<T> implements ICollection<T>{
 	}
 	
 	public findById(id: number): T {
-		var find: any = Sync.promise(this.context, this.context.find, {id: id});
-		var data: any[] = Sync.promise(find, find.toArray);
-		if(data.length>0) return this.map.getInstance<T>(data[0]);
-		else throw new Error("Document not found");
+		return this.findOne({id: id});
 	}
 	
-	findAndModify(criteria: any, sort: any, update: any, options?: any): T {
+	public findAndModify(criteria: any, sort: any, update: any, options?: any): T {
 		var findAndModify: any = Sync.promise(this.context, this.context.findAndModify, criteria, sort, update, options);
-		if(findAndModify instanceof Error) throw findAndModify;
-		return this.map.getInstance<T>(findAndModify);
+		return (findAndModify.value!==null)? this.map.getInstance<T>(findAndModify.value) : null;
+	}
+	
+	public findOne(query: any, options: any={}): T {
+		var result: any = Sync.promise(this.context, this.context.findOne, query, options);
+		return (result!==null)? this.map.getInstance<T>(result) : null;
 	}
 	
 	public findOrCreate(data: any): T {
-		var update: any = { $setOnInsert: data }; 
-		var options = {
-			new: true,
-			upsert: true
-		};
+		var update: any = { $set: data }; 
+		var options = { new: true, upsert: true };
 		return this.map.getInstance<T>(this.findAndModify(data, [], update, options) );
 	}
 	
 	public save(obj: T): T {
 		var saveOperation: any = Sync.promise(this.context, this.context.insert, obj);
-		return this.map.getInstance<T>(saveOperation.ops[0]);
+		return (saveOperation.ops.length>0)? this.map.getInstance<T>(saveOperation.ops[0]) : null;
 		// Workaround. depois e necessario corrigir!!!
 	}
 	
-	public update(params: any, data: any): any {
-		var data: any = Sync.promise(this.context, this.context.update, params, { $set: data });
-		return this.map.getInstance(data);
+	public update(query: any, data: any, options: any={}): any {
+		var data: any = Sync.promise(this.context, this.context.update, query, data, options);
+		return this.map.getInstance<T>(data);
 	}
 	
-	public remove(params: any = {}): boolean {
-		return Sync.promise(this.context, this.context.remove, params);
+	public remove(query: any = {}): boolean {
+		return Sync.promise(this.context, this.context.remove, query);
 	}
 }
 export = MongoCollection;
