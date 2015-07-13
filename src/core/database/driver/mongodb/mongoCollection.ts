@@ -8,12 +8,23 @@ class MongoCollection<T> implements ICollection<T>{
 		map.preConfig(this);
 	}
 	
-	count(query: any={}): number {
+	public aggregate(commands: any[], options: any = {}): T[] {
+		var output: any[] = Sync.promise(this.context, this.context.aggregate, commands, options);
+		var result: T[] = Array<T>();
+		if(output.length>0){
+			output.forEach( (data)=>{
+				result.push(this.map.getInstance<T>(data));
+			});
+		}
+		return result;
+	}
+	
+	public count(query: any={}): number {
 		query = this.map.prepareToInput(query);
 		return Sync.promise(this.context, this.context.count, query);
 	}
 	
-	createIndex(fieldOrSpec: any, options: any = {}): void {
+	public createIndex(fieldOrSpec: any, options: any = {}): void {
 		return Sync.promise(this.context, this.context.ensureIndex, fieldOrSpec, options);
 	}
 	
