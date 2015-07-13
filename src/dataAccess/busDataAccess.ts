@@ -45,10 +45,11 @@ class BusDataAccess implements IDataAccess {
         this.bus.remove();
         buses.forEach( (bus: any) => {
             delete bus._id; // Is being firstly created, will never have an id here.
+            bus.line += "";
             if(bus.line===Strings.dataaccess.bus.blankLine){
                 var latest: Bus = this.history.findOne({order: bus.order}, {sort: [["timestamp", "DESC"]]});
                 if(latest!==null && latest.getLine()!==Strings.dataaccess.bus.blankLine){
-                    bus.line = latest.getLine();
+                    bus.line = latest.getLine().toString();
                     bus.sense = latest.getSense();
                 }
             }
