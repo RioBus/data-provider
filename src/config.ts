@@ -29,7 +29,7 @@ class Config {
 				],
                 itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv"
             },
-			updateInterval:	5000,
+			updateInterval:	10000,
             log: 			"/tmp/riobus/data-server.log"
 		},
 		mailServer: {

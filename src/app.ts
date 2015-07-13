@@ -33,13 +33,10 @@ class Application{
         logger.info(Strings.provider.rest.start);
         
         var itineraries: any = Application.mapItineraries(ida.retrieve());
+        var output: any;
+        var buses: Bus[];
+        
         logger.info("Getting buses...");
-        var output: any = bda.retrieve(itineraries);
-        
-        var buses: Bus[] = output.buses;
-        itineraries = output.itineraries;
-        if(buses.length>0) bda.create(buses);
-        
         Application.schedule( ()=>{
             output = bda.retrieve(itineraries);
             buses = output.buses;
