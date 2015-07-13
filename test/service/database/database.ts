@@ -48,7 +48,7 @@ describe("[SERVICE] Database", () => {
 		done();
 	});
 	
-	var list: Itinerary[] = collection.find();
+	var list: Itinerary[] = collection.find({});
 	
 	it("should return object from the database", (done) => {
 		Assert(list.length > 0);
