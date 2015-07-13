@@ -88,18 +88,27 @@ class BusDataAccess implements IDataAccess {
      * Does the request to the external server and retrieves the data
      * @returns {any}
      */
-    private requestFromServer(itineraries: any): Bus[] {
+    private requestFromServer(itineraries: any): any {
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
 
         var options: any = {
-            url: 'http://' + config.host + config.path.bus,
+            //url: 'http://' + config.host + config.path.bus,
             headers: { 'Accept': '*/*', 'Cache-Control': 'no-cache'},
             json: true
         };
+        
         try {
-            var response: any = http.get(options);
-            return this.respondRequest(response, itineraries);
+            var buses: Bus[] = new Array<Bus>();
+            var self = this;
+            config.path.bus.forEach( (uri)=>{
+                options.url = 'http://' + config.host + uri;
+                var response: any = http.get(options);
+                var data: any = self.respondRequest(response, itineraries);
+                itineraries = data.itineraries;
+                buses = buses.concat(data.buses);
+            });
+            return { buses: buses, itineraries: itineraries };
         } catch (e) {
             this.logger.error(e.stack);
             e.type = Strings.keyword.error;
@@ -112,7 +121,7 @@ class BusDataAccess implements IDataAccess {
      * @param {any} response
      * @returns {any}
      */
-    private respondRequest(response: any, itineraries: any): Bus[] {
+    private respondRequest(response: any, itineraries: any): any {
         switch (response.statusCode) {
             case 200:
                 this.logger.info(Strings.dataaccess.all.request.ok);
