@@ -9,6 +9,7 @@ class BusModelMap implements IModelMap {
 	public preConfig(collection: ICollection<Bus>): void {
 		collection.createIndex({line: 1});
 		collection.createIndex({order: 1});
+		collection.createIndex({coordinates: "2d"});
 	}
 	
 	public prepareToInput(data: any): any {

@@ -7,6 +7,7 @@ class ItineraryModelMap implements IModelMap {
 	
 	preConfig(collection: ICollection<Itinerary>): void {
 		collection.createIndex({line: 1});
+		collection.createIndex({"spots.coordinates": "2d"});
 	}
 	
 	public prepareToInput(data: any): any {
