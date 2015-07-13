@@ -42,7 +42,6 @@ class BusDataAccess implements IDataAccess {
     }
     
     public create(buses: Bus[]): void {
-        this.bus.remove();
         buses.forEach( (bus: any) => {
             delete bus._id; // Is being firstly created, will never have an id here.
             bus.line += "";
@@ -55,8 +54,23 @@ class BusDataAccess implements IDataAccess {
             }
             var history: Bus = this.history.findOrCreate(bus);
             this.logger.info("Bus processed: "+bus.getOrder());
-            this.bus.save(history);
         }, this);
+
+        var pipeline: any[] = [
+            { $sort: { timestamp: -1 } },
+            { $group: {
+                "_id": "$order",
+                "line": { $first: "$line" },
+                "timestamp": { $first: "$timestamp" },
+                "speed": { $first: "$speed" },
+                "direction": { $first: "$direction" },
+                "sense": { $first: "$sense" },
+                "coordinates": { $first: "$coordinates" },
+            } }
+        ];
+        
+        this.bus.remove();
+        this.history.aggregate(pipeline, { allowDiskUse: true, out: this.collectionName });
         this.logger.info(buses.length+" records processed successfully.");
     }
     
