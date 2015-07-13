@@ -26,7 +26,6 @@ class Application{
      * @return {void}
      */
     public static main(argv: string[]): void {
-        "use strict";
         Application.handleFatalError();
         var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
         var bda: IDataAccess = $inject("dataAccess/busDataAccess");
