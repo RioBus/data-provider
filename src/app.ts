@@ -15,6 +15,8 @@ import $inject        = require("./core/inject");
  * @class App
  */
 class Application{
+    
+    public static logger: Logger;
 
     /**
      * Init application
@@ -29,14 +31,14 @@ class Application{
         var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
         var bda: IDataAccess = $inject("dataAccess/busDataAccess");
         
-        var logger: Logger = Factory.getServerLogger();
-        logger.info(Strings.provider.rest.start);
+        Application.logger = Factory.getServerLogger();
+        Application.logger.info(Strings.provider.rest.start);
         
         var itineraries: any = Application.mapItineraries(ida.retrieve());
         var output: any;
         var buses: Bus[];
         
-        logger.info("Getting buses...");
+        Application.logger.info("Getting buses...");
         Application.schedule( ()=>{
             output = bda.retrieve(itineraries);
             buses = output.buses;
@@ -62,6 +64,7 @@ class Application{
     
     public static handleFatalError(): void {
         process.on('uncaughtException', (error: any) => {
+            Application.logger.info(error.stack);
             
             var msgConfig: any = Config.errorMailMessage;
             var mail: MailObject = new MailObject();
@@ -72,8 +75,8 @@ class Application{
             
             var mailServer: MailServer = new MailServer();
             mailServer.sendMail(mail, (error, message) =>{
-                if(error) console.log(error);
-                if(message) console.log(message);
+                //if(error) console.log(error);
+                //if(message) console.log(message);
                 process.exit(-1);
             });
         });
