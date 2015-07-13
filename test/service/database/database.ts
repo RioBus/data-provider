@@ -9,7 +9,18 @@ var Assert = require("assert");
 
 describe("[SERVICE] Database", () => {
 	
-	var context: DbContext = new DbContext();
+	var config: any = {
+		driver: "mongodb",
+		config: {
+			dbName: "riobus",
+			host: "ds047742.mongolab.com",
+			user: "riobus",
+			pass: "riobus",
+			port: "47742"
+		}
+	};
+	
+	var context: DbContext = new DbContext(config);
 	
 	it("should connect to the database", (done) => {
 		Assert(context !== undefined);
