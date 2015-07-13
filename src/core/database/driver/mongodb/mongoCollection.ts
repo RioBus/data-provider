@@ -45,9 +45,9 @@ class MongoCollection<T> implements ICollection<T>{
 	}
 	
 	public findOrCreate(data: any): T {
-		var update: any = { $set: this.map.prepareToInput(data) }; 
+		var update: any = { $set: this.map.prepareToInput(data) };
 		var options = { "new": true, "upsert": true };
-		return this.map.getInstance<T>(this.findAndModify(data, [], update, options) );
+		return this.findAndModify(data, [], update, options);
 	}
 	
 	public save(obj: T): T {
