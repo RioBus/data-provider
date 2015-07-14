@@ -52,7 +52,7 @@ class MongoCollection<T> implements ICollection<T>{
 	public findOne(query: any, options: any={}): T {
 		query = this.map.prepareToInput(query);
 		var result: any = Sync.promise(this.context, this.context.findOne, query, options);
-		return (result!==null)? this.map.getInstance<T>(result) : null;
+		return (result!==null && result!==undefined)? this.map.getInstance<T>(result) : null;
 	}
 	
 	public findOrCreate(data: any): T {
