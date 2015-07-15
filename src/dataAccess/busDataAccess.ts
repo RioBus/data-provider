@@ -106,7 +106,7 @@ class BusDataAccess implements IDataAccess {
         var http: HttpRequest = new HttpRequest();
 
         var options: any = {
-            //url: 'http://' + config.host + config.path.bus,
+            timeout: 20000,
             headers: { 'Accept': '*/*', 'Cache-Control': 'no-cache'},
             json: true
         };
