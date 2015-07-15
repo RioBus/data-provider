@@ -37,8 +37,8 @@ class Application{
         var output: any;
         var buses: Bus[];
         
-        Application.logger.info("Getting buses...");
         Application.schedule( ()=>{
+            Application.logger.info("Getting buses...");
             output = bda.retrieve(itineraries);
             buses = output.buses;
             itineraries = output.itineraries;

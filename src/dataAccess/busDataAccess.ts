@@ -53,7 +53,6 @@ class BusDataAccess implements IDataAccess {
                 }
             }
             var history: Bus = this.history.findOrCreate(bus);
-            this.logger.info("Bus processed: "+bus.getOrder());
         }, this);
 
         var pipeline: any[] = [
@@ -71,7 +70,7 @@ class BusDataAccess implements IDataAccess {
         
         this.bus.remove();
         this.history.aggregate(pipeline, { allowDiskUse: true, out: this.collectionName });
-        this.logger.info(buses.length+" records processed successfully.");
+        this.logger.info(buses.length+" documents processed successfully.");
     }
     
 	public update(...args: any[]): any {}

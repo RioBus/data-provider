@@ -8,15 +8,18 @@ class MongoCollection<T> implements ICollection<T>{
 		map.preConfig(this);
 	}
 	
-	public aggregate(commands: any[], options: any = {}): T[] {
-		var output: any[] = Sync.promise(this.context, this.context.aggregate, commands, options);
-		var result: T[] = Array<T>();
-		if(output.length>0){
-			output.forEach( (data)=>{
-				result.push(this.map.getInstance<T>(data));
-			});
+	public aggregate(commands: any[], options: any = {}): T[] | void {
+		if(options.out===undefined){
+			var output: any[] = Sync.promise(this.context, this.context.aggregate, commands, options);
+			var result: T[] = Array<T>();
+			if(output.length>0){
+				output.forEach( (data)=>{
+					result.push(this.map.getInstance<T>(data));
+				});
+			}
+			return result;
 		}
-		return result;
+		else this.context.aggregate(commands, options, (error, out)=>{ if(error) throw error; });
 	}
 	
 	public count(query: any={}): number {
@@ -75,9 +78,10 @@ class MongoCollection<T> implements ICollection<T>{
 		return this.map.getInstance<T>(data);
 	}
 	
-	public remove(query: any = {}): boolean {
+	public remove(query: any = {}): void {
 		query = this.map.prepareToInput(query);
-		return Sync.promise(this.context, this.context.remove, query);
+		this.context.remove(query, (error, output)=>{ if(error) throw error; });
+		//return Sync.promise(this.context, this.context.remove, query);
 	}
 }
 export = MongoCollection;
