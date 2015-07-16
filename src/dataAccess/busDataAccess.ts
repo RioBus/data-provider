@@ -160,9 +160,7 @@ class BusDataAccess implements IDataAccess {
                     bus.setLine(Strings.dataaccess.bus.blankLine);
                     bus.setSense(Strings.dataaccess.bus.blankSense);
                 } else {
-                    if(!itineraries[line]){
-                        itineraries[line] = this.dataAccess.retrieve(line);
-                    }
+                    if(itineraries[line]===undefined) itineraries[line] = this.dataAccess.retrieve(line);
                     var itinerary: Itinerary = itineraries[line];
                     var nearest: ItinerarySpot = this.getNearest(bus, itinerary);
                     if(nearest!==null && nearest.isReturning()){
