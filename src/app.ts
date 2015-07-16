@@ -42,7 +42,7 @@ class Application{
             output = bda.retrieve(itineraries);
             buses = output.buses;
             itineraries = output.itineraries;
-            if(buses.length>0) bda.create(buses);
+            if(buses!==null && buses!==undefined && buses.length>0) bda.create(buses);
         }, Config.environment.provider.updateInterval);   
     }
     
