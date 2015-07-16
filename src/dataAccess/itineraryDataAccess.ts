@@ -85,17 +85,16 @@ class ItineraryDataAccess implements IDataAccess{
      * @return {Itinerary[]}
      */
     public getItineraries(): Itinerary[] {
-        this.logger.info("Getting all itineraries...");
+        this.logger.info(Strings.dataaccess.itinerary.retrieving);
         return this.collection.find();
     }
 
     /**
      * Retrieves the Itinerary data from the external server
-     * @param {String} line
-     * @return List<Itinerary>
+     * @param {string} line
+     * @return Itinerary[]
      */
     private requestFromServer(line: string): Itinerary {
-        "use strict";
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
         var empty: Itinerary = new Itinerary(line, Strings.dataaccess.bus.blankSense, "", []);

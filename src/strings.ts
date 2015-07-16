@@ -19,6 +19,7 @@ class Strings{
         itinerary: {
             downloading: "Downloading...",
             requesting: "Requesting from: ",
+            retrieving: "Retrieving itineraries from repository",
             searching: "Searching for local data for line itinerary: ",
             stored: "Itinerary stored successfully."
         },

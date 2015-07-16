@@ -32,7 +32,7 @@ class Application{
         var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
         var bda: IDataAccess = $inject("dataAccess/busDataAccess");
         
-        Application.logger = Factory.getServerLogger();
+        Application.logger = Factory.getLogger();
         Application.logger.info(Strings.provider.data.start);
         
         var updateInterval: number = Config.environment.provider.updateInterval;
@@ -59,9 +59,7 @@ class Application{
      */
     public static mapItineraries(itineraries: Itinerary[]): any {
         var obj: any = {};
-        itineraries.forEach((itinerary)=>{
-            obj[itinerary.getLine()] = itinerary;
-        });
+        itineraries.forEach((itinerary)=>{ obj[itinerary.getLine()] = itinerary; });
         return obj;
     }
 
@@ -72,7 +70,7 @@ class Application{
      */
     public static handleFatalError(): void {
         process.on('uncaughtException', (error: any) => {
-            Application.logger.info(error.stack);
+            Application.logger.error(error.stack);
             
             var msgConfig: any = Config.errorMailMessage;
             var mail: MailObject = new MailObject();
@@ -82,9 +80,7 @@ class Application{
             mail.setMessage(Utils.replacePattern(/\$\$/, error.stack, msgConfig.text));
             
             var mailServer: MailServer = new MailServer();
-            mailServer.sendMail(mail, (error, message) =>{
-                process.exit(-1);
-            });
+            mailServer.sendMail(mail, (error, message) =>{ process.exit(-1); });
         });
     }
 }

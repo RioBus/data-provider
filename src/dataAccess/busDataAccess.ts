@@ -176,39 +176,37 @@ class BusDataAccess implements IDataAccess {
      */
     private parseBody(body: any, itineraries: any): any {
         var busList: Bus[] = new Array<Bus>();
-        try {
-            if (!body.DATA) {
-                this.logger.error(Strings.dataaccess.server.jsonError);
-                return busList;
-            }
-            var data = body.DATA;
-            //let columns = body.COLUMNS;
-            // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-            
-            data.forEach( (d) => {
-                var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
-                var line: string = bus.getLine().toString();
-                if (line === ""){
-                    bus.setLine(Strings.dataaccess.bus.blankLine);
-                    bus.setSense(Strings.dataaccess.bus.blankSense);
-                } else {
-                    if(itineraries[line]===undefined) itineraries[line] = this.dataAccess.retrieve(line);
-                    var itinerary: Itinerary = itineraries[line];
-                    var nearest: ItinerarySpot = this.getNearest(bus, itinerary);
-                    if(nearest!==null && nearest.isReturning()){
-                        var description: string[] = itinerary.getDescription().split(" X ");
-                        var tmp: string = description[0];
-                        description[0] = description[1];
-                        description[1] = tmp;
-                        bus.setSense(description.join(" X "));
-                    }
-                    else bus.setSense(itinerary.getDescription());
-                }
-                busList.push(bus);
-            }, this);
-        } catch (e) {
-            this.logger.error(e.stack);
+        
+        if (!body.DATA) {
+            this.logger.error(Strings.dataaccess.server.jsonError);
+            return busList;
         }
+        var data = body.DATA;
+        //let columns = body.COLUMNS;
+        // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
+        
+        data.forEach( (d) => {
+            var bus: Bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
+            var line: string = bus.getLine().toString();
+            if (line === ""){
+                bus.setLine(Strings.dataaccess.bus.blankLine);
+                bus.setSense(Strings.dataaccess.bus.blankSense);
+            } else {
+                if(itineraries[line]===undefined) itineraries[line] = this.dataAccess.retrieve(line);
+                var itinerary: Itinerary = itineraries[line];
+                var nearest: ItinerarySpot = this.getNearest(bus, itinerary);
+                if(nearest!==null && nearest.isReturning()){
+                    var description: string[] = itinerary.getDescription().split(" X ");
+                    var tmp: string = description[0];
+                    description[0] = description[1];
+                    description[1] = tmp;
+                    bus.setSense(description.join(" X "));
+                }
+                else bus.setSense(itinerary.getDescription());
+            }
+            busList.push(bus);
+        }, this);
+            
         return { buses: busList, itineraries: itineraries };
     }
 }
