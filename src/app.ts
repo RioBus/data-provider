@@ -24,7 +24,7 @@ class Application{
      * Init application
      *
      * @method main
-     * @param {String[]} argv Process arg list
+     * @param {string[]} argv Process arg list
      * @return {void}
      */
     public static main(argv: string[]): void {
@@ -33,7 +33,7 @@ class Application{
         var bda: IDataAccess = $inject("dataAccess/busDataAccess");
         
         Application.logger = Factory.getServerLogger();
-        Application.logger.info(Strings.provider.rest.start);
+        Application.logger.info(Strings.provider.data.start);
         
         var updateInterval: number = Config.environment.provider.updateInterval;
         var itineraries: any = Application.mapItineraries(ida.retrieve());
@@ -41,12 +41,12 @@ class Application{
         var buses: Bus[];
         
         while(true) {
-            Application.logger.info("Getting buses...");
+            Application.logger.info(Strings.dataaccess.bus.downloading);
             output = bda.retrieve(itineraries);
             buses = output.buses;
             itineraries = output.itineraries;
             if(buses!==null && buses!==undefined && buses.length>0) bda.create(buses);
-            Application.logger.info(buses.length+" documents processed successfully.");
+            Application.logger.info(buses.length+Strings.dataaccess.bus.processed);
             DeAsync.sleep(updateInterval);
         }
     }
