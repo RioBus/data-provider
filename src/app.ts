@@ -50,15 +50,26 @@ class Application{
             DeAsync.sleep(updateInterval);
         }
     }
-    
-    public static mapItineraries(data: Itinerary[]): any {
+
+    /**
+     * Map the Itinerary[] to a dictionary-like so the routine can access it easily. 
+     * @method mapItineraries
+     * @param {Itinerary[]} itineraries
+     * @return {any}
+     */
+    public static mapItineraries(itineraries: Itinerary[]): any {
         var obj: any = {};
-        data.forEach((itinerary)=>{
+        itineraries.forEach((itinerary)=>{
             obj[itinerary.getLine()] = itinerary;
         });
         return obj;
     }
-    
+
+    /**
+     * Handles 'uncaughtException' and reports it through e-mail 
+     * @method handleFatalError
+     * @return {void}
+     */
     public static handleFatalError(): void {
         process.on('uncaughtException', (error: any) => {
             Application.logger.info(error.stack);
@@ -72,8 +83,6 @@ class Application{
             
             var mailServer: MailServer = new MailServer();
             mailServer.sendMail(mail, (error, message) =>{
-                //if(error) console.log(error);
-                //if(message) console.log(message);
                 process.exit(-1);
             });
         });
