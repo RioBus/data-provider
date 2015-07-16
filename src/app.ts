@@ -46,6 +46,7 @@ class Application{
             buses = output.buses;
             itineraries = output.itineraries;
             if(buses!==null && buses!==undefined && buses.length>0) bda.create(buses);
+            Application.logger.info(buses.length+" documents processed successfully.");
             DeAsync.sleep(updateInterval);
         }
     }

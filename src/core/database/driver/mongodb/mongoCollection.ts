@@ -78,7 +78,6 @@ class MongoCollection<T> implements ICollection<T>{
 	public remove(query: any = {}): void {
 		query = this.map.prepareToInput(query);
 		this.context.remove(query, (error, output)=>{ if(error) throw error; });
-		//return Sync.promise(this.context, this.context.remove, query);
 	}
 }
 export = MongoCollection;
