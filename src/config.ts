@@ -1,4 +1,4 @@
-/// <reference path="../defs/node/node.d.ts" />
+/// <reference path="../defs/tsd.d.ts" />
 class Config {
 	
 	public static rootPath: string = __dirname;
@@ -9,10 +9,10 @@ class Config {
 	}
 	
 	public static errorMailMessage: any = {
-		from: "RioBus <error-report@riob.us>",
-		to: "",
+		from: 	 "RioBus <error-report@riob.us>",
+		to: 	 "",
 		subject: "[ERROR] Server down!",
-		text: "An error ocurred in the data-provider service\n\n$$\n\nand it shut the server down."
+		text: 	 "An error ocurred in the data-provider service\n\n$$\n\nand it shut the server down."
 	}
 
 	public static isProduction(): Boolean {
@@ -33,20 +33,20 @@ class Config {
             log: 			"/tmp/riobus/log/data-server.log"
 		},
 		mailServer: {
-			user: "",
+			user: 	  "",
 			password: "",
-			host: "smtp.gmail.com",
-			ssl: true
+			host: 	  "smtp.gmail.com",
+			ssl: 	  true
 		},
 		development: {
 			database: {
 				driver: "mongodb",
 				config: {
 					dbName: "riobus",
-					host: "mongo",	 	//	host: "ds047742.mongolab.com",
-					user: "riobus",	 	//	user: "riobus",
-					pass: "riobus",		//	pass: "riobus",
-					port: "27017"		//	port: "47742"
+					host: "mongo",
+					user: "riobus",
+					pass: "riobus",
+					port: "27017"
 				}
 			}
 		},
