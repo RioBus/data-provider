@@ -43,6 +43,7 @@ class BusDataAccess implements IDataAccess {
     
     public create(buses: Bus[]): void {
         buses.forEach( (bus: any) => {
+            if(bus===null || bus===undefined) return;
             delete bus._id; // Is being firstly created, will never have an id here.
             bus.line += "";
             if(bus.line===Strings.dataaccess.bus.blankLine){
@@ -52,24 +53,10 @@ class BusDataAccess implements IDataAccess {
                     bus.sense = latest.getSense();
                 }
             }
-            var history: Bus = this.history.findOrCreate(bus);
+            var history: any = this.history.findOrCreate(bus);
+            delete history._id;
+            this.bus.update({ order: history.getOrder() }, history, { upsert: true });
         }, this);
-
-        var pipeline: any[] = [
-            { $sort: { timestamp: -1 } },
-            { $group: {
-                "_id": "$order",
-                "line": { $first: "$line" },
-                "timestamp": { $first: "$timestamp" },
-                "speed": { $first: "$speed" },
-                "direction": { $first: "$direction" },
-                "sense": { $first: "$sense" },
-                "coordinates": { $first: "$coordinates" },
-            } }
-        ];
-        
-        this.bus.remove();
-        this.history.aggregate(pipeline, { allowDiskUse: true, out: this.collectionName });
         this.logger.info(buses.length+" documents processed successfully.");
     }
     
