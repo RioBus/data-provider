@@ -1,9 +1,7 @@
 import Sync = require("./sync");
 /**
  * Creates a new synchronized HttpRequest
- *
  * @class HttpRequest
- * @constructor
  */
 class HttpRequest{
     
@@ -18,7 +16,7 @@ class HttpRequest{
      * Makes GET request
      * @param {String} host Host URL
      * @param {Object} options
-     * @returns {*}
+     * @returns {any}
      */
     public get(host: string, callback?: (error: Error, response: any, body: string)=>void): void|any{
         "use strict";
@@ -34,7 +32,7 @@ class HttpRequest{
      * Makes POST request
      * @param {String} host Host URL
      * @param {Object} options
-     * @returns {*}
+     * @returns {any}
      */
     public post(host: string, data: any, callback?: (error: Error, response: any, body: string)=>void): any{
         "use strict";

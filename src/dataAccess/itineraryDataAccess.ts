@@ -16,9 +16,8 @@ import Sync              = require("../core/sync");
 /**
  * DataAccess referred to Itinerary stored data
  *
- * Does operations over Itinerary data
+ * Operates over Itinerary data
  * @class ItineraryDataAccess
- * @constructor
  */
 class ItineraryDataAccess implements IDataAccess{
     
@@ -33,24 +32,42 @@ class ItineraryDataAccess implements IDataAccess{
         this.collection = this.db.collection<Itinerary>(this.collectionName, new ItineraryModelMap());
     }
     
+    /**
+     * Not apply
+     * @return void
+     */
 	public update(...args: any[]): any {}
     
+    /**
+     * Not apply
+     * @return void
+     */
 	public delete(...args: any[]): any {}
     
+    /**
+     * Saves the Itinerary to the repository
+     * @param {Itinerary} itinerary The Itinerary object to be saved
+     * @return {Itinerary} 
+     */
     public create(itinerary: Itinerary): Itinerary {
         var saved: Itinerary = this.collection.save(itinerary);
         this.logger.info("["+saved.getLine()+"] "+Strings.dataaccess.itinerary.stored);
         return saved;
     }
     
-	public retrieve(data?: string): any {
+    /**
+     * Returns the Itinerary data from the repository.
+     * @param {string} (Optional) data Itinerary identifier
+     * @return {Itinerary | Itinerary[]}
+     */
+	public retrieve(data?: string): Itinerary | Itinerary[] {
         return (data!==undefined)? this.getItinerary(data) : this.getItineraries();
     }
 
     /**
-     * Retrieves the Itinerary spots given a line
-     * @param {String} line
-     * @return List<Itinerary>
+     * Retrieves the Itinerary given a line
+     * @param {string} line
+     * @return {Itinerary}
      */
     public getItinerary(line: string): Itinerary {
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
@@ -62,7 +79,11 @@ class ItineraryDataAccess implements IDataAccess{
             return this.create(itinerary);
         }
     }
-    
+
+    /**
+     * Retrieves the Itinerary list
+     * @return {Itinerary[]}
+     */
     public getItineraries(): Itinerary[] {
         this.logger.info("Getting all itineraries...");
         return this.collection.find();
@@ -121,7 +142,12 @@ class ItineraryDataAccess implements IDataAccess{
         }
         return null;
     }
-    
+
+    /**
+     * Parses the request's body and return the parsed objects
+     * @param {any} data
+     * @returns {Itinerary}
+     */
     private parseBody(data: string): Itinerary {
         var returning: number = 0, description: string, line: string, agency: string;
         var spots: ItinerarySpot[] = new Array<ItinerarySpot>();

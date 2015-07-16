@@ -1,9 +1,7 @@
-/// <reference path="../../defs/node/node.d.ts" />
+/// <reference path="../../defs/tsd.d.ts" />
 /**
  * Manipulates files
- *
  * @class File
- * @constructor
  */
 class File{
     
@@ -20,14 +18,26 @@ class File{
         this.fs = require("fs-extra");
     }
     
+    /**
+     * Get the full file path
+     * @return {string}
+     */
     public getFilePath(): string{
         return this.fullPath;
     }
     
+    /**
+     * Get the directory where the file is
+     * @return {string}
+     */
     public getDirPath(): string{
         return this.directory;
     }
     
+    /**
+     * Get the file name
+     * @return {string}
+     */
     public getFileName(): string{
         return this.file;
     }
