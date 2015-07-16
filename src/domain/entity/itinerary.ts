@@ -1,5 +1,10 @@
 import ItinerarySpot = require("./itinerarySpot");
 
+/**
+ * Describes a Itinerary instance
+ * @class Itinerary
+ * @constructor
+ */
 class Itinerary {
 	
 	public constructor(private line: string, private description: string, 

@@ -1,4 +1,4 @@
-/// <reference path="../../../defs/node/node.d.ts" />
+/// <reference path="../../../defs/tsd.d.ts" />
 import ICollection = require("../../core/database/iCollection");
 import IModelMap   = require("../../core/database/iModelMap");
 import Bus		   = require("../entity/bus");
