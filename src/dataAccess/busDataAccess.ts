@@ -1,24 +1,22 @@
-import Bus         = require("../domain/entity/bus");
-import BusModelMap = require("../domain/modelMap/busModelMap");
-import Config      = require("../config");
-import DbContext   = require("../core/database/dbContext");
-import Factory     = require("../common/factory");
-import File        = require("../core/file");
-import HttpRequest = require("../core/httpRequest");
-import IDataAccess = require("./iDataAccess");
-import Itinerary   = require("../domain/entity/itinerary");
+import Bus           = require("../domain/entity/bus");
+import BusModelMap   = require("../domain/modelMap/busModelMap");
+import Config        = require("../config");
+import DbContext     = require("../core/database/dbContext");
+import Factory       = require("../common/factory");
+import HttpRequest   = require("../core/httpRequest");
+import IDataAccess   = require("./iDataAccess");
+import ICollection   = require("../core/database/iCollection");
+import Itinerary     = require("../domain/entity/itinerary");
 import ItinerarySpot = require("../domain/entity/itinerarySpot");
-import List        = require("../common/tools/list");
-import Logger      = require("../common/logger");
-import Strings     = require("../strings");
-import $inject     = require("../core/inject");
-import ICollection = require("../core/database/iCollection");
+import Logger        = require("../common/logger");
+import Strings       = require("../strings");
+import $inject       = require("../core/inject");
 
 /**
  * DataAccess responsible for managing data access to the data stored in the
  * external server.
  *
- * @class ServerDataAccess
+ * @class BusDataAccess
  * @constructor
  */
 class BusDataAccess implements IDataAccess {
@@ -30,17 +28,31 @@ class BusDataAccess implements IDataAccess {
     private bus: ICollection<Bus>;
     private history: ICollection<Bus>;
 
+    /**
+     * Initializes the dataAccess to do operation over bus data
+     * @returns {IDataAccess}
+     */
     public constructor(private dataAccess: IDataAccess = $inject("dataAccess/itineraryDataAccess")) {
         this.logger = Factory.getServerLogger();
         this.db = new DbContext();
         this.bus = this.db.collection<Bus>(this.collectionName, new BusModelMap());
         this.history = this.db.collection<Bus>(this.historyCollectionName, new BusModelMap());
     }
-    
+
+    /**
+     * Retrieves the bus data from the external server
+     * @param {any} itineraries
+     * @returns {Bus[]}
+     */
 	public retrieve(itineraries: any): Bus[] {
         return this.requestFromServer(itineraries);
     }
-    
+
+    /**
+     * Saves the bus list to the database
+     * @param {Bus[]} buses
+     * @returns {void}
+     */
     public create(buses: Bus[]): void {
         buses.forEach( (bus: any) => {
             if(bus===null || bus===undefined) return;
@@ -57,13 +69,26 @@ class BusDataAccess implements IDataAccess {
             delete history._id;
             this.bus.update({ order: history.getOrder() }, history, { upsert: true });
         }, this);
-        this.logger.info(buses.length+" documents processed successfully.");
     }
-    
+
+    /**
+     * Not apply
+     * @returns {void}
+     */
 	public update(...args: any[]): any {}
-    
+
+    /**
+     * Not apply
+     * @returns {void}
+     */
 	public delete(...args: any[]): any {}
-    
+
+    /**
+     * Gets the ItinerarySpot nearest to Bus position from the given Itinerary
+     * @param {Bus} bus
+     * @param {Itinerary} itinerary
+     * @returns {ItinerarySpot}
+     */
     private getNearest(bus: Bus, itinerary: Itinerary): ItinerarySpot {
         var nearest: ItinerarySpot = null;
         var factor: number = Math.pow(10,5);
@@ -119,6 +144,7 @@ class BusDataAccess implements IDataAccess {
     /**
      * Verifies the request response status and returns the correct output
      * @param {any} response
+     * @param {any} itineraries
      * @returns {any}
      */
     private respondRequest(response: any, itineraries: any): any {
@@ -141,7 +167,13 @@ class BusDataAccess implements IDataAccess {
         }
         return [];
     }
-    
+
+    /**
+     * Parses the request's body and return the parsed objects
+     * @param {any} body
+     * @param {any} itineraries
+     * @returns {any}
+     */
     private parseBody(body: any, itineraries: any): any {
         var busList: Bus[] = new Array<Bus>();
         try {
