@@ -10,6 +10,8 @@ import MailObject     = require("./core/mail/mailObject");
 import Utils          = require("./common/tools/utils");
 import $inject        = require("./core/inject");
 
+var DeAsync = require("deasync");
+
 /**
  * Main application process.
  * @class App
@@ -33,17 +35,19 @@ class Application{
         Application.logger = Factory.getServerLogger();
         Application.logger.info(Strings.provider.rest.start);
         
+        var updateInterval: number = Config.environment.provider.updateInterval;
         var itineraries: any = Application.mapItineraries(ida.retrieve());
         var output: any;
         var buses: Bus[];
         
-        Application.schedule( ()=>{
+        while(true) {
             Application.logger.info("Getting buses...");
             output = bda.retrieve(itineraries);
             buses = output.buses;
             itineraries = output.itineraries;
             if(buses!==null && buses!==undefined && buses.length>0) bda.create(buses);
-        }, Config.environment.provider.updateInterval);   
+            DeAsync.sleep(updateInterval);
+        }
     }
     
     public static mapItineraries(data: Itinerary[]): any {
@@ -52,13 +56,6 @@ class Application{
             obj[itinerary.getLine()] = itinerary;
         });
         return obj;
-    }
-    
-    public static schedule(callback: ()=>void, updateInterval: number): void {
-        setTimeout(()=>{
-            callback();
-            Application.schedule(callback, updateInterval);
-        }, updateInterval);
     }
     
     public static handleFatalError(): void {

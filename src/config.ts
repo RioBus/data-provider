@@ -4,8 +4,8 @@ class Config {
 	public static rootPath: string = __dirname;
 
 	public static log: any = {
-		runtime: "./runtime.log",
-		server: "./server.log"
+		runtime: "/tmp/riobus/log/runtime.log",
+		server: "/tmp/riobus/log/server.log"
 	}
 	
 	public static errorMailMessage: any = {
@@ -30,7 +30,7 @@ class Config {
                 itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv"
             },
 			updateInterval:	5000,
-            log: 			"/tmp/riobus/data-server.log"
+            log: 			"/tmp/riobus/log/data-server.log"
 		},
 		mailServer: {
 			user: "",
