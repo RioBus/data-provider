@@ -1,5 +1,9 @@
 import IModelMap = require("./iModelMap");
 
+/**
+ * Generalizes the NoSQL Collection instance
+ * @interface ICollection
+ */
 interface ICollection<T> {
 	aggregate(commands: any[], options?: any): any;
 	count(query?: any): number;

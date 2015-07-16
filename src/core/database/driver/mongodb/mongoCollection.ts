@@ -66,7 +66,7 @@ class MongoCollection<T> implements ICollection<T>{
 		var data: any = this.map.prepareToInput(obj);
 		var saveOperation: any = Sync.promise(this.context, this.context.insert, data);
 		return (saveOperation.ops.length>0)? this.getData(saveOperation.ops[0]) : null;
-		// Workaround. depois e necessario corrigir!!!
+		// Workaround. Need to fix later
 	}
 	
 	public update(query: any, data: any, options: any={}): void {
