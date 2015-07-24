@@ -1,4 +1,4 @@
-import Config            = require("../config");
+import DbContext         = require("../core/database/dbContext");
 import Factory           = require("../common/factory");
 import File              = require("../core/file");
 import ICollection       = require("../core/database/iCollection");
@@ -7,11 +7,9 @@ import IDataAccess       = require("./iDataAccess");
 import Itinerary         = require("../domain/entity/itinerary");
 import ItinerarySpot     = require("../domain/entity/itinerarySpot");
 import ItineraryModelMap = require("../domain/modelMap/itineraryModelMap");
-import List              = require("../common/tools/list");
 import Logger            = require("../common/logger");
-import Strings           = require("../strings");
-import DbContext         = require("../core/database/dbContext");
-import Sync              = require("../core/sync");
+
+declare var Config, Strings, database;
 
 /**
  * DataAccess referred to Itinerary stored data
@@ -28,7 +26,7 @@ class ItineraryDataAccess implements IDataAccess{
 
     public constructor(){
         this.logger = Factory.getLogger();
-        this.db = new DbContext();
+        this.db = database;
         this.collection = this.db.collection<Itinerary>(this.collectionName, new ItineraryModelMap());
     }
     

@@ -1,16 +1,16 @@
 import Bus            = require("./domain/entity/bus");
+import DbContext      = require("./core/database/dbContext");
 import Factory        = require("./common/factory");
 import Logger         = require("./common/logger");
-import Config   	  = require("./config");
 import IDataAccess    = require("./dataAccess/iDataAccess");
 import Itinerary      = require("./domain/entity/itinerary");
-import Strings        = require("./strings");
 import MailServer     = require("./core/mail/mailServer");
 import MailObject     = require("./core/mail/mailObject");
 import Utils          = require("./common/tools/utils");
 import $inject        = require("./core/inject");
 
-var DeAsync = require("deasync");
+var sleep = require("deasync").sleep;
+declare var Config, Strings, global;
 
 /**
  * Main application process.
@@ -29,6 +29,8 @@ class Application{
      */
     public static main(argv: string[]): void {
         Application.handleFatalError();
+        global.database = new DbContext();
+        
         var ida: IDataAccess = $inject("dataAccess/itineraryDataAccess");
         var bda: IDataAccess = $inject("dataAccess/busDataAccess");
         
@@ -47,7 +49,7 @@ class Application{
             itineraries = output.itineraries;
             if(buses!==null && buses!==undefined && buses.length>0) bda.create(buses);
             Application.logger.info(buses.length+Strings.dataaccess.bus.processed);
-            DeAsync.sleep(updateInterval);
+            sleep(updateInterval);
         }
     }
 

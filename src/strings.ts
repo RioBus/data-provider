@@ -8,7 +8,7 @@ class Strings{
         bus: {
             blankLine: "indefinido",
             blankSense: "desconhecido",
-            creating: "Creating document: ",
+            creating: "Creating documents in the database",
             downloading: "Getting data from external server",
             processed: " documents processed successfully.",
             results: " results",

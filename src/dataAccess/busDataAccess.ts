@@ -1,6 +1,5 @@
 import Bus           = require("../domain/entity/bus");
 import BusModelMap   = require("../domain/modelMap/busModelMap");
-import Config        = require("../config");
 import DbContext     = require("../core/database/dbContext");
 import Factory       = require("../common/factory");
 import HttpRequest   = require("../core/httpRequest");
@@ -9,8 +8,9 @@ import ICollection   = require("../core/database/iCollection");
 import Itinerary     = require("../domain/entity/itinerary");
 import ItinerarySpot = require("../domain/entity/itinerarySpot");
 import Logger        = require("../common/logger");
-import Strings       = require("../strings");
 import $inject       = require("../core/inject");
+
+declare var Config, Strings, database;
 
 /**
  * DataAccess responsible for managing data access to the data stored in the
@@ -34,7 +34,7 @@ class BusDataAccess implements IDataAccess {
      */
     public constructor(private dataAccess: IDataAccess = $inject("dataAccess/itineraryDataAccess")) {
         this.logger = Factory.getServerLogger();
-        this.db = new DbContext();
+        this.db = database;
         this.bus = this.db.collection<Bus>(this.collectionName, new BusModelMap());
         this.history = this.db.collection<Bus>(this.historyCollectionName, new BusModelMap());
     }
@@ -54,6 +54,7 @@ class BusDataAccess implements IDataAccess {
      * @returns {void}
      */
     public create(buses: Bus[]): void {
+        this.logger.info(Strings.dataaccess.bus.creating);
         buses.forEach( (bus: any) => {
             if(bus===null || bus===undefined) return;
             delete bus._id; // Is being firstly created, will never have an id here.
