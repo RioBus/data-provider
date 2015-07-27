@@ -138,7 +138,7 @@ class BusDataAccess implements IDataAccess {
         } catch (e) {
             this.logger.error(e.stack);
             e.type = Strings.keyword.error;
-            return [];
+            return { buses: [], itineraries: itineraries };
         }
     }
 

@@ -47,7 +47,7 @@ class Application{
             output = bda.retrieve(itineraries);
             buses = output.buses;
             itineraries = output.itineraries;
-            if(buses!==null && buses!==undefined && buses.length>0) bda.create(buses);
+            if(buses.length>0) bda.create(buses);
             Application.logger.info(buses.length+Strings.dataaccess.bus.processed);
             sleep(updateInterval);
         }
