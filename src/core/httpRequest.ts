@@ -1,3 +1,4 @@
+declare var require;
 import Sync = require("./sync");
 /**
  * Creates a new synchronized HttpRequest
