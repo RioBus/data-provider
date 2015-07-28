@@ -131,8 +131,8 @@ class BusDataAccess implements IDataAccess {
                 options.url = 'http://' + config.host + uri;
                 var response: any = http.get(options);
                 var data: any = self.respondRequest(response, itineraries);
-                itineraries = data.itineraries;
-                buses = buses.concat(data.buses);
+                if(data.itineraries!==undefined && data.itineraries!==null) itineraries = data.itineraries;
+                if(data.buses!==undefined && data.buses!==null) buses = buses.concat(data.buses);
             });
             return { buses: buses, itineraries: itineraries };
         } catch (e) {
