@@ -10,7 +10,7 @@ import Utils          = require("./common/tools/utils");
 import $inject        = require("./core/inject");
 
 var sleep = require("deasync").sleep;
-declare var Config, Strings, global;
+declare var Config, Strings, global, require;
 
 /**
  * Main application process.

@@ -1,4 +1,4 @@
-/// <reference path="../../defs/tsd.d.ts" />
+declare var require;
 /**
  * Manipulates files
  * @class File

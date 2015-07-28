@@ -1,5 +1,4 @@
-/// <reference path="../../../defs/node/node.d.ts" />
-/// <reference path="../../../defs/mocha/mocha.d.ts" />
+declare var require, describe, it;
 import HttpRequest = require("../../../src/core/httpRequest");
 var Assert = require("assert");
 

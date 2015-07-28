@@ -1,5 +1,4 @@
-/// <reference path="../../../defs/node/node.d.ts" />
-/// <reference path="../../../defs/mocha/mocha.d.ts" />
+declare var require, describe, it;
 import DbContext = require("../../../src/core/database/dbContext");
 import ICollection = require("../../../src/core/database/iCollection");
 import Itinerary = require("../../../src/domain/entity/itinerary");

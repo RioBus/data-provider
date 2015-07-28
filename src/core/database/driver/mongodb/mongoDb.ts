@@ -1,4 +1,4 @@
-/// <reference path="../../../../../defs/tsd.d.ts" />
+declare var require;
 import ICollection 		= require("../../iCollection");
 import IDatabase   		= require("../../iDatabase");
 import IModelMap		= require("../../iModelMap");

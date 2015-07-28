@@ -1,4 +1,4 @@
-/// <reference path="../../defs/node/node.d.ts" />
+declare var require;
 var DeAsync = require("deasync");
 
 /**

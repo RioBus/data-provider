@@ -1,7 +1,6 @@
-/// <reference path="../../../defs/tsd.d.ts" />
 import MailObject = require("./mailObject");
 
-declare var Config;
+declare var Config, require;
 /**
  * Class responsible for send mails
  * @class MailServer

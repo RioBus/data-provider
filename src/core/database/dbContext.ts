@@ -1,4 +1,3 @@
-/// <reference path="../../../defs/node/node.d.ts" />
 import ICollection  = require("./iCollection");
 import IDatabase 	= require("./iDatabase");
 import IModelMap	= require("./iModelMap");

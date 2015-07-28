@@ -8,7 +8,6 @@ class HttpRequest{
     private driver: any;
 
     public constructor(){
-        "use strict";
         this.driver = require('request');
     }
 
@@ -18,8 +17,7 @@ class HttpRequest{
      * @param {Object} options
      * @returns {any}
      */
-    public get(host: string, callback?: (error: Error, response: any, body: string)=>void): void|any{
-        "use strict";
+    public get(host: string, callback?: (error: Error, response: any, body: string)=>void): void | any {
         if(callback) this.driver.get(host, callback);
         else{
             var output: any = Sync.run(this.driver.get, host);
@@ -34,8 +32,7 @@ class HttpRequest{
      * @param {Object} options
      * @returns {any}
      */
-    public post(host: string, data: any, callback?: (error: Error, response: any, body: string)=>void): any{
-        "use strict";
+    public post(host: string, data: any, callback?: (error: Error, response: any, body: string)=>void): any {
         if(callback) this.driver.post({url: host, formData: data}, callback);
         else{
             var output: any = Sync.run(this.driver.post, {url: host, formData: data});

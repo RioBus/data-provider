@@ -1,5 +1,4 @@
-/// <reference path="../defs/tsd.d.ts" />
-declare var global;
+declare var global, require, process;
 global.Config = require("./config");
 global.Strings = require("./strings");
 
