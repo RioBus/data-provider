@@ -1,10 +1,14 @@
-declare var require, describe, it;
+declare var require, describe, it, global;
+import Config = require("../../../src/config");
 import DbContext = require("../../../src/core/database/dbContext");
 import ICollection = require("../../../src/core/database/iCollection");
 import Itinerary = require("../../../src/domain/entity/itinerary");
 import ItineraryModelMap = require("../../../src/domain/modelMap/itineraryModelMap");
+import Strings = require("../../../src/strings");
 
 var Assert = require("assert");
+global.Config = Config;
+global.Strings = Strings;
 
 describe("[SERVICE] Database", () => {
 	
