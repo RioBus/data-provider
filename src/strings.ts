@@ -14,7 +14,8 @@ class Strings{
             results: " results",
             searching: "Searching for: ",
             total: "Total ",
-            updating: "Updating document: "
+            updating: "Updating document: ",
+            noBuses: "There was no buses in the response."
         },
         itinerary: {
             downloading: "Downloading...",
@@ -35,7 +36,8 @@ class Strings{
     };
     
     public static error: any = {
-        notFound: 404
+        notFound: 404,
+        json: "Json error"
     }
 	
     public static provider: any = {

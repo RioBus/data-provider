@@ -23,10 +23,10 @@ class Config {
 		provider: {
 			host: 			"dadosabertos.rio.rj.gov.br",
 			path: {
-            	bus: [
-							"/apiTransporte/apresentacao/rest/index.cfm/onibus",
-							"/apiTransporte/apresentacao/rest/index.cfm/brt"
-				],
+				bus: {
+					"REGULAR": "/apitransporte/apresentacao/rest/index.cfm/onibus",
+					"BRT": "/apitransporte/apresentacao/rest/index.cfm/brt"
+				},
                 itinerary: 	"/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv"
             },
 			updateInterval:	5000,

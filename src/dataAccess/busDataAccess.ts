@@ -124,22 +124,23 @@ class BusDataAccess implements IDataAccess {
             json: true
         };
         
-        try {
-            var buses: Bus[] = new Array<Bus>();
-            var self = this;
-            config.path.bus.forEach( (uri)=>{
-                options.url = 'http://' + config.host + uri;
+        var buses: Bus[] = new Array<Bus>();
+        var self = this;
+        var endpoints: any = config.path.bus;
+        var keys: string[] = Object.keys(endpoints);
+        keys.forEach( (key)=>{
+            var uri: string = endpoints[key];
+            options.url = 'http://' + config.host + uri;
+            try{
                 var response: any = http.get(options);
-                var data: any = self.respondRequest(response, itineraries);
+                var data: any = self.respondRequest(response, itineraries, key);
                 if(data.itineraries!==undefined && data.itineraries!==null) itineraries = data.itineraries;
                 if(data.buses!==undefined && data.buses!==null) buses = buses.concat(data.buses);
-            });
-            return { buses: buses, itineraries: itineraries };
-        } catch (e) {
-            this.logger.error(e.stack);
-            e.type = Strings.keyword.error;
-            return { buses: [], itineraries: itineraries };
-        }
+            } catch (e) {
+                this.logger.error(e.stack);
+            }
+        }, this);
+        return { buses: buses, itineraries: itineraries };
     }
 
     /**
@@ -148,22 +149,22 @@ class BusDataAccess implements IDataAccess {
      * @param {any} itineraries
      * @returns {any}
      */
-    private respondRequest(response: any, itineraries: any): any {
+    private respondRequest(response: any, itineraries: any, key: string): any {
         switch (response.statusCode) {
             case 200:
-                this.logger.info(Strings.dataaccess.all.request.ok);
-                return this.parseBody(response.body, itineraries);
+                this.logger.info("["+key+"] "+Strings.dataaccess.all.request.ok);
+                return this.parseBody(response.body, itineraries, key);
             case 302:
-                this.logger.alert(Strings.dataaccess.all.request.e302);
+                this.logger.alert("["+key+"] "+Strings.dataaccess.all.request.e302);
                 break;
             case 404:
-                this.logger.alert(Strings.dataaccess.all.request.e404);
+                this.logger.alert("["+key+"] "+Strings.dataaccess.all.request.e404);
                 break;
             case 503:
-                this.logger.alert(Strings.dataaccess.all.request.e503);
+                this.logger.alert("["+key+"] "+Strings.dataaccess.all.request.e503);
                 break;
             default:
-                this.logger.error('(' + response.statusCode + ') ' + Strings.dataaccess.all.request.error);
+                this.logger.error("["+key+"] ("+response.statusCode+")"+Strings.dataaccess.all.request.error);
                 break;
         }
         return [];
@@ -175,11 +176,15 @@ class BusDataAccess implements IDataAccess {
      * @param {any} itineraries
      * @returns {any}
      */
-    private parseBody(body: any, itineraries: any): any {
+    private parseBody(body: any, itineraries: any, key: string): any {
         var busList: Bus[] = new Array<Bus>();
         
         if (!body.DATA) {
-            this.logger.error(Strings.dataaccess.server.jsonError);
+            this.logger.error(Strings.error.json);
+            return busList;
+        }
+        if(body.COLUMNS.length<=1){
+            this.logger.error("["+key+"] "+Strings.dataaccess.bus.noBuses);
             return busList;
         }
         var data = body.DATA;
