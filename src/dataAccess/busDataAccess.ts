@@ -59,13 +59,6 @@ class BusDataAccess implements IDataAccess {
             if(bus===null || bus===undefined) return;
             delete bus._id; // Is being firstly created, will never have an id here.
             bus.line += "";
-            if(bus.line===Strings.dataaccess.bus.blankLine){
-                var latest: Bus = this.history.findOne({order: bus.order}, {sort: [["timestamp", "DESC"]]});
-                if(latest!==null && latest.getLine()!==Strings.dataaccess.bus.blankLine){
-                    bus.line = latest.getLine().toString();
-                    bus.sense = latest.getSense();
-                }
-            }
             var history: any = this.history.findOrCreate(bus);
             delete history._id;
             this.bus.update({ order: history.getOrder() }, history, { upsert: true });
@@ -94,7 +87,6 @@ class BusDataAccess implements IDataAccess {
         var nearest: ItinerarySpot = null;
         var factor: number = Math.pow(10,5);
         var nearestNormal: number = 99 * factor;
-        
         itinerary.getSpots().forEach( (current)=>{
             if(nearest===null) nearest = current;
             else {
