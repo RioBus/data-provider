@@ -1,5 +1,5 @@
+import IBulk = require("./iBulk");
 import IModelMap = require("./iModelMap");
-
 /**
  * Generalizes the NoSQL Collection instance
  * @interface ICollection
@@ -16,5 +16,6 @@ interface ICollection<T> {
 	remove(params?: any): any;
 	save(obj: T): any;
 	update(criteria: any, update: any, options?: any): any;
+	initBulk(ordered?: boolean): IBulk<T>;
 }
 export = ICollection;

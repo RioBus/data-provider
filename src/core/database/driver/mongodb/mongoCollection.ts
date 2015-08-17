@@ -1,5 +1,7 @@
+import IBulk   	   = require("../../iBulk");
 import ICollection = require("../../iCollection");
 import IModelMap   = require("../../iModelMap");
+import MongoBulk   = require("./mongoBulk");
 import Sync   	   = require("../../../sync");
 
 class MongoCollection<T> implements ICollection<T>{
@@ -78,6 +80,11 @@ class MongoCollection<T> implements ICollection<T>{
 	public remove(query: any = {}): void {
 		query = this.map.prepareToInput(query);
 		this.context.remove(query, (error, output)=>{ if(error) throw error; });
+	}
+	
+	public initBulk(ordered?: boolean): IBulk<T> {
+		var bulk: any = (ordered)? this.context.initOrderedBulkOp() : this.context.initUnorderedBulkOp();
+		return new MongoBulk<T>(bulk, this.map); 
 	}
 }
 export = MongoCollection;
