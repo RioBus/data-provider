@@ -160,7 +160,7 @@ class MongoCollection<T> implements ICollection<T>{
 	 * @return {IBulk<T>}
 	 */
 	public initBulk(ordered?: boolean): IBulk<T> {
-		var bulk: any = (ordered)? this.context.initOrderedBulkOp() : this.context.initUnorderedBulkOp();
+		var bulk: any = (ordered)? this.context.initializeOrderedBulkOp() : this.context.initializeUnorderedBulkOp();
 		return new MongoBulk<T>(bulk, this.map); 
 	}
 }

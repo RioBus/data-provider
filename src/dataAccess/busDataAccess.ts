@@ -3,6 +3,7 @@ import BusModelMap   = require("../domain/modelMap/busModelMap");
 import DbContext     = require("../core/database/dbContext");
 import Factory       = require("../common/factory");
 import HttpRequest   = require("../core/httpRequest");
+import IBulk         = require("../core/database/iBulk");
 import IDataAccess   = require("./iDataAccess");
 import ICollection   = require("../core/database/iCollection");
 import Itinerary     = require("../domain/entity/itinerary");
@@ -55,14 +56,24 @@ class BusDataAccess implements IDataAccess {
      */
     public create(buses: Bus[]): void {
         this.logger.info(Strings.dataaccess.bus.creating);
+        var busBulk: IBulk<Bus> = this.bus.initBulk();
+        var historyBulk: IBulk<Bus> = this.history.initBulk();
         buses.forEach( (bus: any) => {
             if(bus===null || bus===undefined) return;
             delete bus._id; // Is being firstly created, will never have an id here.
             bus.line += "";
+            /* 
             var history: any = this.history.findOrCreate(bus);
             delete history._id;
             this.bus.update({ order: history.getOrder() }, history, { upsert: true });
+            */
+            historyBulk.find(bus).replaceOne(bus, true);
+            busBulk.find({ order: bus.getOrder() }).replaceOne(bus, true);
         }, this);
+        var busBulkResponse: any = busBulk.execute();
+        var historyBulkResponse: any = historyBulk.execute();
+        if(busBulkResponse instanceof Error) this.logger.error(busBulkResponse);
+        if(historyBulk instanceof Error) this.logger.error(historyBulkResponse);
     }
 
     /**

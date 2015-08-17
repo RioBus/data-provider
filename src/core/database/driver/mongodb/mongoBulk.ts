@@ -2,6 +2,7 @@ import IBulk 	 	 = require("../../iBulk");
 import IBulkFind 	 = require("../../iBulkFind");
 import IModelMap 	 = require("../../iModelMap");
 import MongoBulkFind = require("./mongoBulkFind");
+import Sync			 = require("../../../sync");
 /**
  * Implements MongoDB Bulk operation
  * @class MongoBulk
@@ -11,14 +12,11 @@ class MongoBulk<T> implements IBulk<T> {
 	public constructor(private context: any, private map: IModelMap) {}
 	
 	/**
-	 * Does the bulk operation
-	 * @param {Function} callback - Procedure to execute after Bulk Op execution
-	 * @return {void}
+	 * Does the bulk operation.
+	 * @return {any}
 	 */
-	public execute(callback?: (error: Error, output: any)=>void): void {
-		this.context.execute((error, response)=>{
-			if(callback!==undefined) callback(error, response);
-		});
+	public execute(): any {
+		return Sync.promise(this.context, this.context.execute);
 	}
 	
 	/**

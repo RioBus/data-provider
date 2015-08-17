@@ -7,10 +7,9 @@ interface IBulk<T>{
 	
 	/**
 	 * Does the bulk operation
-	 * @param {Function} callback - Procedure to execute after Bulk Op execution
-	 * @return {void}
+	 * @return {any}
 	 */
-	execute(callback?: (error: Error, output: any)=>void): void;
+	execute(): any;
 	
 	/**
 	 * Queries the collection for the document(s)
