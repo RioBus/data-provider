@@ -95,6 +95,6 @@ interface ICollection<T> {
 	 * @param{boolean} ordered - Optional. Set to true to construct an ordered list of operations. Default value set to false.
 	 * @return {IBulk<T>}
 	 */
-	initBulk(ordered?: boolean): IBulk<T>;
+	initBulk(ordered?: boolean, options?: any): IBulk<T>;
 }
 export = ICollection;

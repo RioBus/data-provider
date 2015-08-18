@@ -159,8 +159,8 @@ class MongoCollection<T> implements ICollection<T>{
 	 * @param{boolean} ordered - Optional. Set to true to construct an ordered list of operations. Default value set to false.
 	 * @return {IBulk<T>}
 	 */
-	public initBulk(ordered?: boolean): IBulk<T> {
-		var bulk: any = (ordered)? this.context.initializeOrderedBulkOp() : this.context.initializeUnorderedBulkOp();
+	public initBulk(ordered?: boolean, options?: any): IBulk<T> {
+		var bulk: any = (ordered)? this.context.initializeOrderedBulkOp(options) : this.context.initializeUnorderedBulkOp(options);
 		return new MongoBulk<T>(bulk, this.map); 
 	}
 }
