@@ -4,6 +4,7 @@ global.Strings = require("./strings");
 
 try{
 	require("./app").main(process.argv);
+	process.exit();
 } catch(e){
 	console.log(e.stack);
 	process.exit(1);

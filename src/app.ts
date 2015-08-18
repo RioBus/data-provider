@@ -10,7 +10,7 @@ import Utils          = require("./common/tools/utils");
 import $inject        = require("./core/inject");
 
 var sleep = require("deasync").sleep;
-declare var Config, Strings, global, require;
+declare var Config, Strings, global, require, process;
 
 /**
  * Main application process.
@@ -37,20 +37,12 @@ class Application{
         Application.logger = Factory.getLogger();
         Application.logger.info(Strings.provider.data.start);
         
-        var updateInterval: number = Config.environment.provider.updateInterval;
         var itineraries: any = Application.mapItineraries(ida.retrieve());
-        var output: any;
-        var buses: Bus[];
-        
-        while(true) {
-            Application.logger.info(Strings.dataaccess.bus.downloading);
-            output = bda.retrieve(itineraries);
-            buses = output.buses;
-            itineraries = output.itineraries;
-            if(buses.length>0) bda.create(buses);
-            Application.logger.info(buses.length+Strings.dataaccess.bus.processed);
-            sleep(updateInterval);
-        }
+        Application.logger.info(Strings.dataaccess.bus.downloading);
+        var output: any = bda.retrieve(itineraries);
+        var buses: Bus[] = output.buses;
+        if(buses.length>0) bda.create(buses);
+        Application.logger.info(buses.length+Strings.dataaccess.bus.processed);
     }
 
     /**
