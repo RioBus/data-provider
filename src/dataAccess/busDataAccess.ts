@@ -1,15 +1,16 @@
-import Bus           = require("../domain/entity/bus");
-import BusModelMap   = require("../domain/modelMap/busModelMap");
-import DbContext     = require("../core/database/dbContext");
-import Factory       = require("../common/factory");
-import HttpRequest   = require("../core/httpRequest");
-import IBulk         = require("../core/database/iBulk");
-import IDataAccess   = require("./iDataAccess");
-import ICollection   = require("../core/database/iCollection");
-import Itinerary     = require("../domain/entity/itinerary");
-import ItinerarySpot = require("../domain/entity/itinerarySpot");
-import Logger        = require("../common/logger");
-import $inject       = require("../core/inject");
+import Bus             = require("../domain/entity/bus");
+import BusModelMap     = require("../domain/modelMap/busModelMap");
+import DbContext       = require("../core/database/dbContext");
+import Factory         = require("../common/factory");
+import HistoryModelMap = require("../domain/modelMap/historyModelMap");
+import HttpRequest     = require("../core/httpRequest");
+import IBulk           = require("../core/database/iBulk");
+import IDataAccess     = require("./iDataAccess");
+import ICollection     = require("../core/database/iCollection");
+import Itinerary       = require("../domain/entity/itinerary");
+import ItinerarySpot   = require("../domain/entity/itinerarySpot");
+import Logger          = require("../common/logger");
+import $inject         = require("../core/inject");
 
 declare var Config, Strings, database;
 
@@ -37,7 +38,7 @@ class BusDataAccess implements IDataAccess {
         this.logger = Factory.getServerLogger();
         this.db = database;
         this.bus = this.db.collection<Bus>(this.collectionName, new BusModelMap());
-        this.history = this.db.collection<Bus>(this.historyCollectionName, new BusModelMap());
+        this.history = this.db.collection<Bus>(this.historyCollectionName, new HistoryModelMap());
     }
 
     /**
