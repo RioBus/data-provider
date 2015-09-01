@@ -44,8 +44,8 @@ class Config {
 				config: {
 					dbName: "riobus",
 					host: "mongo",
-					user: "riobus",
-					pass: "riobus",
+					user: "",
+					pass: "",
 					port: "27017"
 				}
 			}
