@@ -1,12 +1,12 @@
 declare var require, describe, it, global;
-import DbContext = require("../../../src/core/database/dbContext");
-import ICollection = require("../../../src/core/database/iCollection");
-import Itinerary = require("../../../src/domain/entity/itinerary");
-import ItineraryModelMap = require("../../../src/domain/modelMap/itineraryModelMap");
+import DbContext = require("../../src/core/database/dbContext");
+import ICollection = require("../../src/core/database/iCollection");
+import Itinerary = require("../../src/domain/entity/itinerary");
+import ItineraryModelMap = require("../../src/domain/modelMap/itineraryModelMap");
 
 var Assert = require("assert");
 
-describe("[SERVICE] Database", () => {
+describe("Database", () => {
 	
 	var config: any = {
 		driver: "mongodb",
@@ -26,7 +26,7 @@ describe("[SERVICE] Database", () => {
 		done();
 	});
 	
-	var collection: ICollection<Itinerary> = <ICollection<Itinerary>> context.collection("itinerary", new ItineraryModelMap);
+	var collection: ICollection<Itinerary> = <ICollection<Itinerary>> context.collection("itinerary", new ItineraryModelMap());
 	
 	it("should find the collection itinerary", (done) => {
 		Assert(collection !== undefined);
@@ -41,7 +41,7 @@ describe("[SERVICE] Database", () => {
 		done();
 	});
 	
-	it("should find or create the itinerary object in the database", (done) => {
+	it("should find or create the Itinerary object in the database", (done) => {
 		var result = collection.findOrCreate(itinerary);
 		Assert(result instanceof Itinerary);
 		done();
@@ -49,7 +49,7 @@ describe("[SERVICE] Database", () => {
 	
 	var list: Itinerary[] = collection.find({});
 	
-	it("should return object from the database", (done) => {
+	it("should return a list of objects from the database", (done) => {
 		Assert(list.length > 0);
 		var first: Itinerary = list[0];
 		Assert(first instanceof Itinerary);

@@ -1,8 +1,8 @@
 declare var require, describe, it;
-import HttpRequest = require("../../../src/core/httpRequest");
+import HttpRequest = require("../../src/core/httpRequest");
 var Assert = require("assert");
 
-describe("[UNIT] HttpRequest", () => {
+describe("HttpRequest", () => {
 	
 	var http = new HttpRequest();
 
