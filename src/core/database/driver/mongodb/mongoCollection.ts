@@ -5,7 +5,7 @@ import MongoBulk   = require("./mongoBulk");
 import Sync   	   = require("../../../sync");
 
 /**
- * Generalizes the MongoDB Collection instance
+ * MongoDb collection driver
  * @interface ICollection
  * @class MongoCollection
  */
@@ -28,7 +28,7 @@ class MongoCollection<T> implements ICollection<T>{
 	 * Calculates aggregate values for the data in a collection.
 	 * @param {any[]} pipeline - A sequence of data aggregation operations or stages.
 	 * @param {any} options - Optional. Additional options that aggregate() passes to the aggregate command.
-	 * @return {any}
+	 * @return {T[] | void}
 	 */
 	public aggregate(commands: any[], options: any = {}): T[] | void {
 		if(options.out===undefined){
@@ -147,12 +147,11 @@ class MongoCollection<T> implements ICollection<T>{
 	 * Removes documents from a collection.
 	 * @param {any} params - Optional. Specifies deletion criteria using query operators.
 	 * @param {boolean} justOne - Optional. To limit the deletion to just one document, set to true.
-	 * @return {any}
+	 * @return {boolean}
 	 */
-	public remove(query: any = {}): void {
+	public remove(query: any = {}): boolean {
 		query = this.map.prepareToInput(query);
-		Sync.promise(this.context, this.context.remove, query);
-		//this.context.remove(query, (error, output)=>{ if(error) throw error; });
+		return Sync.promise(this.context, this.context.remove, query).result.n > 0;
 	}
 	
 	/**
