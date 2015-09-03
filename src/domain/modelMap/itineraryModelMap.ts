@@ -10,7 +10,7 @@ class ItineraryModelMap implements IModelMap {
 	}
 	
 	public prepareToInput(data: any): any {
-		if(data.line!==undefined) data.line = data.line.toString();
+		if(data.line!==undefined && typeof data.line!=='object') data.line = data.line.toString();
 		if(data.description!==undefined) data.description = data.description.toString();
 		if(data.agency!==undefined) data.agency = data.agency.toString();
 		if(data.spots!==undefined && data.spots.length>0){

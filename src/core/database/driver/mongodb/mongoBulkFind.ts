@@ -14,18 +14,16 @@ class MongoBulkFind<T> implements IBulkFind<T> {
 	 * Adds a single document remove operation to a bulk operations list.
 	 * @return {void}
 	 */
-	public removeOne(query: any): void {
-		var data: any = this.map.prepareToInput(query);
-		this.context.removeOne(data);
+	public removeOne(): void {
+		this.context.removeOne();
 	}
 	
 	/**
 	 * Adds a remove operation to a bulk operations list.
 	 * @return {void}
 	 */
-	public remove(query: any): void {
-		var data: any = this.map.prepareToInput(query);
-		this.context.remove(data);
+	public remove(): void {
+		this.context.remove();
 	}
 	
 	/**

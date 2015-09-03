@@ -8,13 +8,13 @@ interface IBulkFind<T> {
 	 * Adds a single document remove operation to a bulk operations list.
 	 * @return {void}
 	 */
-	removeOne(query: any): void;
+	removeOne(): void;
 	
 	/**
 	 * Adds a remove operation to a bulk operations list.
 	 * @return {void}
 	 */
-	remove(query: any): void;
+	remove(): void;
 	
 	/**
 	 * Adds a single document replacement operation to a bulk operations list.
