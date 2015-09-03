@@ -137,10 +137,11 @@ class MongoCollection<T> implements ICollection<T>{
 	 * @param {any} update - The modifications to apply.
 	 * @param {any} options - Optional. A document that contains a set of options that controls the operation.
 	 */
-	public update(query: any, data: any, options: any={}): void {
+	public update(query: any, data: any, options: any={}): boolean {
 		query = this.map.prepareToInput(query);
 		data = this.map.prepareToInput(data);
-		this.context.update(query, data, options, (error, output)=>{ if(error) throw error });
+		return Sync.promise(this.context, this.context.update, query, data, options).result.n > 0;
+		//this.context.update(query, data, options, (error, output)=>{ if(error) throw error });
 	}
 	
 	/**
