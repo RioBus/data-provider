@@ -1,5 +1,6 @@
 declare var require, describe, it, global;
 import DbContext = require("../../src/core/database/dbContext");
+import IBulk = require("../../src/core/database/iBulk");
 import ICollection = require("../../src/core/database/iCollection");
 import Itinerary = require("../../src/domain/entity/itinerary");
 import ItineraryModelMap = require("../../src/domain/modelMap/itineraryModelMap");
@@ -108,6 +109,90 @@ describe("Database", () => {
 		var expected: boolean = true;
 		Assert.equal(current, expected);
 		done();
+	});
+	
+	it("should batch insert a document in the collection", (done) => {
+		var itinerary: Itinerary = new Itinerary("linha", description, "agencia", []);
+		var bulk: IBulk<Itinerary> = collection.initBulk();
+		bulk.insert(itinerary);
+		var current: any;
+		var expected: boolean = true;
+		try{
+			bulk.execute();
+			current = true;
+		} catch(e){
+			current = e;
+		} finally {
+			Assert.equal(current, expected);
+			done();
+		}
+	});
+	
+	it("should batch update a document in the collection", (done) => {
+		var itinerary: Itinerary = new Itinerary("linha", description, "agencia", []);
+		var bulk: IBulk<Itinerary> = collection.initBulk();
+		
+		var update: any = JSON.stringify(itinerary);
+		update = JSON.parse(update);
+		update.line = "batch";
+		delete update._id;
+		bulk.find(itinerary).update(update);
+		var current: any;
+		var expected: boolean = true;
+		try{
+			bulk.execute();
+			current = true;
+		} catch(e){
+			current = e;
+		} finally {
+			Assert.equal(current, expected);
+			done();
+		}
+	});
+	
+	it("should batch replace a document in the collection", (done) => {
+		var itinerary: Itinerary = new Itinerary("batch", description, "agencia", []);
+		var bulk: IBulk<Itinerary> = collection.initBulk();
+		
+		var update: any = JSON.stringify(itinerary);
+		update = JSON.parse(update);
+		update.line = "replace";
+		delete update._id;
+		
+		bulk.find(itinerary).replaceOne(update);
+		var current: any;
+		var expected: boolean = true;
+		try{
+			bulk.execute();
+			current = true;
+		} catch(e){
+			current = e;
+		} finally {
+			Assert.equal(current, expected);
+			done();
+		}
+	});
+	
+	it("should batch remove documents in the collection", (done) => {
+		var bulk: IBulk<Itinerary> = collection.initBulk();
+		
+		var update: any = JSON.stringify(itinerary);
+		update = JSON.parse(update);
+		update.line = "replace";
+		delete update._id;
+		
+		bulk.find({line: { $in: ["batch", "replace"] } }).remove();
+		var current: any;
+		var expected: boolean = true;
+		try{
+			bulk.execute();
+			current = true;
+		} catch(e){
+			current = e;
+		} finally {
+			Assert.equal(current, expected);
+			done();
+		}
 	});
 	
 });
