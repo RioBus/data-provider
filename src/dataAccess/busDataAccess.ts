@@ -59,21 +59,15 @@ class BusDataAccess implements IDataAccess {
         this.logger.info(Strings.dataaccess.bus.creating);
         var busBulk: IBulk<Bus> = this.bus.initBulk(false, { w: 0 });
         var historyBulk: IBulk<Bus> = this.history.initBulk(false, { w: 0 });
-        buses.forEach( (bus: any) => {
+        buses.forEach( (bus: Bus) => {
             if(bus===null || bus===undefined) return;
-            delete bus._id; // Is being firstly created, will never have an id here.
-            bus.line += "";
+            busBulk.find({ order: bus.getOrder() }).removeOne();
             busBulk.insert(bus);
             historyBulk.insert(bus);
         }, this);
         try {
-            this.bus.remove();
             busBulk.execute();
             historyBulk.execute();
-            //var busOutput = busBulk.execute().toJSON();
-            //var historyOutput = historyBulk.execute().toJSON();
-            //this.logger.info("Buses inserted to search: "+busOutput.nInserted);
-            //this.logger.info("Buses inserted to history: "+historyOutput.nInserted);
         } catch (e) {
             this.logger.error(e);
         }
