@@ -32,7 +32,7 @@ class BusModelMap implements IModelMap {
 	
 	public getInstance<T>(data: any): Bus {
 		if(data!==null)
-			return new Bus(data.line, data.order, data.speed, data.direction, data.coordinates[0], data.coordinates[1], data.timestamp, data.sense, data._id);
+			return new Bus(data.line, data.order, data.speed, data.direction, data.coordinates[0], data.coordinates[1], data.timestamp, data.sense);
 		return null;
 	}
 }
