@@ -29,6 +29,7 @@ class ItineraryModelMap implements IModelMap {
 	}
 	
 	public getInstance<T>(data: any): Itinerary {
+		if(data===null || data===undefined) return data;
 		var spots: ItinerarySpot[] = new Array<ItinerarySpot>();
 		if(data.spots.length>0){
 			data.spots.forEach( (spot)=>{
