@@ -15,6 +15,7 @@ class ItineraryModelMap implements IModelMap {
 		if(data.line!==undefined && typeof data.line!=='object') data.line = data.line.toString();
 		if(data.description!==undefined) data.description = data.description.toString();
 		if(data.agency!==undefined) data.agency = data.agency.toString();
+		if(data.keywords!==undefined) data.keywords = data.keywords.toString();
 		if(data.spots!==undefined && data.spots.length>0){
 			for(var i=0; i<data.spots.length; i++){
 				var spot = data.spots[i];
@@ -36,7 +37,7 @@ class ItineraryModelMap implements IModelMap {
 				spots.push(new ItinerarySpot(spot.coordinates[0], spot.coordinates[1], spot.returning));
 			});
 		}
-		return new Itinerary(data.line, data.description, data.agency, spots, data._id);
+		return new Itinerary(data.line, data.description, data.agency, data.keywords, spots, data._id);
 	}
 }
 export = ItineraryModelMap;

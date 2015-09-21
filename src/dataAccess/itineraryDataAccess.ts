@@ -94,7 +94,7 @@ class ItineraryDataAccess implements IDataAccess{
     private requestFromServer(line: string): Itinerary {
         var config: any = Config.environment.provider;
         var http: HttpRequest = new HttpRequest();
-        var empty: Itinerary = new Itinerary(line, Strings.dataaccess.bus.blankSense, "", []);
+        var empty: Itinerary = new Itinerary(line, Strings.dataaccess.bus.blankSense, "", "", []);
 
         var options: any = {
             url: 'http://' + config.host + config.path.itinerary.replace("$$", line),
@@ -145,7 +145,7 @@ class ItineraryDataAccess implements IDataAccess{
      * @returns {Itinerary}
      */
     private parseBody(data: string): Itinerary {
-        var returning: number = 0, description: string, line: string, agency: string;
+        var returning: number = 0, description: string, line: string, agency: string, keywords: string;
         var spots: ItinerarySpot[] = new Array<ItinerarySpot>();
          
         var body = data.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
@@ -168,8 +168,11 @@ class ItineraryDataAccess implements IDataAccess{
             description = finalDescription.join("-");
             var sequential: number = parseInt(it[3])*returning;
             spots.push(new ItinerarySpot(parseFloat(it[5]), parseFloat(it[6]), (sequential<0)? true: false));
-        });
-        return new Itinerary(line, description, agency, spots);
+        });        
+        keywords = [line.toString(), agency.toString()].concat(description.split(" X ")).join(" ");
+        keywords = keywords.replace("(", "").replace(")", "").replace("-", "");
+        
+        return new Itinerary(line, description, agency, keywords, spots);
     }
 }
 export = ItineraryDataAccess;
