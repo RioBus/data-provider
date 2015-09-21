@@ -6,7 +6,6 @@ import IModelMap = require("../../src/core/database/iModelMap");
 import Config = require("../../src/config");
 
 var Assert = require("assert");
-global.Config = Config;
 
 class TestModelMap implements IModelMap {
 	public collectionName: string = "test";
@@ -15,11 +14,22 @@ class TestModelMap implements IModelMap {
 	public getInstance(data: any): any { return data; }
 }
 
+var config: any = {
+	driver: "mongodb",
+	config: {
+		dbName: "riobus",
+		host: "ds047742.mongolab.com",
+		user: "riobus",
+		pass: "riobus",
+		port: "47742"
+	}
+};
+
 describe("Database", () => {
 	
 	var context: DbContext;
 	try{
-		context = new DbContext();
+		context = new DbContext(config);
 	}catch(e){ console.log(e) }
 	
 	it("should connect to the database", (done) => {

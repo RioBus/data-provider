@@ -40,25 +40,25 @@ class Config {
 		},
 		development: {
 			database: {
-				driver: "mongodb",
+				driver: process.env.RIOBUS_DB_DRIVER,
 				config: {
-					dbName: "riobus",
-					host: "mongo",
-					user: "",
-					pass: "",
-					port: "27017"
+					dbName: process.env.RIOBUS_DB_NAME,
+					host: process.env.RIOBUS_DB_HOST,
+					user: process.env.RIOBUS_DB_USER,
+					pass: process.env.RIOBUS_DB_PASS,
+					port: process.env.RIOBUS_DB_PORT
 				}
 			}
 		},
 		production: {
 			database: {
-				driver: "mongodb",
+				driver: process.env.RIOBUS_DB_DRIVER,
 				config: {
-					dbName: "riobus",
-					host: "mongo",
-					user: "riobus",
-					pass: "riobus",
-					port: "27017"
+					dbName: process.env.RIOBUS_DB_NAME,
+					host: process.env.RIOBUS_DB_HOST,
+					user: process.env.RIOBUS_DB_USER,
+					pass: process.env.RIOBUS_DB_PASS,
+					port: process.env.RIOBUS_DB_PORT
 				}
 			}
 		}
