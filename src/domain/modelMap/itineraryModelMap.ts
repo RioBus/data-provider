@@ -5,6 +5,8 @@ import ItinerarySpot = require("../entity/itinerarySpot");
 
 class ItineraryModelMap implements IModelMap {
 	
+	public collectionName: string = "itinerary";
+	
 	preConfig(collection: ICollection<Itinerary>): void {
 		collection.createIndex({line: 1});
 	}

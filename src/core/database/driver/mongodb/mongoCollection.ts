@@ -1,9 +1,11 @@
+declare var require;
 import IBulk   	   = require("../../iBulk");
 import ICollection = require("../../iCollection");
 import IModelMap   = require("../../iModelMap");
 import MongoBulk   = require("./mongoBulk");
 import Sync   	   = require("../../../sync");
 
+var ObjectID	   = require("mongodb").ObjectID;
 /**
  * MongoDb collection driver
  * @interface ICollection
@@ -79,8 +81,12 @@ class MongoCollection<T> implements ICollection<T>{
 	 * @param {number} id - Document id
 	 * @return {T}
 	 */
-	public findById(id: number): T {
-		return this.findOne({_id: id});
+	public findById(id: string): T {
+		try {
+			return this.findOne({_id: new ObjectID(id)});
+		} catch (e) {
+			return null;
+		}
 	}
 	
 	/**

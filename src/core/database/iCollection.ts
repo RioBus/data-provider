@@ -41,7 +41,7 @@ interface ICollection<T> {
 	 * @param {number} id - Document id
 	 * @return {T}
 	 */
-	findById(id: number): T;
+	findById(id: string): T;
 	
 	/**
 	 * Atomically modifies and returns a single document.

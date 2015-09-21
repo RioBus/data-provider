@@ -6,6 +6,8 @@ var Moment		   = require("moment-timezone");
 
 class HistoryModelMap extends BusModelMap {
 	
+	public collectionName: string = "bus_history";
+	
 	public preConfig(collection: ICollection<Bus>): void {
 		//collection.createIndex({line: 1});
 		//collection.createIndex({order: 1});

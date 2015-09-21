@@ -25,8 +25,6 @@ class BusDataAccess implements IDataAccess {
 
     private logger: Logger;
     private db: DbContext;
-    private collectionName: string = "bus";
-    private historyCollectionName: string = "bus_history";
     private bus: ICollection<Bus>;
     private history: ICollection<Bus>;
 
@@ -37,8 +35,8 @@ class BusDataAccess implements IDataAccess {
     public constructor(private dataAccess: IDataAccess = $inject("dataAccess/itineraryDataAccess")) {
         this.logger = Factory.getServerLogger();
         this.db = database;
-        this.bus = this.db.collection<Bus>(this.collectionName, new BusModelMap());
-        this.history = this.db.collection<Bus>(this.historyCollectionName, new HistoryModelMap());
+        this.bus = this.db.collection<Bus>(new BusModelMap());
+        this.history = this.db.collection<Bus>(new HistoryModelMap());
     }
 
     /**

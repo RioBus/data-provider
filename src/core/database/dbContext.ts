@@ -25,8 +25,8 @@ class DbContext {
 	 * @param {IModelMap} map
 	 * @return {ICollection<T>}
 	 */
-	public collection<T>(name: string, map: IModelMap): ICollection<T> {
-		return this.context.collection<T>(name, map);
+	public collection<T>(map: IModelMap): ICollection<T> {
+		return this.context.collection<T>(map.collectionName, map);
 	}
 	
 	/**

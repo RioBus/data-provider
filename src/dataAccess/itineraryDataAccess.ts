@@ -22,12 +22,11 @@ class ItineraryDataAccess implements IDataAccess{
     private logger: Logger;
     private db: DbContext;
     private collection: ICollection<Itinerary>;
-    private collectionName: string = "itinerary";
 
     public constructor(){
         this.logger = Factory.getLogger();
         this.db = database;
-        this.collection = this.db.collection<Itinerary>(this.collectionName, new ItineraryModelMap());
+        this.collection = this.db.collection<Itinerary>(new ItineraryModelMap());
     }
     
     /**

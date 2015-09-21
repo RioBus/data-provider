@@ -6,6 +6,8 @@ var Moment		   = require("moment-timezone");
 
 class BusModelMap implements IModelMap {
 	
+	public collectionName: string = "bus";
+	
 	public preConfig(collection: ICollection<Bus>): void {
 		collection.createIndex({line: 1});
 		collection.createIndex({order: 1});
