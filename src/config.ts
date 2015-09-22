@@ -38,28 +38,14 @@ class Config {
 			host: 	  "smtp.gmail.com",
 			ssl: 	  true
 		},
-		development: {
-			database: {
-				driver: process.env.RIOBUS_DB_DRIVER,
-				config: {
-					dbName: process.env.RIOBUS_DB_NAME,
-					host: process.env.RIOBUS_DB_HOST,
-					user: process.env.RIOBUS_DB_USER,
-					pass: process.env.RIOBUS_DB_PASS,
-					port: process.env.RIOBUS_DB_PORT
-				}
-			}
-		},
-		production: {
-			database: {
-				driver: process.env.RIOBUS_DB_DRIVER,
-				config: {
-					dbName: process.env.RIOBUS_DB_NAME,
-					host: process.env.RIOBUS_DB_HOST,
-					user: process.env.RIOBUS_DB_USER,
-					pass: process.env.RIOBUS_DB_PASS,
-					port: process.env.RIOBUS_DB_PORT
-				}
+		database: {
+			driver: process.env.RIOBUS_DB_DRIVER,
+			config: {
+				dbName: process.env.RIOBUS_DB_NAME,
+				host: process.env.RIOBUS_DB_HOST,
+				user: process.env.RIOBUS_DB_USER,
+				pass: process.env.RIOBUS_DB_PASS,
+				port: process.env.RIOBUS_DB_PORT
 			}
 		}
 	}
