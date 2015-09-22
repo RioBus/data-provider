@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "configure": "npm install --python=python2.7",
-    "test": "gulp buildTest && mocha .compiled/test/**/*",
+    "test": "gulp buildTest && mocha .compiled/test/**/* --timeout 10000",
     "build": "gulp build",
     "release": "gulp release",
     "start": "gulp build && node .compiled/src/index.js",
