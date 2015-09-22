@@ -2,14 +2,11 @@
   "name": "data-provider",
   "version": "3.3.0",
   "description": "RioBus data-provider application",
-  "main": "dist/index.js",
+  "main": ".compiled/src/index.js",
   "scripts": {
-    "configure": "npm install --python=python2.7",
     "test": "gulp buildTest && mocha .compiled/test/**/* --timeout 10000",
     "build": "gulp build",
-    "release": "gulp release",
-    "start": "gulp build && node .compiled/src/index.js",
-    "deploy": "gulp build && gulp release && gulp run-release"
+    "start": "gulp build && node .compiled/src/index.js"
   },
   "repository": {
     "type": "git",
@@ -47,7 +44,6 @@
     "gulp-load-plugins": "^0.10.0",
     "gulp-shell": "^0.4.2",
     "gulp-typescript": "^2.7.6",
-    "gulp-uglify": "^1.2.0",
     "mocha": "^2.2.5"
   }
 }

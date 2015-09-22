@@ -8,7 +8,6 @@ var paths = {
     root: root,
     build: compiled+"/src",
     buildTest: compiled+"/test",
-    dist: root+"/dist",
     src: root+"/src",
     test: root+"/test"
 };
@@ -19,9 +18,7 @@ function task(name) {
     return require('./gulp/' + name).apply({}, args);
 }
 
-gulp.task("build",       task("compile",     paths));
-gulp.task("buildTest",   ["build"],          task("compile.test", paths));
-gulp.task("release",     ["build"],          task("release",      paths));
-gulp.task("run",         task("run",         paths));
-gulp.task("run-release", task("run-release", paths));
-gulp.task("default",     ["build"]);
+gulp.task("build",     task("compile", paths));
+gulp.task("buildTest", ["build"],      task("compile.test", paths));
+gulp.task("run",       task("run",     paths));
+gulp.task("default",   ["build"]);
