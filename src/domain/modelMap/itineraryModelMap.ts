@@ -9,6 +9,7 @@ class ItineraryModelMap implements IModelMap {
 	
 	preConfig(collection: ICollection<Itinerary>): void {
 		collection.createIndex({line: 1});
+		collection.createIndex({keywords: "text"});
 	}
 	
 	public prepareToInput(data: any): any {
