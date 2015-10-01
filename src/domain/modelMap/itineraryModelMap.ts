@@ -35,7 +35,7 @@ class ItineraryModelMap implements IModelMap {
 		var spots: ItinerarySpot[] = new Array<ItinerarySpot>();
 		if(data.spots.length>0){
 			data.spots.forEach( (spot)=>{
-				spots.push(new ItinerarySpot(spot.coordinates[0], spot.coordinates[1], spot.returning));
+				spots.push(new ItinerarySpot(spot.coordinates[0], spot.coordinates[1]));
 			});
 		}
 		return new Itinerary(data.line, data.description, data.agency, data.keywords, spots, data._id);

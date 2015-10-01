@@ -3,19 +3,15 @@
  * @class Itinerary
  * @constructor
  */
-class ItinerarySpot{
+class ItinerarySpot {
 
-    public constructor(private latitude: number, private longitude: number, private returning: boolean) {}
+    public constructor(private latitude: number, private longitude: number) {}
 	
-	public isReturning(): boolean{
-		return this.returning;
-	}
-	
-	public getLatitude(): number{
+	public getLatitude(): number {
 		return this.latitude;
 	}
 	
-	public getLongitude(): number{
+	public getLongitude(): number {
 		return this.longitude;
 	}
 }

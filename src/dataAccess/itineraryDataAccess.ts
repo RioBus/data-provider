@@ -62,11 +62,20 @@ class ItineraryDataAccess implements IDataAccess{
     }
 
     /**
+     * Retrieves the Itinerary list
+     * @return {Itinerary[]}
+     */
+    private getItineraries(): Itinerary[] {
+        this.logger.info(Strings.dataaccess.itinerary.retrieving);
+        return this.collection.find();
+    }
+
+    /**
      * Retrieves the Itinerary given a line
      * @param {string} line
      * @return {Itinerary}
      */
-    public getItinerary(line: string): Itinerary {
+    private getItinerary(line: string): Itinerary {
         this.logger.info(Strings.dataaccess.itinerary.searching+line);
         var list: Array<Itinerary> = this.collection.find({line: ""+line});
         if(list.length>0){
@@ -75,15 +84,6 @@ class ItineraryDataAccess implements IDataAccess{
             var itinerary: Itinerary = this.requestFromServer(line);
             return this.create(itinerary);
         }
-    }
-
-    /**
-     * Retrieves the Itinerary list
-     * @return {Itinerary[]}
-     */
-    public getItineraries(): Itinerary[] {
-        this.logger.info(Strings.dataaccess.itinerary.retrieving);
-        return this.collection.find();
     }
 
     /**
@@ -119,7 +119,6 @@ class ItineraryDataAccess implements IDataAccess{
      * @return List<Itinerary>
      * */
     private respondRequest(response: any): Itinerary {
-        "use strict";
         switch(response.statusCode){ // Verifying response statusCode
             case 200:
                 return this.parseBody(response.body);
@@ -133,7 +132,7 @@ class ItineraryDataAccess implements IDataAccess{
                 this.logger.alert(Strings.dataaccess.all.request.e503);
                 break;
             default:
-                this.logger.alert('('+response.statusCode+') '+Strings.dataaccess.all.request.default);
+                this.logger.alert("("+response.statusCode+") "+Strings.dataaccess.all.request["default"]);
                 break;
         }
         return null;
@@ -159,20 +158,27 @@ class ItineraryDataAccess implements IDataAccess{
             if(agency===undefined)      agency = it[2];
             if(description===undefined) description = it[1];
             if(line===undefined)        line = it[0];
-            if(parseInt(it[3])==0 && returning==0) returning = 1;
-            else if(parseInt(it[3])==0 && returning==1) returning = -1;
             
             // Transforming the external data into an application's known
             var finalDescription: string[] = it[1].split("-");
             finalDescription.shift();
             description = finalDescription.join("-");
-            var sequential: number = parseInt(it[3])*returning;
-            spots.push(new ItinerarySpot(parseFloat(it[5]), parseFloat(it[6]), (sequential<0)? true: false));
-        });        
-        keywords = [line.toString(), agency.toString()].concat(description.split(" X ")).join(" ");
-        keywords = keywords.replace("(", "").replace(")", "").replace("-", "");
+            spots.push(new ItinerarySpot(parseFloat(it[5]), parseFloat(it[6])));
+        });
+        var consortium: string = this.identifyConsortium(line);
+        keywords = [line.toString(), agency.toString(), consortium].concat(description.split(" X ")).join(",");
+        keywords = keywords.replace("(", " ").replace(")", " ").replace("-", " ").replace(/\s+/g, " ").replace(/^\s|\s$/g, "").replace(/,/g, " ");
         
         return new Itinerary(line, description, agency, keywords, spots);
+    }
+    
+    private identifyConsortium(line: string): string {
+        var consortiums: string[] = Object.keys(Strings.consortiums);
+        var output: string = "";
+        consortiums.forEach((consortium) => {
+            if(Strings.consortiums[consortium].indexOf(line.toString())>-1) output = consortium;
+        });
+        return output;
     }
 }
 export = ItineraryDataAccess;
