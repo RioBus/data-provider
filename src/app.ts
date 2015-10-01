@@ -39,16 +39,14 @@ class Application{
         
         var updateInterval: number = Config.environment.provider.updateInterval;
         var itineraries: any = Application.mapItineraries(ida.retrieve());
-        var output: any;
-        var buses: Bus[];
+        var output: any = { buses: [], itineraries: itineraries };
         
         while(true) {
             Application.logger.info(Strings.dataaccess.bus.downloading);
-            output = bda.retrieve(itineraries);
-            buses = output.buses;
-            itineraries = output.itineraries;
-            if(buses.length>0) bda.create(buses);
-            Application.logger.info(buses.length+Strings.dataaccess.bus.processed);
+            output = bda.retrieve(output);
+            if(output.buses.length>0) bda.create(output.buses);
+            Application.logger.info(output.buses.length+Strings.dataaccess.bus.processed);
+            output.buses = [];
             sleep(updateInterval);
         }
     }
@@ -57,10 +55,10 @@ class Application{
      * Map the Itinerary[] to a dictionary-like so the routine can access it easily. 
      * @method mapItineraries
      * @param {Itinerary[]} itineraries
-     * @return {any}
+     * @return {Object}
      */
-    public static mapItineraries(itineraries: Itinerary[]): any {
-        var obj: any = {};
+    public static mapItineraries(itineraries: Itinerary[]): Object {
+        var obj: Object = {};
         itineraries.forEach((itinerary)=>{ obj[itinerary.getLine()] = itinerary; });
         return obj;
     }
