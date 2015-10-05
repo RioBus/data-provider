@@ -2,6 +2,10 @@ declare var __dirname, process;
 class Config {
 	
 	public static rootPath: string = __dirname;
+	
+	public static cachePath: string = "/tmp/riobus/cache";
+	
+	public static busHistorySize: number = 5;
 
 	public static log: any = {
 		runtime: "/tmp/riobus/log/runtime.log",
@@ -13,10 +17,6 @@ class Config {
 		to: 	 "",
 		subject: "[ERROR] Server down!",
 		text: 	 "An error ocurred in the data-provider service\n\n$$\n\nand it shut the server down."
-	}
-
-	public static isProduction(): Boolean {
-		return process.argv.indexOf("--production") > -1;
 	}
 	
 	public static environment: any = {

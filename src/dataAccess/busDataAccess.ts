@@ -5,12 +5,12 @@ import Factory         = require("../common/factory");
 import HistoryModelMap = require("../domain/modelMap/historyModelMap");
 import HttpRequest     = require("../core/httpRequest");
 import IBulk           = require("../core/database/iBulk");
-import IDataAccess     = require("./iDataAccess");
 import ICollection     = require("../core/database/iCollection");
+import IDataAccess     = require("./iDataAccess");
 import Itinerary       = require("../domain/entity/itinerary");
-import ItinerarySpot   = require("../domain/entity/itinerarySpot");
 import Logger          = require("../common/logger");
 import $inject         = require("../core/inject");
+import BusUtils        = require("../domain/busUtils");
 
 declare var Config, Strings, database;
 
@@ -170,7 +170,9 @@ class BusDataAccess implements IDataAccess {
             } else {
                 if(storage.itineraries[line]===undefined) storage.itineraries[line] = this.dataAccess.retrieve(line);
                 var itinerary: Itinerary = storage.itineraries[line];
+                var startPoint: any = itinerary.getSpots()[0];
                 bus.setSense(itinerary.getDescription());
+                bus = BusUtils.identifySense(bus, startPoint);
             }
             busList.push(bus);
         }, this);
