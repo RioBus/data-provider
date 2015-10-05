@@ -5,7 +5,7 @@ class Config {
 	
 	public static cachePath: string = "/tmp/riobus/cache";
 	
-	public static busHistorySize: number = 5;
+	public static busHistorySize: number = 10;
 
 	public static log: any = {
 		runtime: "/tmp/riobus/log/runtime.log",
