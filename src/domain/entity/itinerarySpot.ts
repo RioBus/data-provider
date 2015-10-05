@@ -1,9 +1,11 @@
+import IGeolocated = require("../../common/iGeolocated");
+
 /**
  * Describes one spot of the Itinerary of a given line
  * @class Itinerary
  * @constructor
  */
-class ItinerarySpot {
+class ItinerarySpot implements IGeolocated {
 
     public constructor(private latitude: number, private longitude: number) {}
 	

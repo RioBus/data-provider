@@ -1,9 +1,11 @@
+import IGeolocated = require("../../common/iGeolocated");
+
 /**
  * Describes a bus instance
  * @class Bus
  * @constructor
  */
-class Bus{
+class Bus implements IGeolocated {
 	
 	private timestamp: string;
 
