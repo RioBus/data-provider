@@ -171,8 +171,9 @@ class BusDataAccess implements IDataAccess {
                 if(storage.itineraries[line]===undefined) storage.itineraries[line] = this.dataAccess.retrieve(line);
                 var itinerary: Itinerary = storage.itineraries[line];
                 var startPoint: any = itinerary.getSpots()[0];
+                var description: string = itinerary.getDescription();
                 bus.setSense(itinerary.getDescription());
-                bus = BusUtils.identifySense(bus, startPoint);
+                if(description!==Strings.dataaccess.bus.blankSense) bus = BusUtils.identifySense(bus, startPoint);
             }
             busList.push(bus);
         }, this);
