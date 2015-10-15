@@ -100,7 +100,10 @@ class BusUtils {
         
         // Setting the new position
         if(!BusUtils.timelineHasData(tmp, history.timeline)) history.timeline.push(tmp);
-        if(history.timeline.length>max) history.timeline.shift();
+        if(history.timeline.length>max) {
+            var overpass: number = history.timeline.length - max, i: number = 0;
+            while (i++<overpass) history.timeline.shift();
+        }
         
         var past: any = null;
         history.timeline.forEach((step, index) => {
@@ -116,12 +119,6 @@ class BusUtils {
         // Updating sense
         var sense: string = BusUtils.prepareSense(bus.getSense(), reducedState);
         bus.setSense(sense);
-        
-        if(bus.getOrder()==="D53660") {
-            console.log("finalState:", finalState);
-            console.log("reducedState:", reducedState);
-            console.log("sense:", sense)
-        }
         
         // Updating the cached data
         BusUtils.writeToCache(bus.getOrder(), history);
