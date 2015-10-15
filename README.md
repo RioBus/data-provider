@@ -11,17 +11,10 @@ Seu objetivo principal é ajudar o cidadão, seja ele morador ou visitante, do R
 Arquitetura
 -----------
 
-A aplicação do provedor de dados do RioBus foi desenvolvida em TypeScript, através do GULP e Node.js.
+A aplicação do provedor de dados do RioBus foi desenvolvida em TypeScript sobre a plataforma Node.js.
 
 A organização da lógica da aplicação é dividida em camadas e separa o acesso ao repositório de dados da lógica da aplicação,
 de forma que o código fique desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
-
-Além disso, foi preparada uma infra-estrutura utilizando o poder do GULP, um dos automatizadores de tarefas mais utilizados
-atualmente por equipes de desenvolvimento de JavaScript. Desta forma foi possível escrever um código limpo e sucinto que
-garante flexibilidade e modularidade.
-
-Além disso, o GULP compila o código do TypeScript em "Javascript comum" seguindo os padrões CommonJS, garantindo a
-compatibilidade com a plataforma do Node.js.
 
 
 Instalação
@@ -41,40 +34,26 @@ Faça o download do projeto em sua máquina:
 Entre na raiz do projeto e instale as dependências do Node.js:
 > $ npm install
 
-Ainda na raiz do projeto, configure o ambiente
-> $ npm run configure
-
 Execute a aplicação:
 > $ npm start
 
 Os dados dos ônibus são salvos no banco de dados NoSQL [MongoDB](https://www.mongodb.org/). Certifique-se de que ele 
-esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas na classe ```Config```, 
-em ```Config.environment.<ambiente>.database```.
+esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas nas variáveis de ambiente do
+Sistema Operacional de acordo com as configurações padrão descritas em ```env.config.sh```.
 
 Comandos NPM
 ------------
-
-npm run configure
-> Configura o ambiente para compilação
-
-npm run build
-> Compila o projeto para JavaScript e põe o código em compiled/build/
 
 npm run test
 > Invoca o Mocha e roda as rotinas de testes unitários configurados em test/
 
 npm run start
-> Compila e roda a aplicação
+> Roda a aplicação
 
-npm run release
-> Compila e gera um código comprimido para distribuição
-
-npm run deploy
-> Compila, gera o código de distribuição e executa a aplicação final
-
-```OBS.: Para a aplicação funcionar, ela precisa estar em um projeto cujos módulos Node.js estejam instalados.```
+npm install
+> Inslata as dependências locais e globais do projeto.
 
 Compatibilidade
 ---------------
 
-* nodejs >= 0.11
+* node.js >= 0.11
