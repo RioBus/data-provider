@@ -2,10 +2,9 @@
   "name": "data-provider",
   "version": "3.4.0",
   "description": "RioBus data-provider application",
-  "main": "src/index.ts",
   "scripts": {
+    "install": "npm install -g mocha typescript ts-node",
     "test": "mocha test/**/* --require ts-node/register --timeout 10000",
-    "install": "npm install -g mocha ts-node typescript",
     "start": "ts-node src/index.ts"
   },
   "repository": {

@@ -1,10 +1,6 @@
 node_modules
-.compiled
 .DS_Store
 .settings
 .idea
 *.log
-defs
-dist
-tmp
 env.config.sh
