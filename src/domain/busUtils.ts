@@ -75,8 +75,8 @@ class BusUtils {
     private static prepareSense(sense: string, sum: number): string {
         var tmp: string = "desconhecido";
         var max: number = Config.busHistorySize;
-        if(sum > 0) tmp = sense;
-        else if(sum < 0) {
+        if(sum < 0) tmp = sense;
+        else if(sum > 0) {
             var tmpSense: string[] = sense.split(" X ");
             var aux: string = tmpSense[1];
             tmpSense[1] = tmpSense[0];
