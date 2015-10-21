@@ -27,8 +27,6 @@ class BusModelMap implements IModelMap {
 		if(data.latitude!==undefined && data.longitude!==undefined){
 			data.coordinates = [parseFloat(data.latitude), parseFloat(data.longitude)]; 
 		}
-		delete data.latitude;
-		delete data.longitude;
 		return data;
 	}
 	
