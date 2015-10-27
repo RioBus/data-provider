@@ -136,7 +136,7 @@ class BusDataAccess implements IDataAccess {
                 this.logger.error("["+key+"] ("+response.statusCode+")"+Strings.dataaccess.all.request.error);
                 break;
         }
-        return [];
+        return storage;
     }
 
     /**

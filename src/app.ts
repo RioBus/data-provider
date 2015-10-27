@@ -64,7 +64,7 @@ class Application{
     }
 
     /**
-     * Handles 'uncaughtException' and reports it through e-mail 
+     * Handles 'uncaughtException' and exits process.
      * @method handleFatalError
      * @return {void}
      */
@@ -72,15 +72,7 @@ class Application{
         process.on('uncaughtException', (error: any) => {
             Application.logger.error(error.stack);
             
-            var msgConfig: any = Config.errorMailMessage;
-            var mail: MailObject = new MailObject();
-            mail.setFromAddress(msgConfig.from);
-            mail.setToAddress(msgConfig.to);
-            mail.setSubject(msgConfig.subject);
-            mail.setMessage(Utils.replacePattern(/\$\$/, error.stack, msgConfig.text));
-            
-            var mailServer: MailServer = new MailServer();
-            mailServer.sendMail(mail, (error, message) =>{ process.exit(-1); });
+            process.exit(-1);
         });
     }
 }
