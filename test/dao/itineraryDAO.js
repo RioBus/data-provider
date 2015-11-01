@@ -8,17 +8,17 @@ const Database = require(`${base}/core`).Database;
 const Itinerary = require(`${base}/model/itinerary`);
 const ItineraryDAO = require(`${base}/dao/itineraryDAO`);
 
-var dao, data, conn, saved;
+var dao, saved;
 
 describe('ItineraryDAO', () => {
 	
 	before(function*() {
-		conn = yield Database.connect();
-		dao  = new ItineraryDAO(conn);
-		data = new Itinerary('line', 'description', 'agency', 'keywords');
+		let conn = yield Database.connect();
+		dao = new ItineraryDAO(conn);
 	});
 	
 	it('should insert data', function*(done) {
+		let data = new Itinerary('line', 'description', 'agency', 'keywords');
 		const response = yield dao.save(data);
 		Assert.equal(response.line, data.line);
 		Assert.equal(response.description, data.description);
