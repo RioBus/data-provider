@@ -5,7 +5,7 @@
 class Itinerary {
 	
 	constructor(line, description, agency, keywords, spots) {
-		this.line = line || 'desconhecido';
+		this.line = line.toString() || 'desconhecido';
 		this.description = description || 'desconhecido';
 		this.agency = agency || '';
 		this.keywords = keywords || '';

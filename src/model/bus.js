@@ -5,8 +5,8 @@
 class Bus {
 	
 	constructor(line, order, speed, direction, latitude, longitude, timestamp, sense) {
-		this.line = line || 'desconhecido';
-		this.order = order;
+		this.line = line.toString() || 'desconhecido';
+		this.order = order.toString();
 		this.speed = speed || 0;
 		this.direction = direction || 0;
 		this.latitude = latitude;
