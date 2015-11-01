@@ -1,3 +1,4 @@
+const Moment = require('moment-timezone');
 /**
  * Describes a bus instance
  * @class {Bus}
@@ -11,7 +12,7 @@ class Bus {
 		this.direction = direction || 0;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.timestamp = (timestamp)? (new Date(timestamp)).toISOString() : (new Date()).toISOString();
+		this.timestamp = Moment.tz(timestamp, "America/Sao_Paulo").format();
 		this.sense = sense || 'desconhecido';
     }
 }
