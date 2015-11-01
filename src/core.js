@@ -1,5 +1,6 @@
 const root = './core';
 module.exports = {
+	Cache:			require(`${root}/cache`),
 	Database:		require(`${root}/database`),
 	File: 			require(`${root}/file`),
 	Http: 			require(`${root}/http`),
