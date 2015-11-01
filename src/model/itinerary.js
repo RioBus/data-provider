@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Describes a Itinerary instance
  * @class {Itinerary}

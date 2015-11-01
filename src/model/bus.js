@@ -1,3 +1,4 @@
+'use strict';
 const GeolocatedSpot = require('./geolocatedSpot');
 const Moment = require('moment-timezone');
 /**
