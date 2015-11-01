@@ -5,22 +5,29 @@
  */
 module.exports = {
     root: __dirname,
+    cache: '/tmp/riobus/cache',
+    historySize: 10,
     logs: {
-        runtime: '/tmp/runtime.log',
-        server: '/tmp/server.log'
+        runtime: '/tmp/riobus/log/runtime.log',
+        server: '/tmp/riobus/log/server.log'
     },
-    server: {
-        ip: '0.0.0.0',
-        port: 8081
+    provider: {
+        host: 'dadosabertos.rio.rj.gov.br',
+        path: {
+            bus: {
+                'REGULAR': '/apitransporte/apresentacao/rest/index.cfm/onibus',
+                'BRT': '/apitransporte/apresentacao/rest/index.cfm/brt'
+            },
+            itinerary: '/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv'
+        },
+        updateInterval:	5000,
+        log: '/tmp/riobus/log/data-server.log'
     },
     database: {
-        dbName: process.env.NoDEJS_DB_NAME  || 'nodejs',
-        host: process.env.NODEJS_DB_HOST    || 'localhost',
-        port: process.env.NODEJS_DB_PORT    || 27017,
-        user: process.env.NODEJS_DB_USER    || '',
-        pass: process.env.NODEJS_DB_PASS    || ''
-    },
-    resources: [
-        'main/mainResource'
-    ]
+        dbName: process.env.RIOBUS_DB_NAME  || 'nodejs',
+        host: process.env.RIOBUS_DB_HOST    || 'localhost',
+        port: process.env.RIOBUS_DB_PORT    || 27017,
+        user: process.env.RIOBUS_DB_USER    || '',
+        pass: process.env.RIOBUS_DB_PASS    || ''
+    }
 };
