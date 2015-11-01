@@ -13,6 +13,7 @@ class Bus extends GeolocatedSpot {
 		this.order = order.toString();
 		this.speed = speed || 0;
 		this.direction = direction || 0;
+		timestamp = (new Date(timestamp)).toISOString();
 		this.timestamp = Moment.tz(timestamp, "America/Sao_Paulo").format();
 		this.sense = sense || 'desconhecido';
     }
