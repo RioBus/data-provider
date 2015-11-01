@@ -1,19 +1,26 @@
 {
   "name": "data-provider",
-  "version": "3.4.1",
+  "version": "4.0.0",
   "description": "RioBus data-provider application",
+  "main": "index.js",
   "scripts": {
-    "install": "npm install -g mocha typescript ts-node",
-    "test": "mocha test/**/* --require ts-node/register --timeout 10000",
-    "start": "ts-node src/index.ts"
+    "test": "mocha test/**/*",
+    "start": "node src/index.js"
   },
+  "compiler": "commonjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/riobus/data-provider"
   },
-  "compiler": "common",
+  "author": "Fred Souza <fred@riob.us> (http://fmsouza.github.io)",
+  "bugs": {
+    "url": "https://github.com/riobus/data-provider/issues"
+  },
+  "homepage": "http://github.com/RioBus/data-provider",
+  "license": "GNU-GPL v2",
   "keywords": [
-    "typescript",
+    "es6",
+    "ECMAscript6",
     "nodejs",
     "node",
     "desktop",
@@ -21,26 +28,18 @@
     "wrapper",
     "infrastructure"
   ],
-  "author": "Fred Souza <fred@riob.us> (http://fmsouza.github.io)",
-  "license": "http://github.com/RioBus/data-provider/blob/master/LICENSE",
-  "bugs": {
-    "url": "https://github.com/riobus/data-provider/issues"
-  },
-  "homepage": "http://github.com/RioBus/data-provider",
   "dependencies": {
-    "compression": "^1.4.4",
-    "deasync": "^0.1.0",
-    "emailjs": "^0.3.16",
-    "express": "^4.12.4",
-    "fs-extra": "^0.18.4",
-    "moment": "^2.10.3",
-    "moment-timezone": "^0.4.0",
-    "mongodb": "^2.0.36",
-    "request": "^2.57.0"
+    "body-parser": "^1.14.1",
+    "co": "^4.6.0",
+    "compression": "^1.5.2",
+    "express": "^4.13.3",
+    "fs-extra": "^0.26.0",
+    "mongodb": "^1.4.4",
+    "request-promise": "^1.0.2",
+    "robe": "^0.12.0"
   },
   "devDependencies": {
     "mocha": "^2.2.5",
-    "ts-node": "^0.2.4",
-    "typescript": "^1.6.2"
+    "co-mocha": "^1.1.2"
   }
 }

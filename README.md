@@ -11,7 +11,7 @@ Seu objetivo principal é ajudar o cidadão, seja ele morador ou visitante, do R
 Arquitetura
 -----------
 
-A aplicação do provedor de dados do RioBus foi desenvolvida em TypeScript sobre a plataforma Node.js.
+A aplicação do provedor de dados do RioBus foi desenvolvida sobre a plataforma Node.js.
 
 A organização da lógica da aplicação é dividida em camadas e separa o acesso ao repositório de dados da lógica da aplicação,
 de forma que o código fique desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
@@ -44,10 +44,10 @@ Sistema Operacional de acordo com as configurações padrão descritas em ```env
 Comandos NPM
 ------------
 
-npm run test
+npm test
 > Invoca o Mocha e roda as rotinas de testes unitários configurados em test/
 
-npm run start
+npm start
 > Roda a aplicação
 
 npm install
