@@ -1,4 +1,5 @@
 /* global Buffer; */
+'use strict';
 const File   = require("./file");
 const Config = require("../config");
 
