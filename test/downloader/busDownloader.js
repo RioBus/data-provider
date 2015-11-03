@@ -4,6 +4,7 @@ require('co-mocha')(require('mocha'));
 const Assert = require('assert');
 
 const base = '../../src';
+const Bus = require(`${base}/model/bus`);
 const BusDownloader = require(`${base}/downloader/busDownloader`);
 const Config = require(`${base}/config`);
 
@@ -21,7 +22,8 @@ describe('BusDownloader', () => {
 		var data = yield BusDownloader.fromURL(urlREGULAR);
 		Assert.notEqual(data, undefined);
 		Assert.notEqual(data, null);
-		Assert.notEqual(data.length, 0);
+		Assert(data instanceof Array);
+		Assert(data[0] instanceof Bus);
 		done();
 	});
 	
@@ -29,7 +31,8 @@ describe('BusDownloader', () => {
 		var data = yield BusDownloader.fromURL(urlBRT);
 		Assert.notEqual(data, undefined);
 		Assert.notEqual(data, null);
-		Assert.notEqual(data.length, 0);
+		Assert(data instanceof Array);
+		Assert(data[0] instanceof Bus);
 		done();
 	});
 });
