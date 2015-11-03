@@ -2,10 +2,10 @@
   "name": "data-provider",
   "version": "4.0.0",
   "description": "RioBus data-provider application",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "mocha test/**/* --timeout 5000",
-    "start": "node src/index.js"
+    "start": "node src/app.js"
   },
   "compiler": "commonjs",
   "repository": {
