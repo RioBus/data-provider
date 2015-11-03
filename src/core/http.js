@@ -20,10 +20,10 @@ class Http {
      */
     static request(options) {
         var data = JSON.parse(JSON.stringify(optionsObj));
-        for(var key in Object.keys(options)) {
+        Object.keys(options).forEach( (key) => {
             data[key] = options[key];
-        }
-        return request(options);
+        });
+        return request(data);
     }
 
     /**
