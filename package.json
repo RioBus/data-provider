@@ -4,7 +4,7 @@
   "description": "RioBus data-provider application",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/**/*",
+    "test": "mocha test/**/* --timeout 5000",
     "start": "node src/index.js"
   },
   "compiler": "commonjs",
