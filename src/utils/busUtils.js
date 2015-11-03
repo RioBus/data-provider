@@ -1,3 +1,4 @@
+'use strict';
 const Bus = require('../model/bus');
 const Spot = require('../model/spot');
 const Cache = require('../core/cache');
