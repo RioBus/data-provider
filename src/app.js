@@ -37,7 +37,6 @@ function* iteration() {
     
     for (var key in buses) {
         var bus = buses[key];
-        logger.info(`[${bus.line}] ${bus.order}`);
         if(bus.line==='indefinido') continue;
         var tmpItinerary = itineraries[bus.line];
         if(!tmpItinerary) {
