@@ -31,9 +31,12 @@ function prepareItineraries(itiList) {
 
 function* iteration() {
     logger.info('Downloading bus states...');
-    var buses = yield BusDownloader.fromURL(getURL('REGULAR'));
-    buses = buses.concat(yield BusDownloader.fromURL(getURL('BRT')));
-    logger.info('Processing senses...');
+    var buses = [];
+    try { buses = buses.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
+    try { buses = buses.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
+    
+    logger.info(`${buses.length} found.`);
+    logger.info('Processing...');
     
     for (var key in buses) {
         var bus = buses[key];
@@ -65,6 +68,7 @@ function* iteration() {
     logger.info('Saved to search collection.');
     yield busDAO.historySave(buses);
     logger.info('Saved to history collection.');
+        
     setTimeout(() => { spawn(iteration); }, timeout);
 }
 
@@ -79,6 +83,6 @@ spawn(function*(){
     spawn(iteration);
 })
 .catch(function(error) {
-    logger.error(error);
+    logger.error(error.stack);
     process.exit(1);
 });
