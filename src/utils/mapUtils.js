@@ -3,10 +3,10 @@
 class MapUtils {
 
 	static distanceBetween(first, second) {
-		var lat1 = first.getLatitude();
-		var lon1 = first.getLongitude();
-		var lat2 = second.getLatitude();
-		var lon2 = second.getLongitude();
+		var lat1 = first.latitude;
+		var lon1 = first.longitude;
+		var lat2 = second.latitude;
+		var lon2 = second.longitude;
 		
 		var theta = lon1 - lon2;
 		var dist = Math.sin(MapUtils.deg2rad(lat1)) * Math.sin(MapUtils.deg2rad(lat2)) + Math.cos(MapUtils.deg2rad(lat1))
