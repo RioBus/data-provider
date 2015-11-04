@@ -79,7 +79,7 @@ class BusUtils {
         return tmp;
     }
 	
-    static identifySense(bus, startPoint) {
+    static identifySense(bus, startPoint, sense) {
         var max = Config.historySize;
         var tmp = BusUtils.readFromCache(bus.order);
         var finalState = [];
@@ -110,7 +110,7 @@ class BusUtils {
         var reducedState = BusUtils.reduceState(finalState);
         
         // Updating sense
-        bus.sense = BusUtils.prepareSense(bus.sense, reducedState);
+        bus.sense = BusUtils.prepareSense(sense, reducedState);
         
         // Updating the cached data
         BusUtils.writeToCache(bus.order, history);

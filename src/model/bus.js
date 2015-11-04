@@ -7,7 +7,7 @@ const Moment = require('moment-timezone');
  */
 class Bus extends Spot {
 	
-	constructor(line, order, speed, direction, latitude, longitude, timestamp, sense) {
+	constructor(line, order, speed, direction, latitude, longitude, timestamp, sense, id) {
 		super(latitude, longitude);
 		this.line = (!line || line==='')? 'indefinido' : line.toString();
 		this.order = order.toString();
@@ -16,6 +16,7 @@ class Bus extends Spot {
 		timestamp = (new Date(timestamp)).toISOString();
 		this.timestamp = Moment.tz(timestamp, "America/Sao_Paulo").format();
 		this.sense =  (!sense || sense==='')? 'desconhecido' : sense;
+		if(id) this._id = id;
     }
 }
 module.exports = Bus;

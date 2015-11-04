@@ -15,10 +15,18 @@ const spawn               = require('co');
 const logger = LoggerFactory.getRuntimeLogger();
 const provider = Config.provider;
 const timeout = provider.updateInterval;
-var db, itineraries, busDAO, itineraryDAO;
+var db, itineraries, buses, busDAO, itineraryDAO;
 
 function getURL(bustype) {
     return `http://${provider.host}${provider.path.bus[bustype.toUpperCase()]}`;
+}
+
+function prepareBuses(busList) {
+    var buses = {};
+    busList.forEach( (bus) => {
+        buses[bus.order] = bus;
+    });
+    return buses;
 }
 
 function prepareItineraries(itiList) {
@@ -31,15 +39,16 @@ function prepareItineraries(itiList) {
 
 function* iteration() {
     logger.info('Downloading bus states...');
-    var buses = [];
-    try { buses = buses.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
-    try { buses = buses.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
+    var busList = [];
+    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
+    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
     
-    logger.info(`${buses.length} found.`);
+    logger.info(`${busList.length} found.`);
     logger.info('Processing...');
     
-    for (var key in buses) {
-        var bus = buses[key];
+    var commonList = [], historyList = [], countSearch = 0, countHistory = 0;
+    
+    for (var bus of busList) {
         if(bus.line==='indefinido') continue;
         var tmpItinerary = itineraries[bus.line];
         if(!tmpItinerary) {
@@ -60,15 +69,53 @@ function* iteration() {
                 else logger.error(e.stack);
             }
         }
-        buses[key] = BusUtils.identifySense(bus, tmpItinerary.spots[0]);
+        bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
+        if(!buses[bus.order]) console.log(bus.order);
+        if(buses[bus.order]) {
+            var tmp = buses[bus.order];
+            if(tmp.timestamp!==bus.timestamp) {
+                historyList.push(bus);
+                countHistory++;
+                tmp.timestamp = bus.timestamp;
+                tmp.latitude = bus.latitude;
+                tmp.longitude = bus.longitude;
+                tmp.speed = bus.speed;
+                tmp.direction = bus.direction;
+                if(tmp.line!==bus.line) {
+                    logger.info(`[${bus.order}] ${tmp.line} -> ${bus.line}`);
+                    tmp.line = bus.line;
+                }
+                tmp = BusUtils.identifySense(tmp, tmpItinerary.spots[0], tmpItinerary.description);
+                try {
+                    yield tmp.save();
+                    countSearch++;
+                } catch (e) {
+                    logger.error(e.stack);
+                }
+            }
+        } else {
+            commonList.push(bus);
+            historyList.push(bus);
+            countSearch++;
+            countHistory++;
+        }
     };
     
-    logger.info('Saving data...');
-    yield busDAO.commonSave(buses);
-    logger.info('Saved to search collection.');
-    yield busDAO.historySave(buses);
-    logger.info('Saved to history collection.');
+    try {
+        if(commonList.length>0) {
+            logger.info('Saving data...');
+            yield busDAO.commonSave(commonList);
+        } else logger.alert('There were no new data to store.');
+        logger.info(`Saved ${countSearch} docs to search collection.`);
         
+        if(historyList.length>0) {
+            yield busDAO.historySave(historyList);
+            logger.info(`Saved ${countSearch} docs to history collection.`);
+        } else logger.alert('There were no new data to store in history.');
+    } catch (e) {
+        logger.error(e);
+    }
+    buses = prepareBuses(yield busDAO.getAll());
     setTimeout(() => { spawn(iteration); }, timeout);
 }
 
@@ -77,7 +124,9 @@ spawn(function*(){
     db = yield Database.connect();
     busDAO = new BusDAO(db);
     itineraryDAO = new ItineraryDAO(db);
-    logger.info('Retrieving itineraries...');
+    logger.info('Loading buses...');
+    buses = prepareBuses(yield busDAO.getAll());
+    logger.info('Loading itineraries...');
     itineraries = prepareItineraries(yield itineraryDAO.getAll());
     logger.info(`Itineraries retrieved: ${Object.keys(itineraries).length}`);
     spawn(iteration);

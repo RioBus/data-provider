@@ -9,6 +9,10 @@ class BusDAO {
 		this.history = connection.collection('bus_history');
 	}
 	
+	getAll() {
+		return this.bus.find({});
+	}
+	
 	commonSave(bus) {
 		return this.bus.insert(bus);
 	}
