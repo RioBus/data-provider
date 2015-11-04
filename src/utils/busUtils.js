@@ -1,9 +1,11 @@
 'use strict';
-const Bus = require('../model/bus');
-const Spot = require('../model/spot');
-const Cache = require('../core/cache');
+const Config   = require('../config');
+const Core     = require('../core');
 const MapUtils = require('./mapUtils');
-const Config = require('../config');
+const Spot     = require('../model/spot');
+
+const Cache    = Core.Cache;
+const Logger   = Core.LoggerFactory.getRuntimeLogger();
 
 class BusUtils {
     
@@ -24,7 +26,11 @@ class BusUtils {
     }
     
     static writeToCache(busOrder, content) {
-        new Cache(busOrder).write(JSON.stringify(content));
+        try {
+            new Cache(busOrder).write(JSON.stringify(content));
+        } catch (e) {
+            Logger.error(e.stack);
+        }
     }
     
     static prepareHistory(content, startPoint) {
@@ -62,9 +68,8 @@ class BusUtils {
     
     static prepareSense(sense, sum) {
         var tmp = 'desconhecido';
-        var max = Config.busHistorySize;
-        if(sum < 0) tmp = sense;
-        else if(sum > 0) {
+        if(sum > 0) tmp = sense;
+        else if(sum < 0) {
             var tmpSense = sense.split(' X ');
             var aux = tmpSense[1];
             tmpSense[1] = tmpSense[0];
@@ -75,8 +80,8 @@ class BusUtils {
     }
 	
     static identifySense(bus, startPoint) {
-        var max = Config.busHistorySize;
-        var tmp = BusUtils.readFromCache(bus.getOrder());
+        var max = Config.historySize;
+        var tmp = BusUtils.readFromCache(bus.order);
         var finalState = [];
         
         // Getting the cached information
@@ -84,7 +89,7 @@ class BusUtils {
         startPoint = new Spot(history.startPoint.latitude, history.startPoint.longitude);
         
         // Preparing current position data
-        tmp = { latitude: bus.getLatitude(), longitude: bus.getLongitude() };
+        tmp = { latitude: bus.latitude, longitude: bus.longitude };
         
         // Setting the new position
         if(!BusUtils.timelineHasData(tmp, history.timeline)) history.timeline.push(tmp);
@@ -104,11 +109,10 @@ class BusUtils {
         var reducedState = BusUtils.reduceState(finalState);
         
         // Updating sense
-        var sense = BusUtils.prepareSense(bus.getSense(), reducedState);
-        bus.setSense(sense);
+        bus.sense = BusUtils.prepareSense(bus.sense, reducedState);
         
         // Updating the cached data
-        BusUtils.writeToCache(bus.getOrder(), history);
+        BusUtils.writeToCache(bus.order, history);
         
         return bus;
     }
