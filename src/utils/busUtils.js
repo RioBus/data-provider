@@ -98,6 +98,7 @@ class BusUtils {
             while (i++<overpass) history.timeline.shift();
         }
         
+        // Setting up the final states
         var past = null;
         history.timeline.forEach((step, index) => {
             var tmpState = BusUtils.currentPositionState(step, past, startPoint);
