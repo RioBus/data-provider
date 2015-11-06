@@ -1,6 +1,2 @@
 #!/bin/bash
-<<<<<<< HEAD
-docker run -it --rm --link mongo -v $(pwd):/app -w /app --name riobus-data-provider riobus /bin/bash
-=======
-docker run -it --rm -p 80:80 -p 8080:8080 -v "$(pwd)":/app --name nodejs nodejs /bin/bash
->>>>>>> a4d75ef33eb439daf2b64d6bafa505d4ef3c28b9
+docker run -it --rm --link mongo -v "$(pwd)":/app -w /app --name riobus-data-provider riobus /bin/bash
