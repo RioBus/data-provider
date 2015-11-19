@@ -20,9 +20,10 @@ describe('BusDAO', () => {
 	
 	it('should insert data', function*() {
 		let data = new Bus('line', 'order', 0, 0, 23, 45, (new Date()).toDateString(), 'sense');
+		
 		const common = yield dao.commonSave(data);
 		const history = yield dao.historySave(data);
-		
+			
 		Assert.equal(common.line, data.line);
 		Assert.equal(history.line, data.line);
 		
@@ -37,6 +38,9 @@ describe('BusDAO', () => {
 		
 		Assert.equal(common.timestamp, data.timestamp);
 		Assert.equal(history.timestamp, data.timestamp);
+		
+		Assert(common.timestamp instanceof Date);
+		Assert(history.timestamp instanceof Date);
 		
 		Assert.equal(common.sense, data.sense);
 		Assert.equal(history.sense, data.sense);
