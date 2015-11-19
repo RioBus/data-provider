@@ -4,7 +4,7 @@
   "description": "RioBus data-provider application",
   "main": "src/app.js",
   "scripts": {
-    "test": "mocha test/* test/**/* --timeout 7000",
+    "test": "mocha test/* test/**/* --timeout 15000",
     "start": "node src/app.js",
     "install": "npm install -g mocha-co"
   },
