@@ -70,7 +70,6 @@ function* iteration() {
             }
         }
         bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
-        if(!buses[bus.order]) console.log(bus.order);
         if(buses[bus.order]) {
             var tmp = buses[bus.order];
             if(tmp.timestamp!==bus.timestamp) {
