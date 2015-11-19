@@ -1,6 +1,5 @@
 'use strict';
 /* global describe, it, before, global, __dirname, after; */
-require('co-mocha')(require('mocha'));
 const base = `${__dirname}/../../src`;
 
 const Assert = require('assert');
@@ -19,7 +18,7 @@ describe('BusDAO', () => {
 		dao = new BusDAO(conn);
 	});
 	
-	it('should insert data', function*(done) {
+	it('should insert data', function*() {
 		let data = new Bus('line', 'order', 0, 0, 23, 45, (new Date()).toDateString(), 'sense');
 		const common = yield dao.commonSave(data);
 		const history = yield dao.historySave(data);
@@ -45,7 +44,6 @@ describe('BusDAO', () => {
 		Assert.notEqual(common._id, undefined);
 		Assert.notEqual(history._id, undefined);
 		saved = [ common, history ];
-		done();
 	});
 	
 	after(function*() {

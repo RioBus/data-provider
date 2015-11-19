@@ -4,8 +4,9 @@
   "description": "RioBus data-provider application",
   "main": "src/app.js",
   "scripts": {
-    "test": "mocha test/**/* --timeout 5000",
-    "start": "node src/app.js"
+    "test": "mocha test/* test/**/* --timeout 20000",
+    "start": "node src/app.js",
+    "install": "npm install -g mocha-co"
   },
   "compiler": "commonjs",
   "repository": {
@@ -41,7 +42,6 @@
     "robe": "^0.12.0"
   },
   "devDependencies": {
-    "mocha": "^2.2.5",
-    "co-mocha": "^1.1.2"
+    "mocha-co": "^1.17.1-co.1"
   }
 }

@@ -39,7 +39,13 @@ Execute a aplicação:
 
 Os dados dos ônibus são salvos no banco de dados NoSQL [MongoDB](https://www.mongodb.org/). Certifique-se de que ele 
 esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas nas variáveis de ambiente do
-Sistema Operacional de acordo com as configurações padrão descritas em ```env.config.sh```.
+Sistema Operacional de acordo com o modelo:
+
+> RIOBUS_DB_NAME - Nome do banco
+> RIOBUS_DB_HOST - Endereço do SGBD
+> RIOBUS_DB_PORT - Porta do banco
+> RIOBUS_DB_USER - Usuário do banco
+> RIOBUS_DB_PASS - Senha de acesso ao banco
 
 Comandos NPM
 ------------
@@ -51,9 +57,9 @@ npm start
 > Roda a aplicação
 
 npm install
-> Inslata as dependências locais e globais do projeto.
+> Inslata as dependências do projeto.
 
 Compatibilidade
 ---------------
 
-* node.js >= 0.11
+* node.js >= 4.0.0
