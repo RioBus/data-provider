@@ -1,6 +1,5 @@
 'use strict';
 /* global describe, it, before, global, __dirname, after; */
-require('co-mocha')(require('mocha'));
 const base = `${__dirname}/../../src`;
 
 const Assert = require('assert');
@@ -18,7 +17,7 @@ describe('ItineraryDAO', () => {
 		dao = new ItineraryDAO(conn);
 	});
 	
-	it('should insert data', function*(done) {
+	it('should insert data', function*() {
 		let data = new Itinerary('line', 'description', 'agency', 'keywords');
 		const response = yield dao.save(data);
 		Assert.equal(response.line, data.line);
@@ -27,13 +26,11 @@ describe('ItineraryDAO', () => {
 		Assert.equal(response.keywords, data.keywords);
 		Assert.notEqual(response._id, undefined);
 		saved = response;
-		done();
 	});
 	
-	it('should retrieve the recently inserted data', function*(done) {
+	it('should retrieve the recently inserted data', function*() {
 		const response = yield dao.getAll();
 		Assert.equal(response.length, 1);
-		done();
 	});
 	
 	after(function*() {
