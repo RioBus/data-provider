@@ -9,14 +9,28 @@ const Config = require('../config');
 
 const logger = LoggerFactory.getRuntimeLogger();
 
+/**
+ * Downloads the latest itinerary data from the external provider service
+ * @class {ItineraryDownloader}
+ */
 class ItineraryDownloader {
 	
+    /**
+     * Downloads the data for a given bus line
+     * @param {string} line - Bus line
+     * @return {Promise}
+     */
 	static fromLine(line) {
 		let urlConfig = Config.provider;
 		var url = `http://${urlConfig.host}${urlConfig.path.itinerary.replace('$$', line)}`;
 		return ItineraryDownloader.fromURL(url);
 	}
 	
+    /**
+     * Downloads the data from the URL
+     * @param {string} url - External provider service address
+     * @return {Promise}
+     */
 	static fromURL(url) {
 		return Http.get(url).then( (response) => {
 			const status = response.statusCode;
@@ -33,6 +47,11 @@ class ItineraryDownloader {
 		});
 	}
 	
+    /**
+     * Preprocesses the request's output body 
+     * @param {string} data - Request body
+     * @return {Itinerary}
+     */
 	static parseBody(data) {
         var description, line, agency, keywords;
         var spots = [];
@@ -61,7 +80,12 @@ class ItineraryDownloader {
         
         return new Itinerary(line, description, agency, keywords, spots);
 	}
-    
+	
+    /**
+     * Tries to figure out the line consortium
+     * @param {string} line - Bus line
+     * @return {string}
+     */
     static identifyConsortium(line) {
         var consortiums = Object.keys(Strings.consortiums);
         var output = '';
