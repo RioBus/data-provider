@@ -9,8 +9,17 @@ const Strings = require('../strings');
 
 const logger = LoggerFactory.getRuntimeLogger();
 
+/**
+ * Downloads the latest Bus data from the external provider service
+ * @class {BusDownloader}
+ */
 class BusDownloader {
-
+	
+    /**
+     * Downloads the data from the URL
+     * @param {string} url - External provider service address
+     * @return {Promise}
+     */
     static fromURL(url) {
         return Http.get(url).then( (response) => {
             const status = response.statusCode;
@@ -26,8 +35,13 @@ class BusDownloader {
                 return [];
         });
     }
-        
-    static parseBody(body, storage) {
+	
+    /**
+     * Preprocesses the request's output body 
+     * @param {string} body - Request body
+     * @return {Bus[]}
+     */
+    static parseBody(body) {
         var buses = [];
         
         if (!body.DATA) {
