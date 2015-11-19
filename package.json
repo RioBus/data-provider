@@ -5,7 +5,8 @@
   "main": "src/app.js",
   "scripts": {
     "test": "mocha test/**/* --timeout 5000",
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "install": "npm install -g mocha"
   },
   "compiler": "commonjs",
   "repository": {
