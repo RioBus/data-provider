@@ -19,16 +19,11 @@ describe('BusDownloader', () => {
 	});
 	
 	it('should download the current REGULAR buses states', function*(done) {
-		var data = yield BusDownloader.fromURL(urlREGULAR);
-		Assert.notEqual(data, undefined);
-		console.log("not undefined");
-		Assert.notEqual(data, null);
-		console.log("not null");
-		Assert(data instanceof Array);
-		console.log("is Array");
-		Assert(data[0] instanceof Bus);
-		console.log("is Bus");
-		list = data;
+		list = yield BusDownloader.fromURL(urlREGULAR);
+		Assert.notEqual(list, undefined);
+		Assert.notEqual(list, null);
+		Assert(list instanceof Array);
+		Assert(list[0] instanceof Bus);
 		done();
 	});
 	
@@ -45,13 +40,9 @@ describe('BusDownloader', () => {
 	it('should download the current BRT buses states', function*(done) {
 		var data = yield BusDownloader.fromURL(urlBRT);
 		Assert.notEqual(data, undefined);
-		console.log("not undefined");
 		Assert.notEqual(data, null);
-		console.log("not null");
 		Assert(data instanceof Array);
-		console.log("is Array");
 		Assert(data[0] instanceof Bus);
-		console.log("is Bus");
 		done();
 	});
 });
