@@ -14,6 +14,7 @@ describe('ItineraryDAO', () => {
 	
 	before(function*() {
 		let conn = yield Database.connect();
+		yield conn.collection('itinerary').remove({});
 		dao = new ItineraryDAO(conn);
 	});
 	

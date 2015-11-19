@@ -14,6 +14,8 @@ describe('BusDAO', () => {
 	
 	before(function*() {
 		let conn = yield Database.connect();
+		yield conn.collection('bus').remove({});
+		yield conn.collection('bus_history').remove({});
 		dao = new BusDAO(conn);
 	});
 	
