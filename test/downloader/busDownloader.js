@@ -25,15 +25,6 @@ describe('BusDownloader', () => {
 		Assert(list[0] instanceof Bus);
 	});
 	
-	it('should have the number count of docs in the array equal to the number of orders', () => {
-		const distinctOrders = [];
-		for(let bus of list) {
-			if(distinctOrders.indexOf(bus.order)>-1) continue;
-			distinctOrders.push(bus.order);
-		}
-		Assert.equal(distinctOrders.length, list.length);
-	});
-	
 	it('should download the current BRT buses states', function*() {
 		var data = yield BusDownloader.fromURL(urlBRT);
 		Assert.notEqual(data, undefined);
