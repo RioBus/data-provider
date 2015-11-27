@@ -15,6 +15,8 @@ const spawn               = require('co');
 const logger = LoggerFactory.getRuntimeLogger();
 const provider = Config.provider;
 const timeout = provider.updateInterval;
+const MainProcess = process;
+
 var db, itineraries, buses, busDAO, itineraryDAO;
 
 function getURL(bustype) {
@@ -60,13 +62,15 @@ function* iteration() {
                 logger.info(`[${bus.line}] Itinerary saved.`);
                 itineraries[bus.line] = tmpItinerary;
             } catch(e) {
-                if(e.statusCode===404) {
-                    logger.info(`[${bus.line}] Itinerary does not exist.`);
-                    tmpItinerary = new Itinerary(bus.line, 'desconhecido', '', '', []);
-                    yield itineraryDAO.save(tmpItinerary);
-                    itineraries[bus.line] = tmpItinerary;
-                }
+                if(e.statusCode===404) 
+                    logger.error(`[${bus.line}] Itinerary does not exist.`);
+                else if(e.statusCode===403)
+                    logger.error(`[${bus.line}] Access forbidden to the Itinerary data.`);
                 else logger.error(e.stack);
+                
+                tmpItinerary = new Itinerary(bus.line, 'desconhecido', '', '', []);
+                yield itineraryDAO.save(tmpItinerary);
+                itineraries[bus.line] = tmpItinerary;
             }
         }
         bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
@@ -104,13 +108,13 @@ function* iteration() {
         if(commonList.length>0) {
             logger.info('Saving data...');
             yield busDAO.commonSave(commonList);
-        } else logger.alert('There were no new data to store.');
-        logger.info(`Saved ${countSearch} docs to search collection.`);
+            logger.info(`Saved ${countSearch} docs to search collection.`);
+        } else logger.info('There were no new data to store.');
         
         if(historyList.length>0) {
             yield busDAO.historySave(historyList);
             logger.info(`Saved ${countSearch} docs to history collection.`);
-        } else logger.alert('There were no new data to store in history.');
+        } else logger.info('There were no new data to store in history.');
     } catch (e) {
         logger.error(e);
     }
@@ -131,6 +135,6 @@ spawn(function*(){
     spawn(iteration);
 })
 .catch(function(error) {
-    logger.error(error.stack);
-    process.exit(1);
+    logger.fatal(error.stack);
+    MainProcess.exit(1);
 });

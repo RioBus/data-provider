@@ -34,6 +34,15 @@ class Logger {
 	}
 	
 	/**
+	 * Displays an fatal error level log
+	 * @param {string} content - Log message
+	 * @return {void}
+	 */
+	fatal(content) {
+		this.log(content, 'FATAL');
+	}
+	
+	/**
 	 * Displays an information level log
 	 * @param {string} content - Log message
 	 * @return {void}
