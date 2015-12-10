@@ -1,6 +1,8 @@
 RioBus
 ======
 
+[![Build Status](https://snap-ci.com/RioBus/data-provider/branch/master/build_image)](https://snap-ci.com/RioBus/data-provider/branch/master)
+
 O RioBus é um sistema colaborativo de monitoramento de ônibus em tempo real, que utiliza a API aberta de dados de
 mobilidade urbana fornecida pela parceria entre a Prefeitura do Rio de Janeiro e a FETRANSPOR.
 Seu objetivo principal é ajudar o cidadão, seja ele morador ou visitante, do Rio de Janeiro a se deslocar pela cidade.
@@ -9,17 +11,10 @@ Seu objetivo principal é ajudar o cidadão, seja ele morador ou visitante, do R
 Arquitetura
 -----------
 
-A aplicação do provedor de dados do RioBus foi desenvolvida em TypeScript, através do GULP e Node.js.
+A aplicação do provedor de dados do RioBus foi desenvolvida sobre a plataforma Node.js.
 
-A organização da lógica da aplicação segue a metodologia de desenvolvimento do DDD (Domain-Driven Design), que deixa o
-código desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
-
-Além disso, foi preparada uma infra-estrutura graças ao poder do GULP, um dos automatizadores de tarefas mais utilizados
-atualmente por equipes de desenvolvimento de JavaScript. Desta forma foi possível escrever um código limpo e sucinto que
-garante flexibilidade e modularidade.
-
-Além disso, o GULP compila o código do TypeScript em "Javascript comum" seguindo os padrões CommonJS, garantindo a
-compatibilidade com a plataforma do Node.js.
+A organização da lógica da aplicação é dividida em camadas e separa o acesso ao repositório de dados da lógica da aplicação,
+de forma que o código fique desacoplado e organizado, facilitando a manutenção e a adição de novas funcionalidades.
 
 
 Instalação
@@ -39,40 +34,32 @@ Faça o download do projeto em sua máquina:
 Entre na raiz do projeto e instale as dependências do Node.js:
 > $ npm install
 
-Ainda na raiz do projeto, configure o ambiente
-> $ npm run configure
-
 Execute a aplicação:
 > $ npm start
 
-Os dados dos ônibus são salvos no banco de dados NoSQL [ArangoDB](https://www.arangodb.com). Certifique-se de que ele 
-esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas na classe ```Config```, 
-em ```Config.environment.<ambiente>.database```.
+Os dados dos ônibus são salvos no banco de dados NoSQL [MongoDB](https://www.mongodb.org/). Certifique-se de que ele 
+esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas nas variáveis de ambiente do
+Sistema Operacional de acordo com o modelo:
+
+> RIOBUS_DB_NAME - Nome do banco
+> RIOBUS_DB_HOST - Endereço do SGBD
+> RIOBUS_DB_PORT - Porta do banco
+> RIOBUS_DB_USER - Usuário do banco
+> RIOBUS_DB_PASS - Senha de acesso ao banco
 
 Comandos NPM
 ------------
 
-npm run configure
-> Configura o ambiente para compilação
-
-npm run build
-> Compila o projeto para JavaScript e põe o código em compiled/build/
-
-npm run test
+npm test
 > Invoca o Mocha e roda as rotinas de testes unitários configurados em test/
 
-npm run start
-> Compila e roda a aplicação
+npm start
+> Roda a aplicação
 
-npm run release
-> Compila e gera um código comprimido para distribuição
-
-npm run deploy
-> Compila, gera o código de distribuição e executa a aplicação final
-
-```OBS.: Para a aplicação funcionar, ela precisa estar em um projeto cujos módulos Node.js estejam instalados.```
+npm install
+> Inslata as dependências do projeto.
 
 Compatibilidade
 ---------------
 
-* nodejs >= 0.10
+* node.js >= 4.0.0
