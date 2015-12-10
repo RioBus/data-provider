@@ -20,46 +20,54 @@ de forma que o código fique desacoplado e organizado, facilitando a manutençã
 Instalação
 ----------
 
-Instale o Node.js
+Instale o Node.js:
 
-Windows e Linux:
-> http://nodebr.com/instalando-node-js-atraves-do-gerenciador-de-pacotes/
-
-Mac OS X:
-> https://nodejs.org/download/
+* Windows e Linux: http://nodebr.com/instalando-node-js-atraves-do-gerenciador-de-pacotes/
+* Mac OS X: https://nodejs.org/download/
 
 Faça o download do projeto em sua máquina:
-> $ git clone https://github.com/RioBus/data-provider.git
+
+```
+$ git clone https://github.com/RioBus/data-provider.git
+```
 
 Entre na raiz do projeto e instale as dependências do Node.js:
-> $ npm install
+
+```
+$ npm install
+```
 
 Execute a aplicação:
-> $ npm start
+
+```
+$ npm start
+```
 
 Os dados dos ônibus são salvos no banco de dados NoSQL [MongoDB](https://www.mongodb.org/). Certifique-se de que ele 
 esteja ligado antes de executar a aplicação. As configurações de conexão devem ser definidas nas variáveis de ambiente do
 Sistema Operacional de acordo com o modelo:
 
-> RIOBUS_DB_NAME - Nome do banco
-> RIOBUS_DB_HOST - Endereço do SGBD
-> RIOBUS_DB_PORT - Porta do banco
-> RIOBUS_DB_USER - Usuário do banco
-> RIOBUS_DB_PASS - Senha de acesso ao banco
+* **RIOBUS_DB_NAME** - Nome do banco
+* **RIOBUS_DB_HOST** - Endereço do SGBD
+* **RIOBUS_DB_PORT** - Porta do banco
+* **RIOBUS_DB_USER** - Usuário do banco
+* **RIOBUS_DB_PASS** - Senha de acesso ao banco
+
 
 Comandos NPM
 ------------
 
-npm test
-> Invoca o Mocha e roda as rotinas de testes unitários configurados em test/
+### npm test
+Invoca o Mocha e roda as rotinas de testes unitários configurados em test/
 
-npm start
-> Roda a aplicação
+### npm start
+Roda a aplicação
 
-npm install
-> Inslata as dependências do projeto.
+### npm install
+Instala as dependências do projeto.
+
 
 Compatibilidade
 ---------------
 
-* node.js >= 4.0.0
+* Node.js >= 4.0.0
