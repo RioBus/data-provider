@@ -38,6 +38,7 @@
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
     "mongodb": "^1.4.4",
+    "request": "^2.67.0",
     "request-promise": "^1.0.2",
     "robe": "^0.12.0"
   },

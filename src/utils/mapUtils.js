@@ -1,4 +1,7 @@
 'use strict';
+const Config   = require('../config');
+const request  = require('request');
+
 /**
  * Map helper functions
  * @class {MapUtils}
@@ -43,5 +46,33 @@ class MapUtils {
 	static rad2deg(rad) {
 		return (rad * 180 / Math.PI);
 	}
+    
+    /**
+     * Receives a coordinates object with latitude and longitude and a callback that will
+     * receive the street name corresponding to the coordinates.
+     * @param {object} coordinates - Object containing a latitude and a longitude property
+     * @param {function} callback - Function to be called when the operation is finished
+     */
+    static reverseGeocode(coordinates, callback) {
+        MapUtils.reverseGeocodeOSRM(coordinates, callback);
+    }
+
+    /**
+     * Find the street name using a coordinate using the Open Street Routing Machine API.
+     * @param {object} coordinates - Object containing a latitude and a longitude property
+     * @param {function} callback - Function to be called when the operation is finished
+     */
+    static reverseGeocodeOSRM(coordinates, callback) {
+        var latlng = coordinates.latitude + ',' + coordinates.longitude;
+        request(Config.OSRM.base_url + '/nearest?loc=' + latlng, function (error, response, body) {
+            if (!error && response.statusCode == 200) {
+                var result = JSON.parse(body);
+                callback(error, result.name);
+            }
+            else {
+                callback(error, null);
+            }
+        })
+    }
 }
 module.exports = MapUtils;

@@ -29,5 +29,8 @@ module.exports = {
         port: process.env.RIOBUS_DB_PORT    || 27017,
         user: process.env.RIOBUS_DB_USER    || '',
         pass: process.env.RIOBUS_DB_PASS    || ''
+    },
+    OSRM: {
+        base_url: 'http://146.164.16.5:5000'
     }
 };
