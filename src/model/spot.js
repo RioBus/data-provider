@@ -5,9 +5,10 @@
  */
 class Spot {
 
-    constructor(latitude, longitude) {
+    constructor(latitude, longitude, returning) {
 		this.latitude = latitude;
 		this.longitude = longitude;
+        this.returning = returning;
 	}
 }
 module.exports = Spot;
