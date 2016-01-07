@@ -39,6 +39,31 @@ function prepareItineraries(itiList) {
     return itineraries;
 }
 
+function* loadItinerary(line) {
+    var tmpItinerary = itineraries[line];
+    if(!tmpItinerary) {
+        logger.alert(`[${line}] Itinerary not found. Downloading...`);
+        try {
+            tmpItinerary = yield ItineraryDownloader.fromLine(line);
+            logger.info(`[${line}] Saving Itinerary to database...`);
+            yield itineraryDAO.save(tmpItinerary);
+            logger.info(`[${line}] Itinerary saved.`);
+            itineraries[line] = tmpItinerary;
+        } catch(e) {
+            if(e.statusCode===404) 
+                logger.error(`[${line}] Itinerary does not exist.`);
+            else if(e.statusCode===403)
+                logger.error(`[${line}] Access forbidden to the Itinerary data.`);
+            else logger.error(e.stack);
+            
+            tmpItinerary = new Itinerary(line, 'desconhecido', '', '', []);
+            yield itineraryDAO.save(tmpItinerary);
+            itineraries[line] = tmpItinerary;
+        }
+    }
+    return tmpItinerary;
+}
+
 function* iteration() {
     logger.info('Downloading bus states...');
     var busList = [];
@@ -52,27 +77,8 @@ function* iteration() {
     
     for (var bus of busList) {
         if(bus.line==='indefinido') continue;
-        var tmpItinerary = itineraries[bus.line];
-        if(!tmpItinerary) {
-            logger.alert(`[${bus.line}] Itinerary not found. Downloading...`);
-            try {
-                tmpItinerary = yield ItineraryDownloader.fromLine(bus.line);
-                logger.info(`[${bus.line}] Saving Itinerary to database...`);
-                yield itineraryDAO.save(tmpItinerary);
-                logger.info(`[${bus.line}] Itinerary saved.`);
-                itineraries[bus.line] = tmpItinerary;
-            } catch(e) {
-                if(e.statusCode===404) 
-                    logger.error(`[${bus.line}] Itinerary does not exist.`);
-                else if(e.statusCode===403)
-                    logger.error(`[${bus.line}] Access forbidden to the Itinerary data.`);
-                else logger.error(e.stack);
-                
-                tmpItinerary = new Itinerary(bus.line, 'desconhecido', '', '', []);
-                yield itineraryDAO.save(tmpItinerary);
-                itineraries[bus.line] = tmpItinerary;
-            }
-        }
+        var tmpItinerary = yield loadItinerary(bus.line);
+        
         bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
         if(buses[bus.order]) {
             var tmp = buses[bus.order];
@@ -109,12 +115,12 @@ function* iteration() {
             logger.info('Saving data...');
             yield busDAO.commonSave(commonList);
             logger.info(`Saved ${countSearch} docs to search collection.`);
-        } else logger.info('There were no new data to store.');
+        } else logger.info('There was no new data to store.');
         
         if(historyList.length>0) {
             yield busDAO.historySave(historyList);
-            logger.info(`Saved ${countSearch} docs to history collection.`);
-        } else logger.info('There were no new data to store in history.');
+            logger.info(`Saved ${countHistory} docs to history collection.`);
+        } else logger.info('There was no new data to store in history.');
     } catch (e) {
         logger.error(e);
     }
