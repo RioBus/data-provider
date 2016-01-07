@@ -1,6 +1,10 @@
 'use strict';
 const Config   = require('../config');
+const Core     = require('../core');
+const Http     = Core.Http;
 const request  = require('request');
+
+const logger   = Core.LoggerFactory.getRuntimeLogger();
 
 /**
  * Map helper functions
@@ -52,27 +56,35 @@ class MapUtils {
      * receive the street name corresponding to the coordinates.
      * @param {object} coordinates - Object containing a latitude and a longitude property
      * @param {function} callback - Function to be called when the operation is finished
+     * @return {Promise}
      */
-    static reverseGeocode(coordinates, callback) {
-        MapUtils.reverseGeocodeOSRM(coordinates, callback);
+    static reverseGeocode(coordinates) {
+        return MapUtils.reverseGeocodeOSRM(coordinates);
     }
 
     /**
      * Find the street name using a coordinate using the Open Street Routing Machine API.
      * @param {object} coordinates - Object containing a latitude and a longitude property
      * @param {function} callback - Function to be called when the operation is finished
+     * @return {Promise}
      */
     static reverseGeocodeOSRM(coordinates, callback) {
         var latlng = coordinates.latitude + ',' + coordinates.longitude;
-        request(Config.OSRM.base_url + '/nearest?loc=' + latlng, function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                var result = JSON.parse(body);
-                callback(error, result.name);
-            }
-            else {
-                callback(error, null);
-            }
-        })
+        var url = Config.OSRM.base_url + '/nearest?loc=' + latlng;
+        
+        return Http.get(url).then( (response) => {
+            const status = response.statusCode;
+                switch(status) {
+                    case 200:
+                        // logger.info(`[${url}] -> 200 OK`);
+                        return response.body.name;
+                        break;
+                    default:
+                        logger.info(`[${url}] -> ${status} ERROR`);
+                        break;
+                }
+                return null;
+        });
     }
 }
 module.exports = MapUtils;

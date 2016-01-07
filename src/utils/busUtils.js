@@ -169,47 +169,77 @@ class BusUtils {
         return bus;
     }
     
+    /**
+     * Finds the occurences of a certain street in the itinerary.
+     * @param {string} street - Name of the street (needle)
+     * @param {array} streets - Array of street objects of the itinerary
+     * @return {array} List of indexes of the matched objects
+     */
+    static streetInItinerary(street, streets) {
+        var matchedIndexes = [];
+        for (var i=0; i<streets.length; i++) {
+            if (streets[i].location === street) {
+                matchedIndexes.push(i);
+            }
+        }
+        return matchedIndexes;
+    }
+    
 	/**
 	 * Tries to figure out the direction of the given Bus
 	 * @param {Bus} bus - Bus instance
 	 * @param {Itinerary} itinerary - Itinerary of the bus line
 	 * @return {Bus}
 	 */
-    static identifyDirection(bus, itinerary) {
-        var max = Config.historySize;
-        var tmp = BusUtils.readFromCache(bus.order);
-        var finalState = [];
+    static* identifyDirection(bus, itinerary) {
+        var streets = itinerary.streets;
         
-        // Getting the cached information
-        var history = BusUtils.prepareHistory(tmp, startPoint); 
-        startPoint = new Spot(history.startPoint.latitude, history.startPoint.longitude);
-        
-        // Preparing current position data
-        tmp = { latitude: bus.latitude, longitude: bus.longitude };
-        
-        // Setting the new position
-        if(!BusUtils.timelineHasData(tmp, history.timeline)) history.timeline.push(tmp);
-        if(history.timeline.length>max) {
-            var overpass = history.timeline.length - max, i = 0;
-            while (i++<overpass) history.timeline.shift();
+        if (!streets || streets.length == 0) {
+            Logger.warning(`Line ${itinerary.line} does not have street itinerary`);
+            bus.sense = "indisponível";
+            return bus;
         }
         
-        // Setting up the final states
-        var past = null;
-        history.timeline.forEach((step, index) => {
-            var tmpState = BusUtils.currentPositionState(step, past, startPoint);
-            finalState.push(tmpState);
-            past = step;
-        });
+        var currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
+        var currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
+        Logger.info(`Current street: ${currentStreet}`);
         
-        // Getting the current punctuation
-        var reducedState = BusUtils.reduceState(finalState);
+        // bus.sense = "xixicoco";
+        // var max = Config.historySize;
+        // var tmp = BusUtils.readFromCache(bus.order);
+        // var finalState = [];
         
-        // Updating sense
-        bus.sense = BusUtils.prepareSense(sense, reducedState);
         
-        // Updating the cached data
-        BusUtils.writeToCache(bus.order, history);
+        // // Getting the cached information
+        // var history = BusUtils.prepareHistory(tmp, startPoint); 
+        // startPoint = new Spot(history.startPoint.latitude, history.startPoint.longitude);
+        
+        // // Preparing current position data
+        // tmp = { latitude: bus.latitude, longitude: bus.longitude };
+        
+        // // Setting the new position
+        // if(!BusUtils.timelineHasData(tmp, history.timeline)) history.timeline.push(tmp);
+        // if(history.timeline.length>max) {
+        //     var overpass = history.timeline.length - max, i = 0;
+        //     while (i++<overpass) history.timeline.shift();
+        // }
+        
+        // // Setting up the final states
+        // var past = null;
+        // history.timeline.forEach((step, index) => {
+        //     var tmpState = BusUtils.currentPositionState(step, past, startPoint);
+        //     finalState.push(tmpState);
+        //     past = step;
+        // });
+        
+        // // Getting the current punctuation
+        // var reducedState = BusUtils.reduceState(finalState);
+        
+        // // Updating sense
+        // bus.sense = BusUtils.prepareSense(sense, reducedState);
+        
+        // // Updating the cached data
+        // BusUtils.writeToCache(bus.order, history);
         
         return bus;
     }

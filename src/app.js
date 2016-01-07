@@ -86,8 +86,8 @@ function* iteration() {
             if(tmp.timestamp.getTime()!==bus.timestamp.getTime()) {
                 // logger.info(`[${bus.order}] Bus has different timestamp from the one cached`);
                 // logger.info(`[${bus.order}] Old: ${tmp.timestamp}   New: ${bus.timestamp}`);
-                bus = BusUtils.identifySense(bus, tmpItinerary);
-                logger.info(`[${bus.order}] Direction: ${bus.sense}`);
+                bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
+                logger.info(`[${bus.order}] Updated direction: ${bus.sense}`);
                 
                 // Add to pending history updates
                 historyPendingSave.push(bus);
@@ -117,7 +117,7 @@ function* iteration() {
         else {
             logger.info(`[${bus.order}] Bus not found on cache`);
             
-            bus = BusUtils.identifySense(bus, tmpItinerary);
+            bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
             logger.info(`[${bus.order}] Direction: ${bus.sense}`);
             
             commonPendingSave.push(bus);
