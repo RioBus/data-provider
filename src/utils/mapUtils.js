@@ -74,16 +74,16 @@ class MapUtils {
         
         return Http.get(url).then( (response) => {
             const status = response.statusCode;
-                switch(status) {
-                    case 200:
-                        // logger.info(`[${url}] -> 200 OK`);
-                        return response.body.name;
-                        break;
-                    default:
-                        logger.info(`[${url}] -> ${status} ERROR`);
-                        break;
-                }
-                return null;
+            switch(status) {
+                case 200:
+                    logger.info(`[${url}] -> 200 OK`);
+                    return response.body.name;
+                    break;
+                default:
+                    logger.error(`[${url}] -> ${status} ERROR`);
+                    break;
+            }
+            return null;
         });
     }
 }

@@ -196,7 +196,7 @@ class BusUtils {
         
         // Check if the itinerary has information about the streets
         if (!streets || streets.length == 0) {
-            Logger.warning(`Line ${itinerary.line} does not have street itinerary`);
+            Logger.alert(`Line ${itinerary.line} does not have street itinerary`);
             bus.sense = "indisponível";
             return bus;
         }
@@ -206,7 +206,7 @@ class BusUtils {
         
         // Check if was able to identify current street
         if (!currentStreet) {
-            Logger.warning(`Current street could not be identified.`);
+            Logger.alert(`Current street could not be identified.`);
             return bus;
         }
         
