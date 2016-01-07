@@ -194,6 +194,7 @@ class BusUtils {
     static* identifyDirection(bus, itinerary) {
         var streets = itinerary.streets;
         
+        // Check if the itinerary has information about the streets
         if (!streets || streets.length == 0) {
             Logger.warning(`Line ${itinerary.line} does not have street itinerary`);
             bus.sense = "indisponível";
@@ -202,8 +203,29 @@ class BusUtils {
         
         var currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
         var currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
+        
+        // Check if was able to identify current street
+        if (!currentStreet) {
+            Logger.warning(`Current street could not be identified.`);
+            return bus;
+        }
+        
         Logger.info(`Current street: ${currentStreet}`);
         
+        // Check if the current street matches the itinerary
+        var matches = BusUtils.streetInItinerary(currentStreet, streets);
+        if (matches.length == 0) {
+            Logger.info(`Current street not in itinerary`);
+        }
+        else {
+            Logger.info(`Current street got ${matches.length} matches in the itinerary:`);
+            for (var match of matches) {
+                if (!match.returning)
+                    Logger.info(`   Going`);
+                else 
+                    Logger.info(`   Returning`);
+            }
+        }
         // bus.sense = "xixicoco";
         // var max = Config.historySize;
         // var tmp = BusUtils.readFromCache(bus.order);
