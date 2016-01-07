@@ -79,11 +79,16 @@ function* iteration() {
         if(bus.line==='indefinido') continue;
         var tmpItinerary = yield loadItinerary(bus.line);
         
-        bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
         // If the same bus is already cached, update it's cached information and write to database
         if(busesCache[bus.order]) {
+            // logger.info(`[${bus.order}] Bus found on cache`);
             var tmp = busesCache[bus.order];
             if(tmp.timestamp.getTime()!==bus.timestamp.getTime()) {
+                // logger.info(`[${bus.order}] Bus has different timestamp from the one cached`);
+                // logger.info(`[${bus.order}] Old: ${tmp.timestamp}   New: ${bus.timestamp}`);
+                bus = BusUtils.identifySense(bus, tmpItinerary);
+                logger.info(`[${bus.order}] Direction: ${bus.sense}`);
+                
                 // Add to pending history updates
                 historyPendingSave.push(bus);
                 tmp.timestamp = bus.timestamp;
@@ -108,13 +113,17 @@ function* iteration() {
                 logger.info(`[${bus.order}] Bus has the same timestamp from cache`);
             }
         }
-        // If the bus is not cached, add it to a list to be saved.
+        // If the bus is not cached, find its direction and add it to a list to be saved.
         else {
             logger.info(`[${bus.order}] Bus not found on cache`);
+            
+            bus = BusUtils.identifySense(bus, tmpItinerary);
+            logger.info(`[${bus.order}] Direction: ${bus.sense}`);
+            
             commonPendingSave.push(bus);
             historyPendingSave.push(bus);
         }
-    };
+    }
     
     try {
         // Push new data to database

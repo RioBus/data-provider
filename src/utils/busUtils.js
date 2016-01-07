@@ -125,11 +125,57 @@ class BusUtils {
 	/**
 	 * tries to figure out the sense of the given Bus
 	 * @param {Bus} bus - Bus instance
-	 * @param {Spot} startPoint - Itinerary begin spot for the bus line 
-	 * @param {string} sense - Bus sense description
+	 * @param {Itinerary} itinerary - Itinerary of the bus line
 	 * @return {Bus}
 	 */
-    static identifySense(bus, startPoint, sense) {
+    static identifySense(bus, itinerary) {
+        var max = Config.historySize;
+        var tmp = BusUtils.readFromCache(bus.order);
+        var startPoint = itinerary.spots[0];
+        var sense = itinerary.description;
+        var finalState = [];
+        
+        // Getting the cached information
+        var history = BusUtils.prepareHistory(tmp, startPoint); 
+        startPoint = new Spot(history.startPoint.latitude, history.startPoint.longitude);
+        
+        // Preparing current position data
+        tmp = { latitude: bus.latitude, longitude: bus.longitude };
+        
+        // Setting the new position
+        if(!BusUtils.timelineHasData(tmp, history.timeline)) history.timeline.push(tmp);
+        if(history.timeline.length>max) {
+            var overpass = history.timeline.length - max, i = 0;
+            while (i++<overpass) history.timeline.shift();
+        }
+        
+        // Setting up the final states
+        var past = null;
+        history.timeline.forEach((step, index) => {
+            var tmpState = BusUtils.currentPositionState(step, past, startPoint);
+            finalState.push(tmpState);
+            past = step;
+        });
+        
+        // Getting the current punctuation
+        var reducedState = BusUtils.reduceState(finalState);
+        
+        // Updating sense
+        bus.sense = BusUtils.prepareSense(sense, reducedState);
+        
+        // Updating the cached data
+        BusUtils.writeToCache(bus.order, history);
+        
+        return bus;
+    }
+    
+	/**
+	 * Tries to figure out the direction of the given Bus
+	 * @param {Bus} bus - Bus instance
+	 * @param {Itinerary} itinerary - Itinerary of the bus line
+	 * @return {Bus}
+	 */
+    static identifyDirection(bus, itinerary) {
         var max = Config.historySize;
         var tmp = BusUtils.readFromCache(bus.order);
         var finalState = [];
