@@ -17,7 +17,7 @@ const provider = Config.provider;
 const timeout = provider.updateInterval;
 const MainProcess = process;
 
-var db, itineraries, buses, busDAO, itineraryDAO;
+var db, itineraries, busesCache, busDAO, itineraryDAO;
 
 function getURL(bustype) {
     return `http://${provider.host}${provider.path.bus[bustype.toUpperCase()]}`;
@@ -73,58 +73,70 @@ function* iteration() {
     logger.info(`${busList.length} found.`);
     logger.info('Processing...');
     
-    var commonList = [], historyList = [], countSearch = 0, countHistory = 0;
+    var commonPendingSave = [], historyPendingSave = [];
     
     for (var bus of busList) {
         if(bus.line==='indefinido') continue;
         var tmpItinerary = yield loadItinerary(bus.line);
         
         bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
-        if(buses[bus.order]) {
-            var tmp = buses[bus.order];
-            if(tmp.timestamp!==bus.timestamp) {
-                historyList.push(bus);
-                countHistory++;
+        // If the same bus is already cached, update it's cached information and write to database
+        if(busesCache[bus.order]) {
+            var tmp = busesCache[bus.order];
+            if(tmp.timestamp.getTime()!==bus.timestamp.getTime()) {
+                // Add to pending history updates
+                historyPendingSave.push(bus);
                 tmp.timestamp = bus.timestamp;
                 tmp.latitude = bus.latitude;
                 tmp.longitude = bus.longitude;
                 tmp.speed = bus.speed;
                 tmp.direction = bus.direction;
+                tmp.sense = bus.sense;
                 if(tmp.line!==bus.line) {
                     logger.info(`[${bus.order}] ${tmp.line} -> ${bus.line}`);
                     tmp.line = bus.line;
                 }
-                tmp = BusUtils.identifySense(tmp, tmpItinerary.spots[0], tmpItinerary.description);
+                
                 try {
+                    // Update current database
                     yield tmp.save();
-                    countSearch++;
                 } catch (e) {
                     logger.error(e.stack);
                 }
             }
-        } else {
-            commonList.push(bus);
-            historyList.push(bus);
-            countSearch++;
-            countHistory++;
+            else {
+                logger.info(`[${bus.order}] Bus has the same timestamp from cache`);
+            }
+        }
+        // If the bus is not cached, add it to a list to be saved.
+        else {
+            logger.info(`[${bus.order}] Bus not found on cache`);
+            commonPendingSave.push(bus);
+            historyPendingSave.push(bus);
         }
     };
     
     try {
-        if(commonList.length>0) {
+        // Push new data to database
+        if(commonPendingSave.length>0) {
             logger.info('Saving data...');
-            yield busDAO.commonSave(commonList);
-            logger.info(`Saved ${countSearch} docs to search collection.`);
+            yield busDAO.commonSave(commonPendingSave);
+            logger.info(`Saved ${commonPendingSave.length} docs to search collection.`);
         } else logger.info('There was no new data to store.');
         
-        if(historyList.length>0) {
-            yield busDAO.historySave(historyList);
-            logger.info(`Saved ${countHistory} docs to history collection.`);
+        if(historyPendingSave.length>0) {
+            yield busDAO.historySave(historyPendingSave);
+            logger.info(`Saved ${historyPendingSave.length} docs to history collection.`);
         } else logger.info('There was no new data to store in history.');
+        
+        // If there is new data, refresh cache to load the stored object.
+        if(commonPendingSave.length>0 || historyPendingSave.length>0) {
+            busesCache = prepareBuses(yield busDAO.getAll());
+        }
     } catch (e) {
         logger.error(e);
     }
-    buses = prepareBuses(yield busDAO.getAll());
+    
     setTimeout(() => { spawn(iteration); }, timeout);
 }
 
@@ -134,7 +146,7 @@ spawn(function*(){
     busDAO = new BusDAO(db);
     itineraryDAO = new ItineraryDAO(db);
     logger.info('Loading buses...');
-    buses = prepareBuses(yield busDAO.getAll());
+    busesCache = prepareBuses(yield busDAO.getAll());
     logger.info('Loading itineraries...');
     itineraries = prepareItineraries(yield itineraryDAO.getAll());
     logger.info(`Itineraries retrieved: ${Object.keys(itineraries).length}`);
