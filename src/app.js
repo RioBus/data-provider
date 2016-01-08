@@ -81,11 +81,9 @@ function* iteration() {
         
         // If the same bus is already cached, update it's cached information and write to database
         if(busesCache[bus.order]) {
-            // logger.info(`[${bus.order}] Bus found on cache`);
             var tmp = busesCache[bus.order];
             if(tmp.timestamp.getTime()!==bus.timestamp.getTime()) {
-                // logger.info(`[${bus.order}] Bus has different timestamp from the one cached`);
-                // logger.info(`[${bus.order}] Old: ${tmp.timestamp}   New: ${bus.timestamp}`);
+                // Bus has different timestamp from the one cached
                 bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
                 logger.info(`[${bus.order}] Updated direction: ${bus.sense}`);
                 
@@ -109,14 +107,9 @@ function* iteration() {
                     logger.error(e.stack);
                 }
             }
-            else {
-                logger.info(`[${bus.order}] Bus has the same timestamp from cache`);
-            }
         }
         // If the bus is not cached, find its direction and add it to a list to be saved.
         else {
-            logger.info(`[${bus.order}] Bus not found on cache`);
-            
             bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
             logger.info(`[${bus.order}] Direction: ${bus.sense}`);
             

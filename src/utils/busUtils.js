@@ -105,25 +105,25 @@ class BusUtils {
     
 	/**
 	 * Updates the bus sense field with it's real direction 
-	 * @param {string} sense - Bus sense description
+	 * @param {string} description - Bus sense description
 	 * @param {number} direction - direction identifier
 	 * @return {string}
 	 */
-    static prepareSense(sense, direction) {
+    static prepareDirection(description, direction) {
         let tmp = 'desconhecido';
-        if(direction > 0) tmp = sense;
+        if(direction > 0) tmp = description;
         else if(direction < 0) {
-            let tmpSense = sense.split(' X ');
-            let aux = tmpSense[1];
-            tmpSense[1] = tmpSense[0];
-            tmpSense[0] = aux;
-            tmp = tmpSense.join(' X ');
+            let tmpDescription = description.split(' X ');
+            let aux = tmpDescription[1];
+            tmpDescription[1] = tmpDescription[0];
+            tmpDescription[0] = aux;
+            tmp = tmpDescription.join(' X ');
         }
         return tmp;
     }
 
 	/**
-	 * tries to figure out the sense of the given Bus
+	 * Tries to figure out the sense of the given Bus
 	 * @param {Bus} bus - Bus instance
 	 * @param {Itinerary} itinerary - Itinerary of the bus line
 	 * @return {Bus}
@@ -161,7 +161,7 @@ class BusUtils {
         var reducedState = BusUtils.reduceState(finalState);
         
         // Updating sense
-        bus.sense = BusUtils.prepareSense(sense, reducedState);
+        bus.sense = BusUtils.prepareDirection(sense, reducedState);
         
         // Updating the cached data
         BusUtils.writeToCache(bus.order, history);
@@ -177,12 +177,36 @@ class BusUtils {
      */
     static streetInItinerary(street, streets) {
         var matchedIndexes = [];
-        for (var i=0; i<streets.length; i++) {
+        for (let i=0; i<streets.length; i++) {
             if (streets[i].location === street) {
                 matchedIndexes.push(i);
             }
         }
         return matchedIndexes;
+    }
+    
+    /**
+     * Identify direction of the bus from the itinerary matches array.
+     * @param {array} matches - Array of indexes of itinerary matches
+     * @param {array} streets - Array of street objects of the itinerary
+     * @return {number} A number indicating the direction.
+     */
+    static identifyStateFromMatches(matches, streets) {
+        let initialMatch = matches[0];
+        let returning = streets[initialMatch].returning;
+        
+        // Check if there are different states
+        for (let i=1; i<matches.length; i++) {
+            var match = matches[i];
+            // If different directions were found
+            if (match.returning !== returning) {
+                return 0;
+            }
+        }
+        
+        // If it's here, it means all matches are on the same direction
+        if (returning) return -1;
+        return 1;
     }
     
 	/**
@@ -192,39 +216,44 @@ class BusUtils {
 	 * @return {Bus}
 	 */
     static* identifyDirection(bus, itinerary) {
-        var streets = itinerary.streets;
+        let streets = itinerary.streets;
         
         // Check if the itinerary has information about the streets
         if (!streets || streets.length == 0) {
-            Logger.alert(`Line ${itinerary.line} does not have street itinerary`);
+            Logger.alert(`[${bus.order}] Line ${itinerary.line} does not have street itinerary`);
             bus.sense = "indisponível";
             return bus;
         }
         
-        var currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
-        var currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
+        let currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
+        let currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
         
         // Check if was able to identify current street
         if (!currentStreet) {
-            Logger.alert(`Current street could not be identified.`);
+            Logger.alert(`[${bus.order}] Current street could not be identified.`);
             return bus;
         }
         
-        Logger.info(`Current street: ${currentStreet}`);
+        Logger.info(`[${bus.order}] Current street: ${currentStreet}`);
         
         // Check if the current street matches the itinerary
-        var matches = BusUtils.streetInItinerary(currentStreet, streets);
+        let matches = BusUtils.streetInItinerary(currentStreet, streets);
         if (matches.length == 0) {
-            Logger.info(`Current street not in itinerary`);
+            Logger.info(`[${bus.order}] Current street not in itinerary`);
         }
         else {
-            Logger.info(`Current street got ${matches.length} matches in the itinerary:`);
-            for (var match of matches) {
+            Logger.info(`[${bus.order}] Current street got ${matches.length} matches in the itinerary:`);
+            
+            for (let matchIndex of matches) {
+                let match = streets[matchIndex];
                 if (!match.returning)
                     Logger.info(`   Going`);
                 else 
                     Logger.info(`   Returning`);
             }
+            let directionState = BusUtils.identifyStateFromMatches(matches, streets);
+            Logger.info(`[${bus.order}] State is ${directionState}`);
+            bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
         }
         // bus.sense = "xixicoco";
         // var max = Config.historySize;
@@ -258,7 +287,7 @@ class BusUtils {
         // var reducedState = BusUtils.reduceState(finalState);
         
         // // Updating sense
-        // bus.sense = BusUtils.prepareSense(sense, reducedState);
+        // bus.sense = BusUtils.prepareDirection(sense, reducedState);
         
         // // Updating the cached data
         // BusUtils.writeToCache(bus.order, history);
