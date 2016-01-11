@@ -84,49 +84,4 @@ describe('BusHistory', () => {
         done();
 	});
     
-	it('should identify if a timeline contains an empty sequence', function(done) {
-        var sequence = [];
-        var history = new BusHistory(['A','B','C','A']);
-        var matches = history.occurrencesOfSequence(sequence);
-		Assert.notEqual(matches, undefined);
-        Assert.deepStrictEqual(matches, 0, "Should be able to find zero matches");
-        done();
-	});
-    
-	it('should identify if a timeline contains an existing sequence with one item', function(done) {
-        var sequence = ['A'];
-        var history = new BusHistory(['A','B','C','A']);
-        var matches = history.occurrencesOfSequence(sequence);
-		Assert.notEqual(matches, undefined);
-        Assert.deepStrictEqual(matches, 2, "Should be able to find 1 match");
-        done();
-	});
-    
-	it('should identify if a timeline contains an existing sequence with many items ocurring once', function(done) {
-        var sequence = ['A','B'];
-        var history = new BusHistory(['A','B','C','A']);
-        var matches = history.occurrencesOfSequence(sequence);
-		Assert.notEqual(matches, undefined);
-        Assert.deepStrictEqual(matches, 1, "Should be able to find 1 match");
-        done();
-	});
-    
-	it('should identify if a timeline contains an existing sequence with many items ocurring many times', function(done) {
-        var sequence = ['A','B'];
-        var history = new BusHistory(['A','B','C','A','B','D','A','E','A','B','F','A']);
-        var matches = history.occurrencesOfSequence(sequence);
-		Assert.notEqual(matches, undefined);
-        Assert.deepStrictEqual(matches, 3, "Should be able to find 3 matches");
-        done();
-	});
-    
-	it('should identify if a timeline contains an existing non-continuous sequence', function(done) {
-        var sequence = ['A','B'];
-        var history = new BusHistory(['A','C','B','A']);
-        var matches = history.occurrencesOfSequence(sequence);
-		Assert.notEqual(matches, undefined);
-        Assert.deepStrictEqual(matches, 1, "Should be able to find 1 match");
-        done();
-	});
-    
 });

@@ -22,27 +22,5 @@ class BusHistory {
         }
     }
     
-    /**
-     * Gets number of times a sequence occurs in a timeline. This can be a
-     * continuous or a non-continuous sequence.
-     * @param {array} sequence - Sequence we are trying to find (needle)
-     */
-    occurrencesOfSequence(sequence) {
-        if (sequence.length == 0 || this.timeline.length == 0 || sequence.length > this.timeline.length) return 0;
-        var lastIndex = -1;
-        var matches = 0;
-        while (true) {
-            for (var item of sequence) {
-                var index = this.timeline.indexOf(item, lastIndex+1);
-                if (index > lastIndex) {
-                    lastIndex = index;
-                } else {
-                    return matches;
-                }
-            }
-            matches++;
-        }
-        return matches;
-    }
 }
 module.exports = BusHistory;
