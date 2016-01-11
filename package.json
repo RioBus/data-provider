@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test/* test/**/* --timeout 20000",
     "start": "node src/app.js",
-    "install": "npm install -g mocha-co"
+    "install": "npm install -g mocha-co@1.17.1-co.1"
   },
   "compiler": "commonjs",
   "repository": {
@@ -38,11 +38,10 @@
     "moment": "^2.10.6",
     "moment-timezone": "^0.4.1",
     "mongodb": "^1.4.4",
-    "request": "^2.67.0",
     "request-promise": "^1.0.2",
     "robe": "^0.12.0"
   },
   "devDependencies": {
-    "mocha-co": "^1.17.1-co.1"
+    "mocha-co": "1.17.1-co.1"
   }
 }
