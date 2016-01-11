@@ -192,7 +192,7 @@ class BusUtils {
      * @return {number} A number indicating the direction.
      */
     static identifyStateFromMatches(matches, streets) {
-        if (!matches || !matches.hasOwnProperty('length') || matches.length == 0) return 0;
+        if (!matches || !(matches instanceof Array) || matches.length == 0) return 0;
         let initialMatch = matches[0];
         
         if (!streets[initialMatch].hasOwnProperty('returning')) return 0;
@@ -201,8 +201,9 @@ class BusUtils {
         // Check if there are different states
         for (let i=1; i<matches.length; i++) {
             var match = matches[i];
+            var matchStreet = streets[match];
             // If different directions were found
-            if (match.returning !== returning) {
+            if (matchStreet.returning !== returning) {
                 return 0;
             }
         }
