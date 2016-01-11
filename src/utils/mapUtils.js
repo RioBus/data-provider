@@ -2,7 +2,6 @@
 const Config   = require('../config');
 const Core     = require('../core');
 const Http     = Core.Http;
-const request  = require('request');
 
 const logger   = Core.LoggerFactory.getRuntimeLogger();
 
