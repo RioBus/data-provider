@@ -29,18 +29,18 @@ class BusHistoryUtils {
     }
     
     /**
-     * Gets number of times a sequence occurs in a timeline. This can be a
+     * Gets number of times a sequence occurs in a itinerary. This can be a
      * continuous or a non-continuous sequence.
-     * @param {array} timeline - Array of streets from the timeline (haystack)
+     * @param {array} itinerary - Array of streets from the itinerary (haystack)
      * @param {array} sequence - Sequence we are trying to find (needle)
      */
-    static timelineContainsSequence(timeline, sequence) {
+    static itineraryContainsSequence(itinerary, sequence) {
         if (sequence.length == 0) return 0;
         var lastIndex = -1;
         var matches = 0;
         while (true) {
             for (var item of sequence) {
-                var index = timeline.indexOf(item, lastIndex+1);
+                var index = itinerary.indexOf(item, lastIndex+1);
                 if (index > lastIndex) {
                     lastIndex = index;
                 } else {

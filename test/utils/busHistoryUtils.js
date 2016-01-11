@@ -69,46 +69,46 @@ describe('BusHistoryUtils', () => {
     //     done();
 	// });
     
-	it('should identify if a timeline contains an empty sequence', function(done) {
+	it('should identify if a itinerary contains an empty sequence', function(done) {
         var sequence = [];
-        var timeline = ['A','B','C','A'];
-        var matches = BusHistoryUtils.timelineContainsSequence(timeline, sequence);
+        var itinerary = ['A','B','C','A'];
+        var matches = BusHistoryUtils.itineraryContainsSequence(itinerary, sequence);
 		Assert.notEqual(matches, undefined);
         Assert.deepStrictEqual(matches, 0, "Should be able to find zero matches");
         done();
 	});
     
-	it('should identify if a timeline contains an existing sequence with one item', function(done) {
+	it('should identify if a itinerary contains an existing sequence with one item', function(done) {
         var sequence = ['A'];
-        var timeline = ['A','B','C','A'];
-        var matches = BusHistoryUtils.timelineContainsSequence(timeline, sequence);
+        var itinerary = ['A','B','C','A'];
+        var matches = BusHistoryUtils.itineraryContainsSequence(itinerary, sequence);
 		Assert.notEqual(matches, undefined);
         Assert.deepStrictEqual(matches, 2, "Should be able to find 1 match");
         done();
 	});
     
-	it('should identify if a timeline contains an existing sequence with many items ocurring once', function(done) {
+	it('should identify if a itinerary contains an existing sequence with many items ocurring once', function(done) {
         var sequence = ['A','B'];
-        var timeline = ['A','B','C','A'];
-        var matches = BusHistoryUtils.timelineContainsSequence(timeline, sequence);
+        var itinerary = ['A','B','C','A'];
+        var matches = BusHistoryUtils.itineraryContainsSequence(itinerary, sequence);
 		Assert.notEqual(matches, undefined);
         Assert.deepStrictEqual(matches, 1, "Should be able to find 1 match");
         done();
 	});
     
-	it('should identify if a timeline contains an existing sequence with many items ocurring many times', function(done) {
+	it('should identify if a itinerary contains an existing sequence with many items ocurring many times', function(done) {
         var sequence = ['A','B'];
-        var timeline = ['A','B','C','A','B','D','A','E','A','B','F','A'];
-        var matches = BusHistoryUtils.timelineContainsSequence(timeline, sequence);
+        var itinerary = ['A','B','C','A','B','D','A','E','A','B','F','A'];
+        var matches = BusHistoryUtils.itineraryContainsSequence(itinerary, sequence);
 		Assert.notEqual(matches, undefined);
         Assert.deepStrictEqual(matches, 3, "Should be able to find 3 matches");
         done();
 	});
     
-	it('should identify if a timeline contains an existing non-continuous sequence', function(done) {
+	it('should identify if a itinerary contains an existing non-continuous sequence', function(done) {
         var sequence = ['A','B'];
-        var timeline = ['A','C','B','A'];
-        var matches = BusHistoryUtils.timelineContainsSequence(timeline, sequence);
+        var itinerary = ['A','C','B','A'];
+        var matches = BusHistoryUtils.itineraryContainsSequence(itinerary, sequence);
 		Assert.notEqual(matches, undefined);
         Assert.deepStrictEqual(matches, 1, "Should be able to find 1 match");
         done();
