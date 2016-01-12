@@ -63,9 +63,48 @@ describe('BusHistoryUtils', () => {
 	it('should not identify the state from a history with one weak item', function(done) {
         var shortHistory = new BusHistory(['A']);
         var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
-		Assert.notEqual(state, undefined);
-		Assert.notEqual(state, null);
-        Assert.deepStrictEqual(state, 0, "Should not be able to identify history");
+        Assert.deepStrictEqual(state, 0, "Should not be able to identify state");
+        done();
+	});
+	
+	it('should not identify the state from a history with a non existing item', function(done) {
+        var shortHistory = new BusHistory(['X']);
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(state, 0, "Should not be able to identify state");
+        done();
+	});
+    
+	it('should not identify the state from a history with non existing items', function(done) {
+        var shortHistory = new BusHistory(['A','X','B']);
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(state, 0, "Should not be able to identify state");
+        done();
+	});
+    
+	it('should identify the state as going with a perfect match', function(done) {
+        var shortHistory = new BusHistory(['A','B']);
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(state, 1, "Should be able to identify state as going");
+        done();
+	});
+    
+	it('should identify the state as returning with a perfect match', function(done) {
+        var shortHistory = new BusHistory(['E','F']);
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(state, -1, "Should be able to identify state as returning");
+        done();
+	});
+    
+	it('should identify the state as going with a match skipping one entry', function(done) {
+        var shortHistory = new BusHistory(['A','C']); // the perfect sequence would be ABC
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(state, 1, "Should be able to identify state as going");
+        done();
+	});
+	it('should identify the state as returning with a match skipping one entry', function(done) {
+        var shortHistory = new BusHistory(['F','A']); // the perfect sequence would be ABC
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(state, -1, "Should be able to identify state as returning");
         done();
 	});
     
