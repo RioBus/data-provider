@@ -102,7 +102,7 @@ describe('BusHistoryUtils', () => {
         done();
 	});
 	it('should identify the state as returning with a match skipping one entry', function(done) {
-        var shortHistory = new BusHistory(['F','A']); // the perfect sequence would be ABC
+        var shortHistory = new BusHistory(['F','A']); // the perfect sequence would be FEA
         var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
         Assert.deepStrictEqual(state, -1, "Should be able to identify state as returning");
         done();

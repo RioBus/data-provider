@@ -21,10 +21,19 @@ class BusHistoryUtils {
         var timeline = history.timeline;
         var queryTimeline = usedTimeline || [];
         
-        if (timeline.length > 0) {
+        // if queryTimeline.length > 0
+        //    itinerary contains queryTimeline and all matches are going?
+        //       return 1
+        //    itinerary contains queryTimeline and all matches are returning?
+        //       return -1
+        //    else
+        //       continue... [inconclusive]
+        // else
+        //    continue... [query is empty, add first element and try]      
+        if (timeline.length > 0) {      
             queryTimeline.push(timeline.pop());
             var possibleState = BusHistoryUtils.identifyStateFromHistory(history, streets, queryTimeline);
-            if (possibleState != 0) return possibleState;
+            return possibleState;
         }
         
         return 0;
