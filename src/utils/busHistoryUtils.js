@@ -21,9 +21,11 @@ class BusHistoryUtils {
         var timeline = history.timeline;
         var queryTimeline = usedTimeline || [];
         
-        queryTimeline.push(timeline.pop());
-        var possibleState = BusHistoryUtils.identifyStateFromHistory(history, streets, queryTimeline);
-        if (possibleState != 0) return possibleState;
+        if (timeline.length > 0) {
+            queryTimeline.push(timeline.pop());
+            var possibleState = BusHistoryUtils.identifyStateFromHistory(history, streets, queryTimeline);
+            if (possibleState != 0) return possibleState;
+        }
         
         return 0;
     }

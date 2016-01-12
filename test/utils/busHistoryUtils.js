@@ -60,14 +60,14 @@ describe('BusHistoryUtils', () => {
         history = new BusHistory(oldTimeline);
 	});
 	
-	// it('should not identify the state from a history with one weak item', function(done) {
-    //     var shortHistory = new BusHistory(['A']);
-    //     var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
-	// 	Assert.notEqual(state, undefined);
-	// 	Assert.notEqual(state, null);
-    //     Assert.deepStrictEqual(state, 0, "Should not be able to identify history");
-    //     done();
-	// });
+	it('should not identify the state from a history with one weak item', function(done) {
+        var shortHistory = new BusHistory(['A']);
+        var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+		Assert.notEqual(state, undefined);
+		Assert.notEqual(state, null);
+        Assert.deepStrictEqual(state, 0, "Should not be able to identify history");
+        done();
+	});
     
 	it('should identify if a itinerary contains an empty sequence', function(done) {
         var sequence = [];
