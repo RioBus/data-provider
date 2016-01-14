@@ -1,4 +1,6 @@
 'use strict';
+const BusHistory     = require('../model/busHistory');
+const BusHistoryUtils = require('./busHistoryUtils');
 const Config   = require('../config');
 const Core     = require('../core');
 const MapUtils = require('./mapUtils');
@@ -246,55 +248,30 @@ class BusUtils {
             Logger.info(`[${bus.order}] Current street not in itinerary`);
         }
         else {
-            Logger.info(`[${bus.order}] Current street got ${matches.length} matches in the itinerary:`);
+            Logger.info(`[${bus.order}] Current street got ${matches.length} matches in the itinerary`);
+            var history = BusHistoryUtils.historyForBus(bus.order);
+            Logger.info(`[${bus.order}] History for bus ${bus.order}: ${JSON.stringify(history)}`);
             
-            for (let matchIndex of matches) {
-                let match = streets[matchIndex];
-                if (!match.returning)
-                    Logger.info(`   Going`);
-                else 
-                    Logger.info(`   Returning`);
+            var added = history.addStreetToHistory(currentStreet);
+            if (added) {
+                Logger.info(`[${bus.order}] Added street to history: ${JSON.stringify(history)}`);
             }
+            else {
+                Logger.info(`[${bus.order}] Added street to history (skipped): ${JSON.stringify(history)}`);
+            }
+            
             let directionState = BusUtils.identifyStateFromMatches(matches, streets);
-            Logger.info(`[${bus.order}] State is ${directionState}`);
+            Logger.info(`[${bus.order}] State from matches is ${directionState}`);
+            
+            if (directionState == 0) {
+                Logger.info(`[${bus.order}] Trying to identify from history`);
+                
+                directionState = BusHistoryUtils.identifyStateFromHistory(history, streets);
+                Logger.info(`[${bus.order}] State from history is ${directionState}`);
+            }
+            
             bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
         }
-        // bus.sense = "xixicoco";
-        // var max = Config.historySize;
-        // var tmp = BusUtils.readFromCache(bus.order);
-        // var finalState = [];
-        
-        
-        // // Getting the cached information
-        // var history = BusUtils.prepareHistory(tmp, startPoint); 
-        // startPoint = new Spot(history.startPoint.latitude, history.startPoint.longitude);
-        
-        // // Preparing current position data
-        // tmp = { latitude: bus.latitude, longitude: bus.longitude };
-        
-        // // Setting the new position
-        // if(!BusUtils.timelineHasData(tmp, history.timeline)) history.timeline.push(tmp);
-        // if(history.timeline.length>max) {
-        //     var overpass = history.timeline.length - max, i = 0;
-        //     while (i++<overpass) history.timeline.shift();
-        // }
-        
-        // // Setting up the final states
-        // var past = null;
-        // history.timeline.forEach((step, index) => {
-        //     var tmpState = BusUtils.currentPositionState(step, past, startPoint);
-        //     finalState.push(tmpState);
-        //     past = step;
-        // });
-        
-        // // Getting the current punctuation
-        // var reducedState = BusUtils.reduceState(finalState);
-        
-        // // Updating sense
-        // bus.sense = BusUtils.prepareDirection(sense, reducedState);
-        
-        // // Updating the cached data
-        // BusUtils.writeToCache(bus.order, history);
         
         return bus;
     }

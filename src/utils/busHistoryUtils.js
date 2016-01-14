@@ -1,16 +1,32 @@
 'use strict';
 const BusHistory = require('../model/busHistory');
-const Config   = require('../config');
-const Core     = require('../core');
+const Config     = require('../config');
+const Core       = require('../core');
 
-const Cache    = Core.Cache;
-const Logger   = Core.LoggerFactory.getRuntimeLogger();
+const Cache      = Core.Cache;
+const Logger     = Core.LoggerFactory.getRuntimeLogger();
+
+var historyArchive = {};
 
 /**
  * BusHistory helper functions
  * @class {BusHistoryUtils}
  */
 class BusHistoryUtils {
+    static historyForBus(order) {
+        var history = historyArchive[order];
+        if (!history) {
+            Logger.info(`[${order}] History for bus ${order} not found. Creating one...`);
+            history = new BusHistory();
+            historyArchive[order] = history;
+        }
+        return history;
+    }
+    
+    static updateHistoryForBus(order, history) {
+        historyArchive[order] = history;
+    }
+    
     /**
      * Identify direction of the bus from the bus history.
      * @param {BusHistory} history - The bus history

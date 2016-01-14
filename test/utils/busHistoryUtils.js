@@ -194,4 +194,37 @@ describe('BusHistoryUtils', () => {
         done();
 	});
     
+    
+    // historyForBus
+    
+	it('should create an empty history timeline for a new bus', function(done) {
+        var history = BusHistoryUtils.historyForBus('A12345');
+		Assert.notEqual(history, undefined);
+		Assert.notEqual(history, null);
+        Assert.deepStrictEqual(history.timeline.length, 0, "Timeline for new bus should be empty");
+        history.addStreetToHistory('A');
+        Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have the inserted item");
+        Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the inserted item");
+        // BusHistoryUtils.updateHistoryForBus('A12345', history);
+        
+        var history2 = BusHistoryUtils.historyForBus('A12345');
+		Assert.notEqual(history2, undefined);
+		Assert.notEqual(history2, null);
+        Assert.deepStrictEqual(history2.timeline.length, 1, "Timeline should have the inserted item");
+        Assert.deepStrictEqual(history2.timeline[0], 'A', "Timeline should have the inserted item");
+        done();
+	});
+    
+	it('should find the history for the previously used bus', function(done) {
+        var history = BusHistoryUtils.historyForBus('A12345');
+		Assert.notEqual(history, undefined);
+		Assert.notEqual(history, null);
+        Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have one item");
+        Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the inserted item");
+        history.addStreetToHistory('B');
+        Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have the inserted item");
+        Assert.deepStrictEqual(history.timeline[1], 'B', "Timeline should have the inserted item");
+        done();
+	});
+    
 });
