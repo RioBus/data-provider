@@ -75,9 +75,8 @@ class MapUtils {
             const status = response.statusCode;
             switch(status) {
                 case 200:
-                    logger.info(`[${url}] -> 200 OK`);
+                    // logger.info(`[${url}] -> 200 OK`);
                     return response.body.name;
-                    break;
                 default:
                     logger.error(`[${url}] -> ${status} ERROR`);
                     break;

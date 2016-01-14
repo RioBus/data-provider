@@ -65,6 +65,20 @@ describe('BusHistory', () => {
         done();
 	});
     
+	it('should not add a repeated item to a timeline', function(done) {
+        var itemToAdd = 'C';
+		var history = new BusHistory();
+        history.addStreetToHistory(itemToAdd);
+        history.addStreetToHistory(itemToAdd);
+        history.addStreetToHistory(itemToAdd);
+        history.addStreetToHistory(itemToAdd);
+        history.addStreetToHistory(itemToAdd);
+        Assert.equal(history.timeline.length, 1, "Timeline added a repeated item")
+        var lastItem = history.timeline[history.timeline.length-1];
+        Assert.deepStrictEqual(lastItem, itemToAdd, "Last item does not match");
+        done();
+	});
+    
 	it('should shift timeline to the maximum size', function(done) {
         var max = Config.historySize;
         var oldTimeline = [];

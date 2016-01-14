@@ -14,12 +14,14 @@ class BusHistory {
     
     addStreetToHistory(street) {
         // Ignore if the item is the same as the previous one added
-        if (this.timeline[this.timeline.length-1] === street) return;
+        if (this.timeline[this.timeline.length-1] === street) return false;
         
         this.timeline.push(street);
         if (this.timeline.length>max) {
             while (this.timeline.length > max) this.timeline.shift();
         }
+        
+        return true;
     }
     
 }
