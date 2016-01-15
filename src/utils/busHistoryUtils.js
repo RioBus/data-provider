@@ -30,24 +30,23 @@ class BusHistoryUtils {
      * @return {number} A number indicating the direction
      */
     static identifyStateFromHistory(history, streets, usedTimeline) {
+        // If this is the first call (without a usedTimeline param), copy the timeline and
+        // create a new BusHistory that it won't be modified by other calls.
+        if (!usedTimeline) {
+            var copiedHistory = new BusHistory(history.timeline.slice(0));
+            history = copiedHistory;
+        }
         var timeline = history.timeline;
         var queryTimeline = usedTimeline || [];
         
-        // if (queryTimeline.length > 0) {
-        //    itinerary contains queryTimeline and all matches are going?
-        //       return 1
-        //    itinerary contains queryTimeline and all matches are returning?
-        //       return -1
-        //    else
-        //       continue... [inconclusive]
-        // else
-        //    continue... [query is empty, add first element and try]      
         if (queryTimeline.length > 0) {
             var itinerarySequenceMatches = BusHistoryUtils.itineraryContainsSequence(streets, queryTimeline);
             if (itinerarySequenceMatches.count > 0) {
+                // all matches are going?
                 if (itinerarySequenceMatches.directions == 1) return 1;
+                // all matches are returning?
                 else if (itinerarySequenceMatches.directions == -1) return -1;
-                // else console.log('Matching ' + queryTimeline + ' found directions ' + itinerarySequenceMatches.directions)
+                // if found both directions, it was inconclusive, so continue
             }
         }
         if (timeline.length > 0) {      
