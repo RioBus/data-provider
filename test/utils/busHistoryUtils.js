@@ -205,7 +205,6 @@ describe('BusHistoryUtils', () => {
         history.addStreetToHistory('A');
         Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have the inserted item");
         Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the inserted item");
-        // BusHistoryUtils.updateHistoryForBus('A12345', history);
         
         var history2 = BusHistoryUtils.historyForBus('A12345');
 		Assert.notEqual(history2, undefined);
@@ -220,10 +219,10 @@ describe('BusHistoryUtils', () => {
 		Assert.notEqual(history, undefined);
 		Assert.notEqual(history, null);
         Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have one item");
-        Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the inserted item");
+        Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the old item");
         history.addStreetToHistory('B');
-        Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have the inserted item");
-        Assert.deepStrictEqual(history.timeline[1], 'B', "Timeline should have the inserted item");
+        Assert.deepStrictEqual(history.timeline.length, 2, "Timeline should have the new item");
+        Assert.deepStrictEqual(history.timeline[1], 'B', "Timeline should have the new item");
         done();
 	});
     

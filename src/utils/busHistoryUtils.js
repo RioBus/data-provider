@@ -23,10 +23,6 @@ class BusHistoryUtils {
         return history;
     }
     
-    static updateHistoryForBus(order, history) {
-        historyArchive[order] = history;
-    }
-    
     /**
      * Identify direction of the bus from the bus history.
      * @param {BusHistory} history - The bus history
