@@ -240,32 +240,19 @@ class BusUtils {
             return bus;
         }
         
-        Logger.info(`[${bus.order}] Current street: ${currentStreet}`);
-        
         // Check if the current street matches the itinerary
         let matches = BusUtils.streetInItinerary(currentStreet, streets);
         if (matches.length == 0) {
-            Logger.info(`[${bus.order}] Current street not in itinerary`);
+            Logger.alert(`[${bus.order}] Current street not in itinerary (${currentStreet})`);
         }
         else {
-            Logger.info(`[${bus.order}] Current street got ${matches.length} matches in the itinerary`);
             var history = BusHistoryUtils.historyForBus(bus.order);
-            Logger.info(`[${bus.order}] History for bus ${bus.order}: ${JSON.stringify(history)}`);
-            
-            var added = history.addStreetToHistory(currentStreet);
-            if (added) {
-                Logger.info(`[${bus.order}] Added street to history: ${JSON.stringify(history)}`);
-            }
-            else {
-                Logger.info(`[${bus.order}] Added street to history (skipped): ${JSON.stringify(history)}`);
-            }
+            history.addStreetToHistory(currentStreet);
             
             let directionState = BusUtils.identifyStateFromMatches(matches, streets);
             Logger.info(`[${bus.order}] State from matches is ${directionState}`);
             
             if (directionState == 0) {
-                Logger.info(`[${bus.order}] Trying to identify from history`);
-                
                 directionState = BusHistoryUtils.identifyStateFromHistory(history, streets);
                 Logger.info(`[${bus.order}] State from history is ${directionState}`);
             }
