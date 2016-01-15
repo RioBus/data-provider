@@ -71,6 +71,13 @@ describe('BusHistoryUtils', () => {
     
     // identifyStateFromHistory
 	
+	it('should preserve the timeline object when trying to identify the state', function(done) {
+        var shortHistory = new BusHistory(['A','X','B']);
+        BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
+        Assert.deepStrictEqual(shortHistory.timeline.length, 3, "Should have preserved the timeline list");
+        done();
+	});
+    
 	it('should not identify the state from a history with one weak item', function(done) {
         var shortHistory = new BusHistory(['A']);
         var state = BusHistoryUtils.identifyStateFromHistory(shortHistory, streets);
@@ -197,32 +204,16 @@ describe('BusHistoryUtils', () => {
     
     // historyForBus
     
-	it('should create an empty history timeline for a new bus', function(done) {
+	it('should create an empty history timeline and then be able to find it', function(done) {
         var history = BusHistoryUtils.historyForBus('A12345');
 		Assert.notEqual(history, undefined);
 		Assert.notEqual(history, null);
         Assert.deepStrictEqual(history.timeline.length, 0, "Timeline for new bus should be empty");
         history.addStreetToHistory('A');
-        Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have the inserted item");
-        Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the inserted item");
         
         var history2 = BusHistoryUtils.historyForBus('A12345');
-		Assert.notEqual(history2, undefined);
-		Assert.notEqual(history2, null);
         Assert.deepStrictEqual(history2.timeline.length, 1, "Timeline should have the inserted item");
         Assert.deepStrictEqual(history2.timeline[0], 'A', "Timeline should have the inserted item");
-        done();
-	});
-    
-	it('should find the history for the previously used bus', function(done) {
-        var history = BusHistoryUtils.historyForBus('A12345');
-		Assert.notEqual(history, undefined);
-		Assert.notEqual(history, null);
-        Assert.deepStrictEqual(history.timeline.length, 1, "Timeline should have one item");
-        Assert.deepStrictEqual(history.timeline[0], 'A', "Timeline should have the old item");
-        history.addStreetToHistory('B');
-        Assert.deepStrictEqual(history.timeline.length, 2, "Timeline should have the new item");
-        Assert.deepStrictEqual(history.timeline[1], 'B', "Timeline should have the new item");
         done();
 	});
     
