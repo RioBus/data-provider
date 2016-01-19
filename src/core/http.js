@@ -3,7 +3,7 @@ const request = require('request-promise');
 
 var optionsObj = {
     method: 'GET',
-    simple: true,
+    simple: false,
     resolveWithFullResponse: true,
     json: true
 }
