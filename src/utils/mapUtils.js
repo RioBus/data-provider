@@ -51,10 +51,9 @@ class MapUtils {
 	}
     
     /**
-     * Receives a coordinates object with latitude and longitude and a callback that will
-     * receive the street name corresponding to the coordinates.
+     * Receives a coordinates object with latitude and longitude and returns
+     * the street name corresponding to the coordinates.
      * @param {object} coordinates - Object containing a latitude and a longitude property
-     * @param {function} callback - Function to be called when the operation is finished
      * @return {Promise}
      */
     static reverseGeocode(coordinates) {
@@ -64,10 +63,9 @@ class MapUtils {
     /**
      * Find the street name using a coordinate using the Open Street Routing Machine API.
      * @param {object} coordinates - Object containing a latitude and a longitude property
-     * @param {function} callback - Function to be called when the operation is finished
      * @return {Promise}
      */
-    static reverseGeocodeOSRM(coordinates, callback) {
+    static reverseGeocodeOSRM(coordinates) {
         var latlng = coordinates.latitude + ',' + coordinates.longitude;
         var url = Config.OSRM.base_url + '/nearest?loc=' + latlng;
         
@@ -78,9 +76,12 @@ class MapUtils {
                     // logger.info(`[${url}] -> 200 OK`);
                     return response.body.name;
                 default:
-                    logger.error(`[${url}] -> ${status} ERROR`);
+                    logger.error(`[${url}] -> ${status} ERROR: ${response.toString()}`);
                     break;
             }
+            return null;
+        }).catch(function (err) {
+            logger.error(`[${url}] -> ERROR: ${err.error.code}`);
             return null;
         });
     }

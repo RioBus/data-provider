@@ -44,7 +44,10 @@ class ItineraryDownloader {
 					break;
 			}
 			return null;
-		});
+		}).catch(function (err) {
+            logger.error(`[${url}] -> ERROR: ${err.error.code}`);
+            return null;
+        });
 	}
 	
     /**
