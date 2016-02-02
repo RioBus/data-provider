@@ -233,10 +233,14 @@ class BusUtils {
         
         let currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
         let currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
+        let history = BusHistoryUtils.historyForBus(bus.order);
         
         // Check if was able to identify current street
         if (!currentStreet) {
             Logger.alert(`[${bus.order}] Current street could not be identified.`);
+            
+            // Use last identified direction
+            bus.sense = BusUtils.prepareDirection(itinerary.description, history.directionState);
             return bus;
         }
         
@@ -246,24 +250,36 @@ class BusUtils {
             Logger.alert(`[${bus.order}] Current street not in itinerary (${currentStreet})`);
         }
         else {
-            var history = BusHistoryUtils.historyForBus(bus.order);
-            var added = history.addStreetToHistory(currentStreet);
+            var timelineModified = history.addStreetToHistory(currentStreet);
             
-            // If the history has been modified, write it to cache
-            if (added) {
-                BusHistoryUtils.writeToCache(bus.order, history);
-                Logger.alert(`[${bus.order}] Wrote bus history to cache`);
-            }
-            
+            // Try to identify from matches
             let directionState = BusUtils.identifyStateFromMatches(matches, streets);
             Logger.info(`[${bus.order}] State from matches is ${directionState}`);
             
+            // If
             if (directionState == 0) {
                 directionState = BusHistoryUtils.identifyStateFromHistory(history, streets);
                 Logger.info(`[${bus.order}] State from history is ${directionState}`);
             }
             
+            // If all methods fail to identify a direction, use last one identified
+            if (directionState == 0) {
+                directionState = history.directionState;
+                Logger.info(`[${bus.order}] State from cache is ${directionState}`);
+            }
+            // If a new direction was identified, update history
+            else if (directionState != history.directionState) {
+                history.directionState = directionState;
+                timelineModified = true;
+            }
+            
             bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
+            
+            // If the history has been modified, write it to cache
+            if (timelineModified) {
+                BusHistoryUtils.writeToCache(bus.order, history);
+                //Logger.alert(`[${bus.order}] Updated bus history cache (timeline or direction updated)`);
+            }
         }
         
         return bus;

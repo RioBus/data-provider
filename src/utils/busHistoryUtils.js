@@ -25,9 +25,14 @@ class BusHistoryUtils {
         if (!history) {
             Logger.info(`[${order}] History for bus ${order} not found. Creating one...`);
             var cachedHistoryJSON = BusHistoryUtils.readFromCache(order);
-            var cachedHistory = (cachedHistoryJSON !== '') ? JSON.parse(cachedHistoryJSON).timeline : [];
-            Logger.info(`[${order}] History for bus ${order} found on cache: ${cachedHistoryJSON}`);
-            history = new BusHistory(cachedHistory);
+            if (cachedHistoryJSON !== '') {
+                var cachedHistory = JSON.parse(cachedHistoryJSON);
+                Logger.info(`[${order}] History for bus ${order} found on cache: ${cachedHistoryJSON}`);
+                history = new BusHistory(cachedHistory.timeline, cachedHistory.directionState);
+            }
+            else {
+                history = new BusHistory();
+            }
             historyArchive[order] = history;
         }
         return history;

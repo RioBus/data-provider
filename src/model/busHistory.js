@@ -8,8 +8,9 @@ var max = Config.historySize;
  * @class {BusHistory}
  */
 class BusHistory {
-    constructor(timeline) {
+    constructor(timeline, directionState) {
         this.timeline = timeline || [];
+        this.directionState = directionState || 0;
     }
     
     addStreetToHistory(street) {
