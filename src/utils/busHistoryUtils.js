@@ -13,14 +13,48 @@ var historyArchive = {};
  * @class {BusHistoryUtils}
  */
 class BusHistoryUtils {
+    /**
+     * Returns a BusHistory for the specified bus order, reading from file cache
+     * or creating a new one if it doesn't exist.
+     * @param {string} order - Bus order code
+     * @return {BusHistory} A BusHistory object for the bus containing previous
+     * timeline if available.
+     */
     static historyForBus(order) {
         var history = historyArchive[order];
         if (!history) {
             Logger.info(`[${order}] History for bus ${order} not found. Creating one...`);
-            history = new BusHistory();
+            var cachedHistoryJSON = BusHistoryUtils.readFromCache(order);
+            var cachedHistory = (cachedHistoryJSON !== '') ? JSON.parse(cachedHistoryJSON).timeline : [];
+            Logger.info(`[${order}] History for bus ${order} found on cache: ${cachedHistoryJSON}`);
+            history = new BusHistory(cachedHistory);
             historyArchive[order] = history;
         }
         return history;
+    }
+    
+    /**
+	 * Reads a bus history data from cache
+	 * @param {string} busOrder - Bus order code
+	 * @return {string}
+	 */
+    static readFromCache(busOrder) {
+        try { return new Cache(busOrder).retrieve(); }
+        catch (e) { return ''; }
+    }
+
+	/**
+	 * Writes a bus history data to cache
+	 * @param {string} busOrder - Bus order code
+	 * @param {string} content - Content to be cached
+	 * @return {void}
+	 */
+    static writeToCache(busOrder, content) {
+        try {
+            new Cache(busOrder).write(JSON.stringify(content));
+        } catch (e) {
+            Logger.error(e.stack);
+        }
     }
     
     /**

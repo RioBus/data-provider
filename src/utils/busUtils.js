@@ -247,7 +247,13 @@ class BusUtils {
         }
         else {
             var history = BusHistoryUtils.historyForBus(bus.order);
-            history.addStreetToHistory(currentStreet);
+            var added = history.addStreetToHistory(currentStreet);
+            
+            // If the history has been modified, write it to cache
+            if (added) {
+                BusHistoryUtils.writeToCache(bus.order, history);
+                Logger.alert(`[${bus.order}] Wrote bus history to cache`);
+            }
             
             let directionState = BusUtils.identifyStateFromMatches(matches, streets);
             Logger.info(`[${bus.order}] State from matches is ${directionState}`);
