@@ -210,11 +210,11 @@ class BusUtils {
         
         // Check if was able to identify current street
         if (!currentStreet) {
-            Logger.alert(`[${bus.order}] Current street could not be identified (${bus.latitude},${bus.longitude}).`);
+            Logger.alert(`[${bus.order}] Current street could not be identified (${bus.latitude},${bus.longitude})`);
             
-            // Use last identified direction
+            // Use the last identified direction
             directionState = history.directionState;
-            Logger.info(`[${bus.order}] Using last state from cache: ${directionState}`);
+            Logger.info(`[${bus.order}] Using last direction from cache: ${directionState}`);
             bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
             return bus;
         }
@@ -224,9 +224,9 @@ class BusUtils {
         if (matches.length == 0) {
             Logger.alert(`[${bus.order}] Current street not in itinerary (${currentStreet})`);
             
-            // Use last identified direction
+            // Use the last identified direction
             directionState = history.directionState;
-            Logger.info(`[${bus.order}] Using last state from cache: ${directionState}`);
+            Logger.info(`[${bus.order}] Using last direction from cache: ${directionState}`);
             bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
         }
         else {
@@ -234,17 +234,20 @@ class BusUtils {
             
             // Try to identify direction matching history to itinerary
             directionState = BusHistoryUtils.identifyStateFromHistory(history, streets);
-            Logger.info(`[${bus.order}] State from history is ${directionState}`);
-            
-            // If all methods fail to identify a direction, use last one identified
-            if (directionState == 0) {
-                directionState = history.directionState;
-                Logger.info(`[${bus.order}] State from cache is ${directionState}`);
+            if (directionState != 0) {
+                Logger.info(`[${bus.order}] Using identified direction from history: ${directionState}`);
+                
+                // If a new direction was identified, set flag to update history
+                if (directionState != history.directionState) {
+                    history.directionState = directionState;
+                    timelineModified = true;
+                }
             }
-            // If a new direction was identified, update history
-            else if (directionState != history.directionState) {
-                history.directionState = directionState;
-                timelineModified = true;
+            // If failed to identify a direction, use the last one identified
+            else {
+                directionState = history.directionState;
+                Logger.alert(`[${bus.order}] Could not identify direction from history`);
+                Logger.info(`[${bus.order}] Using last direction from cache: ${directionState}`);
             }
             
             bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
