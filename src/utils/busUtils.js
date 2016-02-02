@@ -187,34 +187,6 @@ class BusUtils {
         return matchedIndexes;
     }
     
-    /**
-     * Identify direction of the bus from the itinerary matches array.
-     * @param {array} matches - Array of indexes of itinerary matches
-     * @param {array} streets - Array of street objects of the itinerary
-     * @return {number} A number indicating the direction.
-     */
-    static identifyStateFromMatches(matches, streets) {
-        if (!matches || !(matches instanceof Array) || matches.length == 0) return 0;
-        let initialMatch = matches[0];
-        
-        if (!streets[initialMatch].hasOwnProperty('returning')) return 0;
-        let returning = streets[initialMatch].returning;
-        
-        // Check if there are different states
-        for (let i=1; i<matches.length; i++) {
-            var match = matches[i];
-            var matchStreet = streets[match];
-            // If different directions were found
-            if (matchStreet.returning !== returning) {
-                return 0;
-            }
-        }
-        
-        // If it's here, it means all matches are on the same direction
-        if (returning) return -1;
-        else return 1;
-    }
-    
 	/**
 	 * Tries to figure out the direction of the given Bus
 	 * @param {Bus} bus - Bus instance
@@ -234,13 +206,16 @@ class BusUtils {
         let currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
         let currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
         let history = BusHistoryUtils.historyForBus(bus.order);
+        var directionState;
         
         // Check if was able to identify current street
         if (!currentStreet) {
-            Logger.alert(`[${bus.order}] Current street could not be identified.`);
+            Logger.alert(`[${bus.order}] Current street could not be identified (${bus.latitude},${bus.longitude}).`);
             
             // Use last identified direction
-            bus.sense = BusUtils.prepareDirection(itinerary.description, history.directionState);
+            directionState = history.directionState;
+            Logger.info(`[${bus.order}] Using last state from cache: ${directionState}`);
+            bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
             return bus;
         }
         
@@ -248,19 +223,18 @@ class BusUtils {
         let matches = BusUtils.streetInItinerary(currentStreet, streets);
         if (matches.length == 0) {
             Logger.alert(`[${bus.order}] Current street not in itinerary (${currentStreet})`);
+            
+            // Use last identified direction
+            directionState = history.directionState;
+            Logger.info(`[${bus.order}] Using last state from cache: ${directionState}`);
+            bus.sense = BusUtils.prepareDirection(itinerary.description, directionState);
         }
         else {
             var timelineModified = history.addStreetToHistory(currentStreet);
             
-            // Try to identify from matches
-            let directionState = BusUtils.identifyStateFromMatches(matches, streets);
-            Logger.info(`[${bus.order}] State from matches is ${directionState}`);
-            
-            // If
-            if (directionState == 0) {
-                directionState = BusHistoryUtils.identifyStateFromHistory(history, streets);
-                Logger.info(`[${bus.order}] State from history is ${directionState}`);
-            }
+            // Try to identify direction matching history to itinerary
+            directionState = BusHistoryUtils.identifyStateFromHistory(history, streets);
+            Logger.info(`[${bus.order}] State from history is ${directionState}`);
             
             // If all methods fail to identify a direction, use last one identified
             if (directionState == 0) {

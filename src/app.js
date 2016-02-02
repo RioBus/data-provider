@@ -70,8 +70,7 @@ function* iteration() {
     try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
     try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
     
-    logger.info(`${busList.length} found.`);
-    logger.info('Processing...');
+    logger.info(`${busList.length} found. Processing...`);
     
     var commonPendingSave = [], historyPendingSave = [];
     
