@@ -89,30 +89,4 @@ describe('BusUtils', () => {
         done();
 	});
     
-	it('should identify the state as going from a list of 1 match', function(done) {
-		var matches = [2];
-        var state = BusUtils.identifyStateFromMatches(matches, streets);
-		Assert.notEqual(state, undefined);
-		Assert.notEqual(state, null);
-        Assert.deepStrictEqual(state, 1, "Identified the wrong direction");
-        done();
-	});
-    
-	it('should identify the state as going from a list of matches in the same direction', function(done) {
-		var matches = [1,3];
-        var state = BusUtils.identifyStateFromMatches(matches, streets);
-		Assert.notEqual(state, undefined);
-		Assert.notEqual(state, null);
-        Assert.deepStrictEqual(state, 1, "Identified the wrong direction");
-        done();
-	});
-    
-	it('should identify the state as returning from a list of matches in the same direction', function(done) {
-		var matches = [6,8];
-        var state = BusUtils.identifyStateFromMatches(matches, streets);
-		Assert.notEqual(state, undefined);
-		Assert.notEqual(state, null);
-        Assert.deepStrictEqual(state, -1, "Identified the wrong direction");
-        done();
-	});
 });
