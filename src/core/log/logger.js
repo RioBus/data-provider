@@ -1,4 +1,5 @@
 'use strict';
+const colors = require('colors');
 const Config = require('../../config');
 const File = require('../file');
 
@@ -21,7 +22,7 @@ class Logger {
 	 * @return {void}
 	 */
 	alert(content) {
-		this.log(content, 'ALERT');
+		this.log(content, 'ALERT', colors.yellow);
 	}
 	
 	/**
@@ -30,7 +31,7 @@ class Logger {
 	 * @return {void}
 	 */
 	error(content) {
-		this.log(content, 'ERROR');
+		this.log(content, 'ERROR', colors.red);
 	}
 	
 	/**
@@ -39,7 +40,7 @@ class Logger {
 	 * @return {void}
 	 */
 	fatal(content) {
-		this.log(content, 'FATAL');
+		this.log(content, 'FATAL', colors.red);
 	}
 	
 	/**
@@ -53,14 +54,15 @@ class Logger {
 	
 	/**
 	 * Displays an custom level log
-	 * @param {string} content - Log message
+	 * @param {string} content - Log messagea
 	 * @param {string} level - Log level (Optional)
 	 * @return {void}
 	 */
-	log(content, level) {
+	log(content, level, color) {
 		if(!level) level = 'INFO';
 		var text = `[${new Date().toISOString()}] (${level}) ${content}`;
-		console.log(text);
+		if (color) console.log(color(text));
+        else console.log(text);
 		this.fs.append(text);
 	}
 }

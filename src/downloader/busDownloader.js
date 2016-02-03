@@ -29,7 +29,7 @@ class BusDownloader {
                         return BusDownloader.parseBody(response.body);
                         break;
                     default:
-                        logger.info(`[${url}] -> ${status} ERROR`);
+                        logger.error(`[${url}] -> ${status} ERROR`);
                         break;
                 }
                 return [];
