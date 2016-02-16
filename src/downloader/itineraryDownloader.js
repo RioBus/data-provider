@@ -41,13 +41,11 @@ class ItineraryDownloader {
 					break;
 				default:
 					logger.info(`[${url}] -> ${status} ERROR`);
+                    throw response;
 					break;
 			}
 			return null;
-		}).catch(function (err) {
-            logger.error(`[${url}] -> ERROR: ${err.error.code}`);
-            return null;
-        });
+		});
 	}
 	
     /**
