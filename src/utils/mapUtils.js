@@ -5,6 +5,8 @@ const Http     = Core.Http;
 
 const logger   = Core.LoggerFactory.getRuntimeLogger();
 
+var reverseGeocodeCache = {};
+
 /**
  * Map helper functions
  * @class {MapUtils}
@@ -67,6 +69,14 @@ class MapUtils {
      */
     static reverseGeocodeOSRM(coordinates) {
         var latlng = coordinates.latitude + ',' + coordinates.longitude;
+        
+        var streetFromCache = this.loadReverseGeocodeFromCache(latlng);
+        if (streetFromCache) {
+            return Promise.resolve(streetFromCache).then( (value) => {
+                return value;
+            });
+        }
+        
         var url = Config.OSRM.base_url + '/nearest?loc=' + latlng;
         
         return Http.get(url).then( (response) => {
@@ -74,7 +84,9 @@ class MapUtils {
             switch(status) {
                 case 200:
                     // logger.info(`[${url}] -> 200 OK`);
-                    return response.body.name;
+                    var streetName = response.body.name;
+                    this.addReverseGeocodeToCache(latlng, streetName);
+                    return streetName;
                 default:
                     logger.error(`[${url}] -> ${status} ERROR: ${response.toString()}`);
                     break;
@@ -84,6 +96,18 @@ class MapUtils {
             logger.error(`[${url}] -> ERROR: ${err.error.code}`);
             return null;
         });
+    }
+    
+    static loadReverseGeocodeFromCache(latlng) {
+        // let value = reverseGeocodeCache[latlng];
+        // if (value) console.log('Cache hit');
+        // return value;
+        return reverseGeocodeCache[latlng];
+    }
+    
+    static addReverseGeocodeToCache(latlng, streetName) {
+        reverseGeocodeCache[latlng] = streetName;
+        // console.log('Cache miss. Cache size: ' + Object.keys(reverseGeocodeCache).length);
     }
 }
 module.exports = MapUtils;
