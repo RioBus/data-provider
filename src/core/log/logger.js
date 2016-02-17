@@ -54,8 +54,9 @@ class Logger {
 	
 	/**
 	 * Displays an custom level log
-	 * @param {string} content - Log messagea
+	 * @param {string} content - Log message
 	 * @param {string} level - Log level (Optional)
+	 * @param {color} color - Color of the log message (Optional)
 	 * @return {void}
 	 */
 	log(content, level, color) {
