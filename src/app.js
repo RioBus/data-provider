@@ -84,10 +84,12 @@ function* iteration() {
             if(tmp.timestamp.getTime()!==bus.timestamp.getTime()) {
                 // Bus has different timestamp from the one cached
                 bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
-                logger.info(`[${bus.order}] Updated direction: ${bus.sense}`);
+                // logger.info(`[${bus.order}] Updated direction: ${bus.sense}`);
                 
                 // Add to pending history updates
                 historyPendingSave.push(bus);
+                
+                // Update cached object from search collection and save it
                 tmp.timestamp = bus.timestamp;
                 tmp.latitude = bus.latitude;
                 tmp.longitude = bus.longitude;
@@ -100,7 +102,7 @@ function* iteration() {
                 }
                 
                 try {
-                    // Update current database
+                    // Update current collection
                     yield tmp.save();
                 } catch (e) {
                     logger.error(e.stack);
@@ -110,7 +112,7 @@ function* iteration() {
         // If the bus is not cached, find its direction and add it to a list to be saved.
         else {
             bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
-            logger.info(`[${bus.order}] Direction: ${bus.sense}`);
+            // logger.info(`[${bus.order}] Direction: ${bus.sense}`);
             
             commonPendingSave.push(bus);
             historyPendingSave.push(bus);
