@@ -56,7 +56,7 @@ function* loadItinerary(line) {
                 logger.error(`[${line}] Access forbidden to the Itinerary data.`);
             else logger.error(e.stack);
             
-            tmpItinerary = new Itinerary(line, 'desconhecido', '', '', []);
+            tmpItinerary = new Itinerary(line);
             yield itineraryDAO.save(tmpItinerary);
             itineraries[line] = tmpItinerary;
         }
