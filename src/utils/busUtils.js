@@ -204,7 +204,7 @@ class BusUtils {
         }
         
         let currentCoordinates = { latitude: bus.latitude, longitude: bus.longitude };
-        let currentStreet = yield MapUtils.reverseGeocode(currentCoordinates);
+        let currentStreet = yield MapUtils.streetNameFromCoordinates(currentCoordinates);
         let history = BusHistoryUtils.historyForBus(bus.order);
         var directionState;
         

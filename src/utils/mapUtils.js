@@ -58,7 +58,7 @@ class MapUtils {
      * @param {object} coordinates - Object containing a latitude and a longitude property
      * @return {Promise}
      */
-    static reverseGeocode(coordinates) {
+    static streetNameFromCoordinates(coordinates) {
         return MapUtils.reverseGeocodeOSRM(coordinates);
     }
 
