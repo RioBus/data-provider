@@ -2,6 +2,7 @@
 const Core = require('../core');
 const Http = Core.Http;
 const Itinerary = require('../model/itinerary');
+const ItinerarySpot = require('../model/itinerarySpot');
 const LoggerFactory = Core.LoggerFactory;
 const Spot = require('../model/spot');
 const Strings = require('../strings');
@@ -81,7 +82,7 @@ class ItineraryDownloader {
             var finalDescription = it[1].split("-");
             finalDescription.shift();
             description = finalDescription.join("-");
-            spots.push(new Spot(parseFloat(it[5]), parseFloat(it[6]), returning));
+            spots.push(new ItinerarySpot(parseFloat(it[5]), parseFloat(it[6]), returning));
             
             i++;
         });
