@@ -82,13 +82,13 @@ function* iteration() {
         // If the same bus is already cached, update it's cached information and write to database
         if(busesCache[bus.order]) {
             var tmp = busesCache[bus.order];
-            if(tmp.timestamp.getTime()!==bus.timestamp.getTime()) {
+            if(tmp.timestamp.getTime() !== bus.timestamp.getTime()) {
                 // Bus has different timestamp from the one cached
                 bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
                 // logger.info(`[${bus.order}] Updated direction: ${bus.sense}`);
                 
                 // Add to pending history updates
-                historyPendingSave.push(bus);
+                if(!Config.ignoreHistoryCollection) historyPendingSave.push(bus);
                 
                 // Update cached object from search collection and save it
                 tmp.timestamp = bus.timestamp;
@@ -117,25 +117,25 @@ function* iteration() {
             // logger.info(`[${bus.order}] Direction: ${bus.sense}`);
             
             commonPendingSave.push(bus);
-            historyPendingSave.push(bus);
+            if(!Config.ignoreHistoryCollection) historyPendingSave.push(bus);
         }
     }
     
     try {
         // Push new data to database
-        if(commonPendingSave.length>0) {
+        if(commonPendingSave.length > 0) {
             logger.info('Saving data...');
             yield busDAO.commonSave(commonPendingSave);
         }
         logger.info(`Updated ${commonUpdatedCount} and added ${commonPendingSave.length} docs to search collection.`);
         
-        if(historyPendingSave.length>0) {
+        if(historyPendingSave.length > 0) {
             yield busDAO.historySave(historyPendingSave);
             logger.info(`Added ${historyPendingSave.length} docs to history collection.`);
         } else logger.info('There was no new data to store in history.');
         
         // If there is new data, refresh cache to load the stored object.
-        if(commonPendingSave.length>0 || historyPendingSave.length>0) {
+        if(commonPendingSave.length > 0 || historyPendingSave.length > 0) {
             busesCache = prepareBuses(yield busDAO.getAll());
         }
     } catch (e) {
@@ -147,6 +147,7 @@ function* iteration() {
 
 spawn(function*(){
     logger.info('Starting the server...');
+    if(Config.ignoreHistoryCollection) logger.info('Saving to history collection is disabled.');
     db = yield Database.connect();
     busDAO = new BusDAO(db);
     itineraryDAO = new ItineraryDAO(db);

@@ -18,7 +18,7 @@ class BusHistory {
         if (this.timeline[this.timeline.length-1] === street) return false;
         
         this.timeline.push(street);
-        if (this.timeline.length>max) {
+        if (this.timeline.length > max) {
             while (this.timeline.length > max) this.timeline.shift();
         }
         

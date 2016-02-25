@@ -7,6 +7,7 @@ module.exports = {
     root: __dirname,
     cache: '/tmp/riobus/cache',
     historySize: 10,
+    ignoreHistoryCollection: process.env.RIOBUS_IGNORE_HISTORY_COLLECTION || false,
     logs: {
         runtime: '/tmp/riobus/log/runtime.log',
         server: '/tmp/riobus/log/server.log'
