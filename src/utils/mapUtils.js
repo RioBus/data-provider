@@ -77,7 +77,8 @@ class MapUtils {
             });
         }
         
-        var url = Config.OSRM.base_url + '/nearest?loc=' + latlng;
+        var OSRM = Config.OSRM;
+        var url = `http://${OSRM.host}:${OSRM.port}/nearest?loc=${latlng}`;
         
         return Http.get(url).then( (response) => {
             const status = response.statusCode;

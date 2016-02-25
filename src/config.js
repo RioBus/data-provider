@@ -31,6 +31,7 @@ module.exports = {
         pass: process.env.RIOBUS_DB_PASS    || ''
     },
     OSRM: {
-        base_url: process.env.RIOBUS_OSRM_BASE_URL || 'http://146.164.16.5:5000'
+        host: process.env.RIOBUS_OSRM_HOST   || 'localhost',
+        port: process.env.RIOBUS_OSRM_PORT   || 5000
     }
 };
