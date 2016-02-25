@@ -73,6 +73,7 @@ function* iteration() {
     logger.info(`${busList.length} found. Processing...`);
     
     var commonPendingSave = [], historyPendingSave = [];
+    var commonUpdatedCount = 0;
     
     for (var bus of busList) {
         if(bus.line==='indefinido') continue;
@@ -104,6 +105,7 @@ function* iteration() {
                 try {
                     // Update current collection
                     yield tmp.save();
+                    commonUpdatedCount++;
                 } catch (e) {
                     logger.error(e.stack);
                 }
@@ -124,12 +126,12 @@ function* iteration() {
         if(commonPendingSave.length>0) {
             logger.info('Saving data...');
             yield busDAO.commonSave(commonPendingSave);
-            logger.info(`Saved ${commonPendingSave.length} docs to search collection.`);
-        } else logger.info('There was no new data to store.');
+        }
+        logger.info(`Updated ${commonUpdatedCount} and added ${commonPendingSave.length} docs to search collection.`);
         
         if(historyPendingSave.length>0) {
             yield busDAO.historySave(historyPendingSave);
-            logger.info(`Saved ${historyPendingSave.length} docs to history collection.`);
+            logger.info(`Added ${historyPendingSave.length} docs to history collection.`);
         } else logger.info('There was no new data to store in history.');
         
         // If there is new data, refresh cache to load the stored object.
