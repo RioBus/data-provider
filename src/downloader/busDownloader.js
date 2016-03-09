@@ -29,10 +29,13 @@ class BusDownloader {
                         return BusDownloader.parseBody(response.body);
                         break;
                     default:
-                        logger.info(`[${url}] -> ${status} ERROR`);
+                        logger.error(`[${url}] -> ${status} ERROR`);
                         break;
                 }
                 return [];
+        }).catch(function (err) {
+            logger.error(`[${url}] -> ERROR: ${err.code}`);
+            return [];
         });
     }
 	
