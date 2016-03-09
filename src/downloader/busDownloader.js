@@ -34,7 +34,7 @@ class BusDownloader {
                 }
                 return [];
         }).catch(function (err) {
-            logger.error(`[${url}] -> ERROR: ${err.error.code}`);
+            logger.error(`[${url}] -> ERROR: ${err.code}`);
             return [];
         });
     }
