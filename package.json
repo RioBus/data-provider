@@ -1,6 +1,6 @@
 {
   "name": "data-provider",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "RioBus data-provider application",
   "main": "src/app.js",
   "scripts": {
