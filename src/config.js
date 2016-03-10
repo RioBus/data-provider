@@ -7,6 +7,7 @@ module.exports = {
     root: __dirname,
     cache: '/tmp/riobus/cache',
     historySize: 10,
+    ignoreHistoryCollection: process.env.RIOBUS_IGNORE_HISTORY_COLLECTION || false,
     logs: {
         runtime: '/tmp/riobus/log/runtime.log',
         server: '/tmp/riobus/log/server.log'
@@ -29,5 +30,9 @@ module.exports = {
         port: process.env.RIOBUS_DB_PORT    || 27017,
         user: process.env.RIOBUS_DB_USER    || '',
         pass: process.env.RIOBUS_DB_PASS    || ''
+    },
+    OSRM: {
+        host: process.env.RIOBUS_OSRM_HOST   || 'localhost',
+        port: process.env.RIOBUS_OSRM_PORT   || 5000
     }
 };

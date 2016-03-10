@@ -22,14 +22,18 @@ describe('BusDownloader', () => {
 		Assert.notEqual(list, undefined);
 		Assert.notEqual(list, null);
 		Assert(list instanceof Array);
-		Assert(list[0] instanceof Bus);
+		for (let element of list) {
+			Assert(element instanceof Bus, "Downloaded element should be of type Bus");
+		}
 	});
 	
 	it('should download the current BRT buses states', function*() {
-		var data = yield BusDownloader.fromURL(urlBRT);
-		Assert.notEqual(data, undefined);
-		Assert.notEqual(data, null);
-		Assert(data instanceof Array);
-		Assert(data[0] instanceof Bus);
+		list = yield BusDownloader.fromURL(urlBRT);
+		Assert.notEqual(list, undefined);
+		Assert.notEqual(list, null);
+		Assert(list instanceof Array);
+		for (let element of list) {
+			Assert(element instanceof Bus, "Downloaded element should be of type Bus");
+		}
 	});
 });

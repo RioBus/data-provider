@@ -17,7 +17,7 @@ const provider = Config.provider;
 const timeout = provider.updateInterval;
 const MainProcess = process;
 
-var db, itineraries, buses, busDAO, itineraryDAO;
+var db, itineraries, busesCache, busDAO, itineraryDAO;
 
 function getURL(bustype) {
     return `http://${provider.host}${provider.path.bus[bustype.toUpperCase()]}`;
@@ -39,96 +39,120 @@ function prepareItineraries(itiList) {
     return itineraries;
 }
 
+function* loadItinerary(line) {
+    var tmpItinerary = itineraries[line];
+    if(!tmpItinerary) {
+        logger.alert(`[${line}] Itinerary not found. Downloading...`);
+        try {
+            tmpItinerary = yield ItineraryDownloader.fromLine(line);
+            logger.info(`[${line}] Saving Itinerary to database...`);
+            yield itineraryDAO.save(tmpItinerary);
+            logger.info(`[${line}] Itinerary saved.`);
+            itineraries[line] = tmpItinerary;
+        } catch(e) {
+            if(e.statusCode===404) 
+                logger.error(`[${line}] Itinerary does not exist.`);
+            else if(e.statusCode===403)
+                logger.error(`[${line}] Access forbidden to the Itinerary data.`);
+            else logger.error(e.stack);
+            
+            tmpItinerary = new Itinerary(line);
+            yield itineraryDAO.save(tmpItinerary);
+            itineraries[line] = tmpItinerary;
+        }
+    }
+    return tmpItinerary;
+}
+
 function* iteration() {
     logger.info('Downloading bus states...');
     var busList = [];
     try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
     try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
     
-    logger.info(`${busList.length} found.`);
-    logger.info('Processing...');
+    logger.info(`${busList.length} found. Processing...`);
     
-    var commonList = [], historyList = [], countSearch = 0, countHistory = 0;
+    var commonPendingSave = [], historyPendingSave = [];
+    var commonUpdatedCount = 0;
     
     for (var bus of busList) {
         if(bus.line==='indefinido') continue;
-        var tmpItinerary = itineraries[bus.line];
-        if(!tmpItinerary) {
-            logger.alert(`[${bus.line}] Itinerary not found. Downloading...`);
-            try {
-                tmpItinerary = yield ItineraryDownloader.fromLine(bus.line);
-                logger.info(`[${bus.line}] Saving Itinerary to database...`);
-                yield itineraryDAO.save(tmpItinerary);
-                logger.info(`[${bus.line}] Itinerary saved.`);
-                itineraries[bus.line] = tmpItinerary;
-            } catch(e) {
-                if(e.statusCode===404) 
-                    logger.error(`[${bus.line}] Itinerary does not exist.`);
-                else if(e.statusCode===403)
-                    logger.error(`[${bus.line}] Access forbidden to the Itinerary data.`);
-                else logger.error(e.stack);
+        var tmpItinerary = yield loadItinerary(bus.line);
+        
+        // If the same bus is already cached, update it's cached information and write to database
+        if(busesCache[bus.order]) {
+            var tmp = busesCache[bus.order];
+            if(tmp.timestamp.getTime() !== bus.timestamp.getTime()) {
+                // Bus has different timestamp from the one cached
+                bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
+                // logger.info(`[${bus.order}] Updated direction: ${bus.sense}`);
                 
-                tmpItinerary = new Itinerary(bus.line, 'desconhecido', '', '', []);
-                yield itineraryDAO.save(tmpItinerary);
-                itineraries[bus.line] = tmpItinerary;
-            }
-        }
-        bus = BusUtils.identifySense(bus, tmpItinerary.spots[0], tmpItinerary.description);
-        if(buses[bus.order]) {
-            var tmp = buses[bus.order];
-            if(tmp.timestamp!==bus.timestamp) {
-                historyList.push(bus);
-                countHistory++;
+                // Add to pending history updates
+                if(!Config.ignoreHistoryCollection) historyPendingSave.push(bus);
+                
+                // Update cached object from search collection and save it
                 tmp.timestamp = bus.timestamp;
                 tmp.latitude = bus.latitude;
                 tmp.longitude = bus.longitude;
                 tmp.speed = bus.speed;
                 tmp.direction = bus.direction;
+                tmp.sense = bus.sense;
                 if(tmp.line!==bus.line) {
                     logger.info(`[${bus.order}] ${tmp.line} -> ${bus.line}`);
                     tmp.line = bus.line;
                 }
-                tmp = BusUtils.identifySense(tmp, tmpItinerary.spots[0], tmpItinerary.description);
+                
                 try {
+                    // Update current collection
                     yield tmp.save();
-                    countSearch++;
+                    commonUpdatedCount++;
                 } catch (e) {
                     logger.error(e.stack);
                 }
             }
-        } else {
-            commonList.push(bus);
-            historyList.push(bus);
-            countSearch++;
-            countHistory++;
         }
-    };
+        // If the bus is not cached, find its direction and add it to a list to be saved.
+        else {
+            bus = yield BusUtils.identifyDirection(bus, tmpItinerary);
+            // logger.info(`[${bus.order}] Direction: ${bus.sense}`);
+            
+            commonPendingSave.push(bus);
+            if(!Config.ignoreHistoryCollection) historyPendingSave.push(bus);
+        }
+    }
     
     try {
-        if(commonList.length>0) {
+        // Push new data to database
+        if(commonPendingSave.length > 0) {
             logger.info('Saving data...');
-            yield busDAO.commonSave(commonList);
-            logger.info(`Saved ${countSearch} docs to search collection.`);
-        } else logger.info('There were no new data to store.');
+            yield busDAO.commonSave(commonPendingSave);
+        }
+        logger.info(`Updated ${commonUpdatedCount} and added ${commonPendingSave.length} docs to search collection.`);
         
-        if(historyList.length>0) {
-            yield busDAO.historySave(historyList);
-            logger.info(`Saved ${countSearch} docs to history collection.`);
-        } else logger.info('There were no new data to store in history.');
+        if(historyPendingSave.length > 0) {
+            yield busDAO.historySave(historyPendingSave);
+            logger.info(`Added ${historyPendingSave.length} docs to history collection.`);
+        } else logger.info('There was no new data to store in history.');
+        
+        // If there is new data, refresh cache to load the stored object.
+        if(commonPendingSave.length > 0 || historyPendingSave.length > 0) {
+            busesCache = prepareBuses(yield busDAO.getAll());
+        }
     } catch (e) {
         logger.error(e);
     }
-    buses = prepareBuses(yield busDAO.getAll());
+    
     setTimeout(() => { spawn(iteration); }, timeout);
 }
 
 spawn(function*(){
     logger.info('Starting the server...');
+    if(Config.ignoreHistoryCollection) logger.info('Saving to history collection is disabled.');
     db = yield Database.connect();
     busDAO = new BusDAO(db);
     itineraryDAO = new ItineraryDAO(db);
     logger.info('Loading buses...');
-    buses = prepareBuses(yield busDAO.getAll());
+    busesCache = prepareBuses(yield busDAO.getAll());
     logger.info('Loading itineraries...');
     itineraries = prepareItineraries(yield itineraryDAO.getAll());
     logger.info(`Itineraries retrieved: ${Object.keys(itineraries).length}`);

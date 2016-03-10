@@ -2,6 +2,7 @@
 const Core = require('../core');
 const Http = Core.Http;
 const Itinerary = require('../model/itinerary');
+const ItinerarySpot = require('../model/itinerarySpot');
 const LoggerFactory = Core.LoggerFactory;
 const Spot = require('../model/spot');
 const Strings = require('../strings');
@@ -41,6 +42,7 @@ class ItineraryDownloader {
 					break;
 				default:
 					logger.info(`[${url}] -> ${status} ERROR`);
+                    throw response;
 					break;
 			}
 			return null;
@@ -53,13 +55,15 @@ class ItineraryDownloader {
      * @return {Itinerary}
      */
 	static parseBody(data) {
-        var description, line, agency, keywords;
+        var description, line, agency, keywords, seq, returning;
+        var i = 0;
         var spots = [];
          
         var body = data.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
         body.shift(); // Removes the CSV header line with column names
         // columns: ["linha", "descricao", "agencia", "sequencia", "shape_id", "latitude", "longitude"]
         
+        returning = false;
         body.forEach( (iti)=>{
             if(iti.length<=0) return;
             var it = iti.split(",");
@@ -68,11 +72,19 @@ class ItineraryDownloader {
             if(description===undefined) description = it[1];
             if(line===undefined)        line = it[0];
             
+            seq = it[3];
+            // If the spot's sequential number is 0 and it's not the first one, the next coordinates are returning.
+            if (seq == 0 && i != 0) {
+                returning = true;
+            }
+            
             // Transforming the external data into an application's known
             var finalDescription = it[1].split("-");
             finalDescription.shift();
             description = finalDescription.join("-");
-            spots.push(new Spot(parseFloat(it[5]), parseFloat(it[6])));
+            spots.push(new ItinerarySpot(parseFloat(it[5]), parseFloat(it[6]), returning));
+            
+            i++;
         });
         var consortium = ItineraryDownloader.identifyConsortium(line);
         keywords = [line.toString(), agency.toString(), consortium].concat(description.split(" X ")).join(",");
