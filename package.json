@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test/* test/**/* --timeout 20000",
     "start": "node src/app.js",
-    "install": "npm install -g mocha-co"
+    "install": "npm install -g mocha-co@1.17.1-co.1"
   },
   "compiler": "commonjs",
   "repository": {
@@ -32,6 +32,7 @@
   "dependencies": {
     "body-parser": "^1.14.1",
     "co": "^4.6.0",
+    "colors": "^1.1.2",
     "compression": "^1.5.2",
     "express": "^4.13.3",
     "fs-extra": "^0.26.0",
@@ -40,8 +41,5 @@
     "mongodb": "^1.4.4",
     "request-promise": "^1.0.2",
     "robe": "^0.12.0"
-  },
-  "devDependencies": {
-    "mocha-co": "^1.17.1-co.1"
   }
 }
