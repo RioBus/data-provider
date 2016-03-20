@@ -37,7 +37,6 @@ class MapUtils {
                 case 200:
                     // logger.info(`[${url}] -> 200 OK`);
                     var streetName = response.body.name;
-                    this.addReverseGeocodeToCache(latlng, streetName);
                     return streetName;
                 default:
                     logger.error(`[${url}] -> ${status} ERROR: ${response.toString()}`);
@@ -45,7 +44,7 @@ class MapUtils {
             }
             return null;
         }).catch(function (err) {
-            logger.error(`[${url}] -> ERROR: ${err.code}`);
+            logger.error(`[${url}] -> ERROR: ${err.toString()}`);
             return null;
         });
     }

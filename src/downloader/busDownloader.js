@@ -27,14 +27,13 @@ class BusDownloader {
                     case 200:
                         logger.info(`[${url}] -> 200 OK`);
                         return BusDownloader.parseBody(response.body);
-                        break;
                     default:
                         logger.error(`[${url}] -> ${status} ERROR`);
                         break;
                 }
                 return [];
         }).catch(function (err) {
-            logger.error(`[${url}] -> ERROR: ${err.code}`);
+            logger.error(`[${url}] -> ERROR: ${err.statusCode}`);
             return [];
         });
     }

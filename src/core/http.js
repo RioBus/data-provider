@@ -6,7 +6,8 @@ var optionsObj = {
     simple: true,
     resolveWithFullResponse: true,
     json: true
-}
+};
+
 /**
  * Creates a new synchronized HttpRequest
  * @class {Http}
@@ -34,7 +35,10 @@ class Http {
      * @returns {Promise}
      */
     static get(host, data, headers) {
-        return Http.request({ uri: host, body: data || {}, headers: headers || {} });
+        let obj = { uri: host };
+        if(data) obj.body = data;
+        if(headers) obj.headers = headers;
+        return Http.request(obj);
     }
 
     /**
