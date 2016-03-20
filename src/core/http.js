@@ -6,7 +6,8 @@ var optionsObj = {
     simple: true,
     resolveWithFullResponse: true,
     json: true
-}
+};
+
 /**
  * Creates a new synchronized HttpRequest
  * @class {Http}
