@@ -22,18 +22,14 @@ class BusDownloader {
      */
     static fromURL(url) {
         return Http.get(url).then( (response) => {
-            const status = response.statusCode;
-                switch(status) {
-                    case 200:
-                        logger.info(`[${url}] -> 200 OK`);
-                        return BusDownloader.parseBody(response.body);
-                    default:
-                        logger.error(`[${url}] -> ${status} ERROR`);
-                        break;
-                }
-                return [];
+            logger.info(`[${url}] -> 200 OK`);
+            return BusDownloader.parseBody(response.body);
         }).catch(function (err) {
-            logger.error(`[${url}] -> ERROR: ${err.statusCode}`);
+            if (err.name == 'StatusCodeError') {
+                logger.error(`[${url}] -> ${err.statusCode} ERROR`);
+            } else {
+                logger.error(`[${url}] -> ERROR: ${JSON.stringify(err)}`);
+            }
             return [];
         });
     }
