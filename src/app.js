@@ -64,10 +64,21 @@ function* loadItinerary(line) {
     return tmpItinerary;
 }
 
+function concatBusList(a, b) {
+    for(let i=0; i<a.length; i++) {
+        for(let j=0; j<b.length; j++) {
+            if( ( a[i].order === b[j].order ) && ( parseFloat(b[j].timestamp.getTime()) > parseFloat(a[i].timestamp.getTime()) ) )
+                a[i] = b[j];
+        }
+    }
+    return a;
+}
+
 function* iteration() {
     logger.info('Downloading bus states...');
     var busList = [];
     try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
+    try { busList = concatBusList(busList, yield BusDownloader.fromURL(getURL('REGULAR-NEW'))); } catch(e) { logger.error(`[${getURL('REGULAR-NEW')}] -> ${e.statusCode} ERROR`); }
     try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
     
     logger.info(`${busList.length} found. Processing...`);
