@@ -16,12 +16,14 @@ module.exports = {
         host: 'dadosabertos.rio.rj.gov.br',
         path: {
             bus: {
-                'REGULAR': '/apitransporte/apresentacao/rest/index.cfm/onibus2',
+                'REGULAR': '/apitransporte/apresentacao/rest/index.cfm/onibus',
+                'REGULAR-NEW': '/apitransporte/apresentacao/rest/index.cfm/onibus2',
                 'BRT': '/apitransporte/apresentacao/rest/index.cfm/brt'
             },
             itinerary: '/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv'
         },
         updateInterval:	5000,
+        updateTimeout: 10000,
         log: '/tmp/riobus/log/data-server.log'
     },
     database: {

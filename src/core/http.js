@@ -34,10 +34,10 @@ class Http {
      * @param {Object} headers - Headers to be set (Optional)
      * @returns {Promise}
      */
-    static get(host, data, headers) {
+    static get(host, headers, timeout) {
         let obj = { uri: host };
-        if(data) obj.body = data;
         if(headers) obj.headers = headers;
+        if(timeout) obj.timeout = timeout;
         return Http.request(obj);
     }
 
