@@ -20,8 +20,8 @@ class BusDownloader {
      * @param {string} url - External provider service address
      * @return {Promise}
      */
-    static fromURL(url) {
-        return Http.get(url).then( (response) => {
+    static fromURL(url, timeout) {
+        return Http.get(url, undefined, timeout).then( (response) => {
             logger.info(`[${url}] -> 200 OK`);
             return BusDownloader.parseBody(response.body);
         }).catch(function (err) {
