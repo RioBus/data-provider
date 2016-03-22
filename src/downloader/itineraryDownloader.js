@@ -21,7 +21,7 @@ class ItineraryDownloader {
      * @param {string} line - Bus line
      * @return {Promise}
      */
-	static fromLine(line) {
+	static fromLine(line, timeout) {
 		let urlConfig = Config.provider;
 		var url = `http://${urlConfig.host}${urlConfig.path.itinerary.replace('$$', line)}`;
 		return ItineraryDownloader.fromURL(url);
@@ -32,20 +32,17 @@ class ItineraryDownloader {
      * @param {string} url - External provider service address
      * @return {Promise}
      */
-	static fromURL(url) {
-		return Http.get(url).then( (response) => {
+	static fromURL(url, timeout) {
+		return Http.get(url, undefined, timeout).then( (response) => {
 			const status = response.statusCode;
 			switch(status) {
 				case 200:
 					logger.info(`[${url}] -> 200 OK`);
 					return ItineraryDownloader.parseBody(response.body);
-					break;
 				default:
 					logger.info(`[${url}] -> ${status} ERROR`);
                     throw response;
-					break;
 			}
-			return null;
 		});
 	}
 	

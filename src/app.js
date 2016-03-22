@@ -44,7 +44,7 @@ function* loadItinerary(line) {
     if(!tmpItinerary) {
         logger.alert(`[${line}] Itinerary not found. Downloading...`);
         try {
-            tmpItinerary = yield ItineraryDownloader.fromLine(line);
+            tmpItinerary = yield ItineraryDownloader.fromLine(line, Config.provider.updateTimeout);
             logger.info(`[${line}] Saving Itinerary to database...`);
             yield itineraryDAO.save(tmpItinerary);
             logger.info(`[${line}] Itinerary saved.`);
@@ -77,9 +77,9 @@ function concatBusList(a, b) {
 function* iteration() {
     logger.info('Downloading bus states...');
     var busList = [];
-    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR'))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
-    try { busList = concatBusList(busList, yield BusDownloader.fromURL(getURL('REGULAR-NEW'))); } catch(e) { logger.error(`[${getURL('REGULAR-NEW')}] -> ${e.statusCode} ERROR`); }
-    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT'))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
+    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR', Config.provider.updateTimeout))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
+    try { busList = concatBusList(busList, yield BusDownloader.fromURL(getURL('REGULAR-NEW', Config.provider.updateTimeout))); } catch(e) { logger.error(`[${getURL('REGULAR-NEW')}] -> ${e.statusCode} ERROR`); }
+    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT', Config.provider.updateTimeout))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
     
     logger.info(`${busList.length} found. Processing...`);
     
