@@ -24,7 +24,7 @@ class ItineraryDownloader {
 	static fromLine(line, timeout) {
 		let urlConfig = Config.provider;
 		var url = `http://${urlConfig.host}${urlConfig.path.itinerary.replace('$$', line)}`;
-		return ItineraryDownloader.fromURL(url);
+		return ItineraryDownloader.fromURL(url, timeout, line);
 	}
     
 	
@@ -33,22 +33,23 @@ class ItineraryDownloader {
      * @param {string} url - External provider service address
      * @return {Promise}
      */
-    static fromURL(url, timeout) {
+    static fromURL(url, timeout, line) {
         return Http.get(url, undefined, timeout).catch(function (error) {
-            error.body = [];
+            error.body = '';
             return error;
         }).then( (response) => {
             logger.info(`[${url}] -> ${response.statusCode || response.code}`);
-            return ItineraryDownloader.parseBody(response.body);
+            return ItineraryDownloader.parseBody(line, response.body);
         });
     }
 	
     /**
      * Preprocesses the request's output body 
+     * @param {string} lineQuery - Requested line 
      * @param {string} data - Request body
      * @return {Itinerary}
      */
-	static parseBody(data) {
+	static parseBody(lineQuery, data) {
         var description, line, agency, keywords, seq, returning;
         var i = 0;
         var spots = [];
@@ -56,6 +57,7 @@ class ItineraryDownloader {
         var body = data.toString().replace(/\r/g, "").replace(/\"/g, "").split("\n");
         body.shift(); // Removes the CSV header line with column names
         // columns: ["linha", "descricao", "agencia", "sequencia", "shape_id", "latitude", "longitude"]
+        if (body.length===0) return new Itinerary(lineQuery);
         
         returning = false;
         body.forEach( (iti)=>{
