@@ -21,16 +21,15 @@ class BusDownloader {
      * @return {Promise}
      */
     static fromURL(url, timeout) {
-        return Http.get(url, undefined, timeout).then( (response) => {
+        let p = Http.get(url, undefined, timeout);
+        p.catch(function (error) {
+            if(error.statusCode===404) logger.error(`[${url}] -> ${error.statusCode} ${error.name}: ${error.statusCode}`);
+            else logger.error(`[${url}] -> ${error.statusCode} ${error.name}: ${error.code}`);
+            return [];
+        });
+        return p.then( (response) => {
             logger.info(`[${url}] -> 200 OK`);
             return BusDownloader.parseBody(response.body);
-        }).catch(function (err) {
-            if (err.name == 'StatusCodeError') {
-                logger.error(`[${url}] -> ${err.statusCode} ERROR`);
-            } else {
-                logger.error(`[${url}] -> ERROR: ${JSON.stringify(err)}`);
-            }
-            return [];
         });
     }
 	

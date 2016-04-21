@@ -26,25 +26,25 @@ class ItineraryDownloader {
 		var url = `http://${urlConfig.host}${urlConfig.path.itinerary.replace('$$', line)}`;
 		return ItineraryDownloader.fromURL(url);
 	}
+    
 	
     /**
      * Downloads the data from the URL
      * @param {string} url - External provider service address
      * @return {Promise}
      */
-	static fromURL(url, timeout) {
-		return Http.get(url, undefined, timeout).then( (response) => {
-			const status = response.statusCode;
-			switch(status) {
-				case 200:
-					logger.info(`[${url}] -> 200 OK`);
-					return ItineraryDownloader.parseBody(response.body);
-				default:
-					logger.info(`[${url}] -> ${status} ERROR`);
-                    throw response;
-			}
-		});
-	}
+    static fromURL(url, timeout) {
+        let p = Http.get(url, undefined, timeout);
+        p.catch(function (error) {
+            if(error.statusCode===404) logger.error(`[${url}] -> ${error.statusCode} ${error.name}: ${error.statusCode}`);
+            else logger.error(`[${url}] -> ${error.statusCode} ${error.name}: ${error.code}`);
+            return [];
+        });
+        return p.then( (response) => {
+            logger.info(`[${url}] -> 200 OK`);
+            return ItineraryDownloader.parseBody(response.body);
+        });
+    }
 	
     /**
      * Preprocesses the request's output body 
