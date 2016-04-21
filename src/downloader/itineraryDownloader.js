@@ -38,7 +38,9 @@ class ItineraryDownloader {
             error.body = '';
             return error;
         }).then( (response) => {
-            logger.info(`[${url}] -> ${response.statusCode || response.code}`);
+            let msg = `[${url}] -> ${response.statusCode || response.code}`;
+            if(response.statusCode>=400) logger.error(msg);
+            else logger.info(msg);
             return ItineraryDownloader.parseBody(line, response.body);
         });
     }

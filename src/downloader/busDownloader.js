@@ -25,7 +25,9 @@ class BusDownloader {
             error.body = { DATA: [], COLUMNS: [] };
             return error;
         }).then( response => {
-            logger.info(`[${url}] -> ${response.statusCode || response.code}`);
+            let msg = `[${url}] -> ${response.statusCode || response.code}`;
+            if(response.statusCode>=400) logger.error(msg);
+            else logger.info(msg);
             return BusDownloader.parseBody(response.body);
         });
     }
