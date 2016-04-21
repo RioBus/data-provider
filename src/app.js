@@ -40,26 +40,14 @@ function prepareItineraries(itiList) {
 }
 
 function* loadItinerary(line) {
-    var tmpItinerary = itineraries[line];
+    let tmpItinerary = itineraries[line];
     if(!tmpItinerary) {
         logger.alert(`[${line}] Itinerary not found. Downloading...`);
-        try {
-            tmpItinerary = yield ItineraryDownloader.fromLine(line, Config.provider.updateTimeout);
-            logger.info(`[${line}] Saving Itinerary to database...`);
-            yield itineraryDAO.save(tmpItinerary);
-            logger.info(`[${line}] Itinerary saved.`);
-            itineraries[line] = tmpItinerary;
-        } catch(e) {
-            if(e.statusCode===404) 
-                logger.error(`[${line}] Itinerary does not exist.`);
-            else if(e.statusCode===403)
-                logger.error(`[${line}] Access forbidden to the Itinerary data.`);
-            else logger.error(e.stack);
-            
-            tmpItinerary = new Itinerary(line);
-            yield itineraryDAO.save(tmpItinerary);
-            itineraries[line] = tmpItinerary;
-        }
+        tmpItinerary = yield ItineraryDownloader.fromLine(line, Config.provider.updateTimeout);
+        logger.info(`[${line}] Saving Itinerary to database...`);
+        itineraries[line] = tmpItinerary;
+        yield itineraryDAO.save(tmpItinerary);
+        logger.info(`[${line}] Itinerary saved.`);
     }
     return tmpItinerary;
 }
