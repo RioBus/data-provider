@@ -65,9 +65,9 @@ function concatBusList(a, b) {
 function* iteration() {
     logger.info('Downloading bus states...');
     var busList = [];
-    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR', Config.provider.updateTimeout))); } catch(e) { logger.error(`[${getURL('REGULAR')}] -> ${e.statusCode} ERROR`); }
-    try { busList = concatBusList(busList, yield BusDownloader.fromURL(getURL('REGULAR-NEW', Config.provider.updateTimeout))); } catch(e) { logger.error(`[${getURL('REGULAR-NEW')}] -> ${e.statusCode} ERROR`); }
-    try { busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT', Config.provider.updateTimeout))); } catch(e) { logger.error(`[${getURL('BRT')}] -> ${e.statusCode} ERROR`); }
+    busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR', Config.provider.updateTimeout)));
+    busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR-NEW', Config.provider.updateTimeout)));
+    busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT', Config.provider.updateTimeout)));
     
     logger.info(`${busList.length} found. Processing...`);
     
