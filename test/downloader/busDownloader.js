@@ -20,44 +20,32 @@ describe('BusDownloader', () => {
 	});
 	
 	it('should download the current REGULAR buses states', function*() {
-		try {
-			list = yield BusDownloader.fromURL(urlREGULAR);
-			Assert.notEqual(list, undefined);
-			Assert.notEqual(list, null);
-			Assert(list instanceof Array);
-			for (let element of list) {
-				Assert(element instanceof Bus, "Downloaded element should be of type Bus");
-			}
-		} catch (e) {
-			Assert(true);
+		list = yield BusDownloader.fromURL(urlREGULAR);
+		Assert.notEqual(list, undefined);
+		Assert.notEqual(list, null);
+		Assert(list instanceof Array);
+		for (let element of list) {
+			Assert(element instanceof Bus, "Downloaded element should be of type Bus");
 		}
 	});
 	
 	it('should download the current REGULAR-NEW buses states', function*() {
-		try {
-			list = yield BusDownloader.fromURL(urlREGULAR2);
-			Assert.notEqual(list, undefined);
-			Assert.notEqual(list, null);
-			Assert(list instanceof Array);
-			for (let element of list) {
-				Assert(element instanceof Bus, "Downloaded element should be of type Bus");
-			}
-		} catch(e) {
-			Assert(true);
+		list = yield BusDownloader.fromURL(urlREGULAR2);
+		Assert.notEqual(list, undefined);
+		Assert.notEqual(list, null);
+		Assert(list instanceof Array);
+		for (let element of list) {
+			Assert(element instanceof Bus, "Downloaded element should be of type Bus");
 		}
 	});
 	
 	it('should download the current BRT buses states', function*() {
-		try {
-			list = yield BusDownloader.fromURL(urlBRT);
-			Assert.notEqual(list, undefined);
-			Assert.notEqual(list, null);
-			Assert(list instanceof Array);
-			for (let element of list) {
-				Assert(element instanceof Bus, "Downloaded element should be of type Bus");
-			}
-		} catch(e) {
-			Assert(true);
+		list = yield BusDownloader.fromURL(urlBRT);
+		Assert.notEqual(list, undefined);
+		Assert.notEqual(list, null);
+		Assert(list instanceof Array);
+		for (let element of list) {
+			Assert(element instanceof Bus, "Downloaded element should be of type Bus");
 		}
 	});
 });
