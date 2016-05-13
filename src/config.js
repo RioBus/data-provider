@@ -23,7 +23,7 @@ module.exports = {
             itinerary: '/apiTransporte/Apresentacao/csv/gtfs/onibus/percursos/gtfs_linha$$-shapes.csv'
         },
         updateInterval:	5000,
-        updateTimeout: 10000,
+        updateTimeout: 5000,
         log: '/tmp/riobus/log/data-server.log'
     },
     database: {
