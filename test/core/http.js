@@ -7,9 +7,9 @@ const express = require('express');
 
 
 describe('Http', () => {
-	
+
 	let http, server, addr;
-    
+
     before( () => {
         let app = express();
         let port = 3000;
@@ -32,11 +32,9 @@ describe('Http', () => {
 
         server = app.listen(port, () => addr = `http://localhost:${port}` );
     });
-    
-    after( () => {
-        server.close();
-    });
-    
+
+    after(() => server.close());
+
     it(`should read 'success' from the request to '${addr}'`, (done) => {
         Http.get(addr).then( response => {
             Assert.equal(response.statusCode, 200);
@@ -44,7 +42,7 @@ describe('Http', () => {
             done();
         });
     });
-    
+
     it(`should read 'long' from the request to '${addr}/long'`, (done) => {
         Http.get(`${addr}/long`).then( response => {
             Assert.equal(response.statusCode, 200);
@@ -52,12 +50,14 @@ describe('Http', () => {
             done();
         });
     });
-    
+
     it(`should end the request to '${addr}/toolong' when taking more than 5 sec to respond`, (done) => {
         let p = Http.get(`${addr}/toolong`, undefined, 5000);
-        p.catch( response => {
-            Assert.equal(response.error.code, 'ETIMEDOUT');
-            done();
+        p.then(
+            response => Assert(false, 'Request not aborted after 5 seconds.'),
+            error => {
+                Assert.equal(error.code, 'ETIMEDOUT');
+                done();
         });
     });
 });
