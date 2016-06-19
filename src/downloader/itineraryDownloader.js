@@ -34,17 +34,19 @@ class ItineraryDownloader {
      * @return {Promise}
      */
     static fromURL(url, timeout, line) {
-        return Http.get(url, undefined, timeout).catch(function (error) {
-            error.body = '';
-            return error;
-        }).then( (response) => {
+        return Http.get(url, undefined, timeout)
+        .then(response => response, error => error)
+        .then( (response) => {
             let msg = `[${url}] -> ${response.statusCode || response.code}`;
-            if(response.statusCode>=400) logger.error(msg);
-            else logger.info(msg);
+            if(response.statusCode>=400) {
+                logger.error(msg);
+                return ItineraryDownloader.parseBody(line, '');
+            }
+            logger.info(msg);
             return ItineraryDownloader.parseBody(line, response.body);
         });
     }
-	
+
     /**
      * Preprocesses the request's output body 
      * @param {string} lineQuery - Requested line 
