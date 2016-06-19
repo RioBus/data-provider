@@ -1,5 +1,5 @@
 'use strict';
-const request = require('request-promise');
+const request = require('request');
 
 var optionsObj = {
     method: 'GET',
@@ -24,7 +24,12 @@ class Http {
         Object.keys(options).forEach( (key) => {
             data[key] = options[key];
         });
-        return request(data);
+        return new Promise( (resolve, reject) => {
+            request(data, (error, response) => {
+                if (error) reject(error);
+                else resolve(response);
+            });
+        });
     }
 
     /**
