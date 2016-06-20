@@ -1,5 +1,5 @@
 'use strict';
-const Bus     = require('../model/bus');
+const Bus = require('../model/bus');
 const BusUtils = require('../utils/busUtils');
 const Core = require('../core');
 const Http = Core.Http;
@@ -14,7 +14,7 @@ const logger = LoggerFactory.getRuntimeLogger();
  * @class {BusDownloader}
  */
 class BusDownloader {
-	
+
     /**
      * Downloads the data from the URL
      * @param {string} url - External provider service address
@@ -25,12 +25,13 @@ class BusDownloader {
         .then(response => response, error => error)
         .then( response => {
             let msg = `[${url}] -> ${response.statusCode || response.code}`;
-            if(response.statusCode>=400) {
+            if(response.statusCode>=400 || response.code) {
                 logger.error(msg);
                 return BusDownloader.parseBody({ DATA: [], COLUMNS: [] });
             }
             else logger.info(msg);
-            return BusDownloader.parseBody(response.body);
+            let body = response.body || { DATA: [], COLUMNS: [] };
+            return BusDownloader.parseBody(body);
         });
     }
 
@@ -41,7 +42,7 @@ class BusDownloader {
      */
     static parseBody(body) {
         var buses = [];
-        
+
         if (!body.DATA) {
             logger.error(Strings.error.json);
             return buses;
@@ -53,7 +54,7 @@ class BusDownloader {
         var data = body.DATA;
         //let columns = body.COLUMNS;
         // columns: ['DATAHORA', 'ORDEM', 'LINHA', 'LATITUDE', 'LONGITUDE', 'VELOCIDADE', 'DIRECAO']
-        
+
         data.forEach( (d) => {
             var bus = new Bus(d[2], d[1], d[5], d[6], d[3], d[4], d[0]);
             buses.push(bus);
