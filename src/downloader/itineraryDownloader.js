@@ -38,7 +38,7 @@ class ItineraryDownloader {
         .then(response => response, error => error)
         .then( (response) => {
             let msg = `[${url}] -> ${response.statusCode || response.code}`;
-            if(response.statusCode>=400) {
+            if(response.statusCode>=400 || response.code) {
                 logger.error(msg);
                 return ItineraryDownloader.parseBody(line, '');
             }
