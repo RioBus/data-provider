@@ -12,6 +12,7 @@ module.exports = {
         runtime: '/tmp/riobus/log/runtime.log',
         server: '/tmp/riobus/log/server.log'
     },
+    saveLog: process.env.RIOBUS_SAVE_LOG || false,
     provider: {
         host: 'dadosabertos.rio.rj.gov.br',
         path: {
