@@ -64,7 +64,7 @@ class Logger {
 		var text = `[${new Date().toISOString()}] (${level}) ${content}`;
 		if (color) console.log(color(text));
         else console.log(text);
-		this.fs.append(text);
+		if (Config.saveLog) this.fs.append(text);
 	}
 }
 module.exports = Logger;
