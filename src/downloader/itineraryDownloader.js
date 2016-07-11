@@ -36,14 +36,15 @@ class ItineraryDownloader {
     static fromURL(url, timeout, line) {
         return Http.get(url, undefined, timeout)
         .then(response => response, error => error)
-        .then( (response) => {
-            let msg = `[${url}] -> ${response.statusCode || response.code}`;
-            if(response.statusCode>=400 || response.code) {
-                logger.error(msg);
-                return ItineraryDownloader.parseBody(line, '');
+        .then( response => {
+            switch (response.statusCode) {
+                case 200:
+                    logger.info(`[${url}] -> ${response.statusCode}`);
+                    return ItineraryDownloader.parseBody(line, response.body);
+                default:
+                    logger.error(`[${url}] -> ${response.statusCode || response.code}`);
+                    return ItineraryDownloader.parseBody(line, '');
             }
-            logger.info(msg);
-            return ItineraryDownloader.parseBody(line, response.body);
         });
     }
 
