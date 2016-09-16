@@ -35,8 +35,8 @@ class Http {
     /**
      * Makes GET request
      * @param {string} host - Host URL
-     * @param {Object} data - Data to be sent (Optional)
      * @param {Object} headers - Headers to be set (Optional)
+     * @param {number} timeout - Timeout for the request in milliseconds (Optional)
      * @returns {Promise}
      */
     static get(host, headers, timeout) {

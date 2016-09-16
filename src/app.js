@@ -43,7 +43,7 @@ function* loadItinerary(line) {
     let tmpItinerary = itineraries[line];
     if(!tmpItinerary) {
         logger.alert(`[${line}] Itinerary not found. Downloading...`);
-        tmpItinerary = yield ItineraryDownloader.fromLine(line, Config.provider.updateTimeout);
+        tmpItinerary = yield ItineraryDownloader.fromLine(line);
         logger.info(`[${line}] Saving Itinerary to database...`);
         itineraries[line] = tmpItinerary;
         yield itineraryDAO.save(tmpItinerary);
@@ -65,9 +65,9 @@ function concatBusList(a, b) {
 function* iteration() {
     logger.info('Downloading bus states...');
     var busList = [];
-    busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR', Config.provider.updateTimeout)));
-    busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR-NEW', Config.provider.updateTimeout)));
-    busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT', Config.provider.updateTimeout)));
+    busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR')));
+    busList = busList.concat(yield BusDownloader.fromURL(getURL('REGULAR-NEW')));
+    busList = busList.concat(yield BusDownloader.fromURL(getURL('BRT')));
 
     logger.info(`${busList.length} found. Processing...`);
 

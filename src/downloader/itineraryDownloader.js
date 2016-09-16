@@ -1,4 +1,5 @@
 'use strict';
+const Config = require('../config');
 const Core = require('../core');
 const Http = Core.Http;
 const Itinerary = require('../model/itinerary');
@@ -6,7 +7,6 @@ const ItinerarySpot = require('../model/itinerarySpot');
 const LoggerFactory = Core.LoggerFactory;
 const Spot = require('../model/spot');
 const Strings = require('../strings');
-const Config = require('../config');
 
 const logger = LoggerFactory.getRuntimeLogger();
 
@@ -15,16 +15,16 @@ const logger = LoggerFactory.getRuntimeLogger();
  * @class {ItineraryDownloader}
  */
 class ItineraryDownloader {
-	
+
     /**
      * Downloads the data for a given bus line
      * @param {string} line - Bus line
      * @return {Promise}
      */
-	static fromLine(line, timeout) {
+	static fromLine(line) {
 		let urlConfig = Config.provider;
 		var url = `http://${urlConfig.host}${urlConfig.path.itinerary.replace('$$', line)}`;
-		return ItineraryDownloader.fromURL(url, timeout, line);
+		return ItineraryDownloader.fromURL(url, line);
 	}
     
 	
@@ -33,8 +33,8 @@ class ItineraryDownloader {
      * @param {string} url - External provider service address
      * @return {Promise}
      */
-    static fromURL(url, timeout, line) {
-        return Http.get(url, undefined, timeout)
+    static fromURL(url, line) {
+        return Http.get(url, undefined, Config.provider.updateTimeout)
         .then(response => response, error => error)
         .then( response => {
             switch (response.statusCode) {
