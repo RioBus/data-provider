@@ -155,9 +155,10 @@ spawn(function*(){
     logger.info('Loading itineraries...');
     itineraries = prepareItineraries(yield itineraryDAO.getAll());
     logger.info(`Itineraries retrieved: ${Object.keys(itineraries).length}`);
-    spawn(iteration);
-})
-.catch(function(error) {
-    logger.fatal(error.stack);
+    spawn(iteration).catch(onError);
+}).catch(onError);
+
+function onError(err) {
+    logger.fatal(err.stack);
     MainProcess.exit(1);
-});
+}
