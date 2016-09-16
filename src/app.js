@@ -141,7 +141,7 @@ function* iteration() {
         logger.error(e);
     }
 
-    setTimeout(() => { spawn(iteration); }, timeout);
+    setTimeout(() => { spawn(iteration).catch(onError); }, timeout);
 }
 
 spawn(function*(){
