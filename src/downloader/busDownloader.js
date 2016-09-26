@@ -1,6 +1,7 @@
 'use strict';
 const Bus = require('../model/bus');
 const BusUtils = require('../utils/busUtils');
+const Config = require('../config');
 const Core = require('../core');
 const Http = Core.Http;
 const ItineraryDownloader = require('./itineraryDownloader');
@@ -20,8 +21,8 @@ class BusDownloader {
      * @param {string} url - External provider service address
      * @return {Promise}
      */
-    static fromURL(url, timeout) {
-        return Http.get(url, undefined, timeout)
+    static fromURL(url) {
+        return Http.get(url, undefined, Config.provider.updateTimeout)
         .then(response => response, error => error)
         .then( response => {
             switch (response.statusCode) {
